@@ -1,0 +1,12 @@
+TARGET = checkers
+
+OBJS = checkers.o scenegraph-psp.o texture.o
+
+BUILD_PRX=0
+CFLAGS=-g
+EXTRA_TARGETS = EBOOT.PBP
+
+LIBS = -lpspgu -lpspgum -lstdc++ -lpspdebugkb
+
+PSPSDK=$(shell psp-config --pspsdk-path)
+include $(PSPSDK)/lib/build.mak
