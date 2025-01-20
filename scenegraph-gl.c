@@ -7,35 +7,12 @@
 #include "scenegraph.h"
 #include "texture.h"
 
-#include <SDL2/SDL.h>
-
 #include <GL/gl.h>
 #include <GL/glu.h>
-
-static SDL_Window *window;
 
 void
 sg_init(struct scenegraph *scenegraph)
 {
-	void *draw_buffer, *disp_buffer, *depth_buffer;
-	SDL_GLContext context;
-
-	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) == -1) {
-		fprintf(stderr, "Error: %s\n", SDL_GetError());
-		return EXIT_FAILURE;
-	}
-
-	window = SDL_CreateWindow("Hello", SDL_WINDOWPOS_CENTERED,
-				  SDL_WINDOWPOS_CENTERED,
-				  scenegraph->width, scenegraph->height,
-				  SDL_WINDOW_SHOWN|SDL_WINDOW_OPENGL);
-
-	if (!window) {
-		fprintf(stderr, "Error: %s\n", SDL_GetError());
-		return EXIT_FAILURE;
-	}
-
-	context = SDL_GL_CreateContext(window);
 	glEnable(GL_CULL_FACE);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
@@ -72,7 +49,6 @@ sg_render(struct scenegraph *scenegraph)
 	for (int i = 0; i < scenegraph->num_render; i++) {
 		scenegraph->render[i](scenegraph);
 	}
-	SDL_GL_SwapWindow(window);
 }
 
 void
