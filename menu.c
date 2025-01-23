@@ -150,7 +150,7 @@ render_logo(struct scenegraph *scenegraph)
 {
 	struct sg_object obj;
 	obj.color = 0xffffff | alpha<<24;
-	obj.flags = SG_OBJ_2D | SG_OBJ_TEXTURED;
+	obj.flags = SG_OBJ_2D | SG_OBJ_TEXTURED | SG_OBJ_NOLIGHTING;
 	obj.texture = &texture_logo;
 	obj.vertices = logo_verts;
 	obj.num_vertices = sizeof (logo_verts)/(5*sizeof (float));
@@ -183,11 +183,11 @@ void (*menu_render_functions[])(struct scenegraph *) = {
 	render_particles,
 	render_board,
 	render_pieces,
-	//render_logo,
-	//render_buttons
+	render_logo,
+	render_buttons
 };
 
-size_t num_menu_render_functions = 3;
+size_t num_menu_render_functions = 5;
 
 void
 animate(struct scenegraph *scenegraph)
@@ -216,6 +216,28 @@ menu_init(void)
 		button2_verts[i] += 200;
 		button2_verts[i+1] += 140;
 	}
+#ifndef __psp__
+	for (int i = 0; i < 30; i += 5) {
+		logo_verts[i] /= 256.0;
+		logo_verts[i+1] /= 128.0;
+		logo_verts[i+2] /= 240.0;
+		logo_verts[i+2] -= 1;
+		logo_verts[i+3] /= -136.0;
+		logo_verts[i+3] += 1;
+		button1_verts[i] /= 128.0;
+		button1_verts[i+1] /= 64.0;
+		button1_verts[i+2] /= 240.0;
+		button1_verts[i+2] -= 1;
+		button1_verts[i+3] /= -136.0;
+		button1_verts[i+3] += 1;
+		button2_verts[i] /= 128.0;
+		button2_verts[i+1] /= 64.0;
+		button2_verts[i+2] /= 240.0;
+		button2_verts[i+2] -= 1;
+		button2_verts[i+3] /= -136.0;
+		button2_verts[i+3] += 1;
+	}
+#endif
 	texture_init_from_file(&texture_logo, 256, 128,
 			       "assets/textures/logo");
 	texture_init_from_file(&texture_button1, 128, 64,
