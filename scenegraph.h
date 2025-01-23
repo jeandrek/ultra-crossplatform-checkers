@@ -16,6 +16,7 @@ struct scenegraph {
 
 #define SG_OBJ_NOLIGHTING	1<<0
 #define SG_OBJ_TEXTURED		1<<1
+#define SG_OBJ_2D		1<<2
 
 struct sg_object {
 	uint32_t	color;

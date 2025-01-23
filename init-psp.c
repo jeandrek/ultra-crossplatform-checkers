@@ -28,6 +28,7 @@ callback_thread(SceSize args, void *arg)
 	sceKernelSleepThreadCB();
 }
 
+void animate(struct scenegraph *);
 int
 main(void)
 {
@@ -41,5 +42,6 @@ main(void)
 
 	for (;;) {
 		sg_render(&scenegraph);
+		animate(&scenegraph);
 	}
 }

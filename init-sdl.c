@@ -12,6 +12,7 @@
 
 static SDL_Window *window;
 
+void animate(struct scenegraph *);
 int
 main(void)
 {
@@ -50,15 +51,15 @@ main(void)
 				goto quit;
 			}
 		}
-		// Run at as close to 40 FPS as possible
-		if (SDL_GetTicks() - ticks >= 25) {
+		// Run at as close to 60 FPS as possible
+		if (SDL_GetTicks() - ticks >= 16) {
 			sg_render(&scenegraph);
+			animate(&scenegraph);
+			SDL_GL_SwapWindow(window);
 			ticks = SDL_GetTicks();
 		} else {
-			SDL_Delay(5); // Idle
+			SDL_Delay(2); // Idle
 		}
-		sg_render(&scenegraph);
-		SDL_GL_SwapWindow(window);
 	}
 quit:
 }
