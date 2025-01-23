@@ -13,36 +13,7 @@ struct texture texture_logo;
 struct texture texture_button1;
 struct texture texture_button2;
 
-/* float __attribute__((aligned(16))) particle_verts[] = { */
-/* 	0, 0, 0, */
-/* 	0, 3, 0, */
-/* 	3, 0, 0, */
-/* 	3, 0, 0, */
-/* 	0, 3, 0, */
-/* 	3, 3, 0 */
-/* }; */
-float __attribute__((aligned(16))) particle_verts[] = {
-	0, 0, 1,
-	0, 0, 0,
-	0, 0, 1,
-	0.05, 0, 0,
-	0, 0, 1,
-	0, 0.05, 0,
-	0, 0, 1,
-	0.05, 0, 0,
-	0, 0, 1,
-	0.05, 0.05, 0,
-	0, 0, 1,
-	0, 0.05, 0
-};
-float __attribute__((aligned(16))) particle_verts1[] = {
-	0, 0, 0,
-	0, 5, 0,
-	5, 0, 0,
-	5, 0, 0,
-	0, 5, 0,
-	5, 5, 0
-};
+static uint64_t board[2] = {0x55aa55, 0xaa55aa0000000000};
 
 static float __attribute__((aligned(16))) logo_verts[] = {
 	0, 0,
@@ -90,63 +61,7 @@ static float __attribute__((aligned(16))) button2_verts[] = {
 int alpha = 0;
 
 void
-render_particles(struct scenegraph *scenegraph)
-{
-	struct sg_object obj;
-	static int t = 0;
-	static int a = 255;//rand()%127 + 126;
-	obj.color=0xffff0000;
-	obj.flags = SG_OBJ_NOLIGHTING;
-	obj.vertices = particle_verts;
-	obj.num_vertices = sizeof (particle_verts)/(6*sizeof (float));
-	t++;
-	for (int i = 0; i < 300; i++) {
-		obj.y = 0;
-		obj.z = 3 - i/25.0;
-		obj.x = sin(6*obj.z + t/2.0);
-		sg_render_object(scenegraph, &obj);
-	}
-#if 0
-	struct sg_object obj;
-	static int t = 0;
-	static int a = 255;//rand()%127 + 126;
-	obj.flags = SG_OBJ_2D;
-	obj.vertices = particle_verts1;
-	obj.num_vertices = sizeof (particle_verts)/(3*sizeof (float));
-	obj.x = 0;
-	obj.y = 0;
-	obj.z = 0;
-	t++;
-	if (t > 80) {
-		if (a > 3)
-			a -= 6;
-		else a = 0;
-	}
-	for (int i = 0; i < 100; i++) {
-		int p = rand()%10;
-		/* if (p == 0) */
-		/* 	obj.color = 0xff0000|a<<24; */
-		/* else if (p == 1) */
-		/* 	obj.color = 0xffffff|a<<24; */
-		/* else */ if (p == 2)
-			obj.color = 0x0099ff| a << 24;
-		else
-			obj.color = 0x0000ff|a<<24;
-		float r = t<80 ? t/80.0 : 1;
-		float b = (rand() % 512) * 2*M_PI/512;
-		int x = r*180*cos(b) + 480/2 + rand()%10 - 5;
-		int y = r*130*sin(b) + 272/2 + rand()%10 - 5;
-		for (int j = 0; j < 18; j+=3) {
-			particle_verts1[j] = particle_verts[j] + x;
-			particle_verts1[j+1] = particle_verts[j+1] + y;
-		}
-		sg_render_object(scenegraph, &obj);
-	}
-#endif
-}
-
-void
-render_logo(struct scenegraph *scenegraph)
+menu_render_logo(struct scenegraph *scenegraph)
 {
 	struct sg_object obj;
 	obj.color = 0xffffff | alpha<<24;
@@ -161,7 +76,7 @@ render_logo(struct scenegraph *scenegraph)
 }
 int selected_button = 0;
 void
-render_buttons(struct scenegraph *scenegraph)
+menu_render_buttons(struct scenegraph *scenegraph)
 {
 	struct sg_object obj;
 	obj.color = (selected_button == 0 ? 0xffffff : 0xaaaaaa) | alpha<<24;
@@ -179,29 +94,68 @@ render_buttons(struct scenegraph *scenegraph)
 	sg_render_object(scenegraph, &obj);
 }
 
-void (*menu_render_functions[])(struct scenegraph *) = {
-	render_particles,
-	render_board,
-	render_pieces,
-	render_logo,
-	render_buttons
-};
-
-size_t num_menu_render_functions = 5;
 
 void
-animate(struct scenegraph *scenegraph)
+menu_render_pieces(struct scenegraph *scenegraph)
 {
-	static int i = 0;
-	if (i < 77) {
-		scenegraph->cam_z -= 0.25;
-		scenegraph->cam_dir_vert -= M_PI/4/80;
-		i++;
-	} else if (i < 120) i++;
-	else if (alpha < 0xff) {
-		alpha += 3;
+	static int t = 0;
+	static int waiting = 0;
+	int num = 0;
+	int speed = 7;
+	if (waiting == 0 && t < 80+12*speed) t++;
+	else if (waiting < 200) waiting++;
+	else if (t > 0) t--;
+	else waiting = 0;
+
+	for (int i = 0; i < 64; i++) {
+		if ((board[0] >> i) & 1) {
+			float x0 = -0.875;
+			float y0 = 0.13 + 0.07*(11 - num);
+			float z0 = 0;
+			float x1 = -0.875 + 0.25*(i % 8);
+			float y1 = 0.13;
+			float z1 = -(-0.875 + 0.25*(i / 8));
+			int t_thres = 80 + speed*num;
+			float fac = (t < t_thres ? 0 : (t > t_thres + speed ? 1 : (t - t_thres)/(float)speed));
+			render_piece(scenegraph,
+				     (1 - fac)*x0 + fac*x1,
+				     (1 - fac)*y0 + fac*y1,
+				     (1 - fac)*z0 + fac*z1,
+				     0xff0000ff);
+			num++;
+		}
+	}
+
+	num=0;
+	for (int i = 0; i < 64; i++) {
+		if ((board[1] >> i) & 1) {
+			float x0 = 0.875;
+			float y0 = 0.13 + 0.07*(11 - num);
+			float z0 = 0;
+			float x1 = -0.875 + 0.25*(i % 8);
+			float y1 = 0.13;
+			float z1 = -(-0.875 + 0.25*(i / 8));
+			int t_thres = 80 + speed*num;
+			float fac = (t < t_thres ? 0 : (t > t_thres + speed ? 1 : (t - t_thres)/(float)speed));
+			render_piece(scenegraph,
+				     (1 - fac)*x0 + fac*x1,
+				     (1 - fac)*y0 + fac*y1,
+				     (1 - fac)*z0 + fac*z1,
+				     0xff4d4d4d);
+			num++;
+		}
 	}
 }
+
+void (*menu_render_functions[])(struct scenegraph *) = {
+	render_board,
+	menu_render_pieces,
+	menu_render_logo,
+	menu_render_buttons
+};
+
+size_t num_menu_render_functions = 4;
+
 
 void
 menu_init(void)

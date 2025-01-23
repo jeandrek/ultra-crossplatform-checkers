@@ -12,7 +12,7 @@
 
 struct texture texture_board;
 
-uint64_t board[2] = {0x55aa55, 0xaa55aa0000000000};
+static uint64_t board[2] = {0x55aa55, 0xaa55aa0000000000};
 
 void
 render_board(struct scenegraph *scenegraph)
@@ -35,58 +35,38 @@ render_highlight(struct scenegraph *scenegraph)
 }
 
 void
-render_pieces(struct scenegraph *scenegraph)
+render_piece(struct scenegraph *scenegraph, float x, float y, float z,
+	     uint32_t color)
 {
 	struct sg_object obj;
-	static int t = 0;
-	static int waiting = 0;
-	int num = 0;
 	obj.flags = 0;
+	obj.color = color;
 	obj.vertices = oct_verts;
 	obj.num_vertices = 96;
-	obj.y = 0.13;
-	int speed = 7;
-	if (waiting == 0 && t < 80+12*speed) t++;
-	else if (waiting < 200) waiting++;
-	else if (t > 0) t--;
-	else waiting = 0;
+	obj.x = x;
+	obj.y = y;
+	obj.z = z;
+	sg_render_object(scenegraph, &obj);
+}
 
-	obj.color = 0xff0000ff;
+void
+render_pieces(struct scenegraph *scenegraph)
+{
 	for (int i = 0; i < 64; i++) {
 		if ((board[0] >> i) & 1) {
-			float x0 = -0.875;
-			float y0 = 0.13 + 0.07*(11 - num);
-			float z0 = 0;
-			float x1 = -0.875 + 0.25*(i % 8);
-			float y1 = 0.13;
-			float z1 = -(-0.875 + 0.25*(i / 8));
-			int t_thres = 80 + speed*num;
-			float fac = (t < t_thres ? 0 : (t > t_thres + speed ? 1 : (t - t_thres)/(float)speed));
-			obj.x = (1 - fac)*x0 + fac*x1;
-			obj.y = (1 - fac)*y0 + fac*y1;
-			obj.z = (1 - fac)*z0 + fac*z1;
-			sg_render_object(scenegraph, &obj);
-			num++;
+			render_piece(scenegraph,
+				     -0.875 + 0.25*(i % 8),
+				     0.13, -(-0.875 + 0.25*(i / 8)),
+				     0xff0000ff);
 		}
 	}
 
-	num=0;
-	obj.color = 0xff4d4d4d;
 	for (int i = 0; i < 64; i++) {
 		if ((board[1] >> i) & 1) {
-			float x0 = 0.875;
-			float y0 = 0.13 + 0.07*(11 - num);
-			float z0 = 0;
-			float x1 = -0.875 + 0.25*(i % 8);
-			float y1 = 0.13;
-			float z1 = -(-0.875 + 0.25*(i / 8));
-			int t_thres = 80 + speed*num;
-			float fac = (t < t_thres ? 0 : (t > t_thres + speed ? 1 : (t - t_thres)/(float)speed));
-			obj.x = (1 - fac)*x0 + fac*x1;
-			obj.y = (1 - fac)*y0 + fac*y1;
-			obj.z = (1 - fac)*z0 + fac*z1;
-			sg_render_object(scenegraph, &obj);
-			num++;
+			render_piece(scenegraph,
+				     -0.875 + 0.25*(i % 8),
+				     0.13, -(-0.875 + 0.25*(i / 8)),
+				     0xff4d4d4d);
 		}
 	}
 }
@@ -111,9 +91,9 @@ checkers_init(struct scenegraph *scenegraph, int width, int height)
 	scenegraph->far_plane = 24;
 	scenegraph->cam_x = 0;
 	scenegraph->cam_y = 1.5;
-	scenegraph->cam_z = 21.5;
+	scenegraph->cam_z = 1.5;
 	scenegraph->cam_dir_horiz = 0;
-	scenegraph->cam_dir_vert = 0;//-M_PI/4;
+	scenegraph->cam_dir_vert = -M_PI/4;
 	scenegraph->light0_enabled = 1;
 	scenegraph->light0_x = 0;
 	scenegraph->light0_y = 2;

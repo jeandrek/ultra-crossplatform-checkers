@@ -56,7 +56,6 @@ sg_render(struct scenegraph *scenegraph)
 void
 sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 {
-	glDisable(GL_CULL_FACE);
 	if (obj->flags & SG_OBJ_NOLIGHTING)	glDisable(GL_LIGHTING);
 	if (obj->flags & SG_OBJ_TEXTURED) {
 		glEnable(GL_TEXTURE_2D);

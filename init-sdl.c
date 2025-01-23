@@ -12,7 +12,6 @@
 
 static SDL_Window *window;
 
-void animate(struct scenegraph *);
 int
 main(void)
 {
@@ -54,7 +53,6 @@ main(void)
 		// Run at as close to 60 FPS as possible
 		if (SDL_GetTicks() - ticks >= 16) {
 			sg_render(&scenegraph);
-			animate(&scenegraph);
 			SDL_GL_SwapWindow(window);
 			ticks = SDL_GetTicks();
 		} else {
