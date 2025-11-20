@@ -104,6 +104,7 @@ checkers_init(struct scenegraph *scenegraph, int width, int height)
 
 	texture_init_from_file(&texture_board, 128, 128,
 			       "assets/textures/board");
+	menu_load(scenegraph);
 	menu_init(scenegraph);
 }
 

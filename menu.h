@@ -3,6 +3,7 @@
 
 struct scenegraph;
 
+void menu_load(struct scenegraph *scenegraph);
 void menu_init(struct scenegraph *scenegraph);
 void menu_update(struct scenegraph *scenegraph);
 

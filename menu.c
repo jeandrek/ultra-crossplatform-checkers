@@ -44,7 +44,6 @@ static float __attribute__((aligned(16))) button2_verts[] = {
 };
 
 int selected_button = 0;
-int firsttime = 1;
 
 void
 menu_render_buttons(struct scenegraph *scenegraph)
@@ -72,10 +71,8 @@ size_t num_menu_render_functions = 1;
 
 
 void
-menu_init(struct scenegraph *scenegraph)
+menu_load(struct scenegraph *scenegraph)
 {
-	if (!firsttime) goto hack;	/* XXX */
-
 	for (int i = 2; i < 30; i += 5) {
 		button1_verts[i] += 202;
 		button1_verts[i+1] += 100;
@@ -101,9 +98,11 @@ menu_init(struct scenegraph *scenegraph)
 #endif
 	texture_init_from_file(&texture_menu_ss, 512, 256,
 			       "assets/textures/menu-ss");
-	firsttime = 0;
-hack:
+}
 
+void
+menu_init(struct scenegraph *scenegraph)
+{
 	scenegraph->num_render = num_menu_render_functions;
 	scenegraph->render = menu_render_functions;
 }
