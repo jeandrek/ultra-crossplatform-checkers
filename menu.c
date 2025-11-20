@@ -9,77 +9,48 @@
 #include "scenegraph.h"
 #include "texture.h"
 
-struct texture texture_logo;
-struct texture texture_button1;
-struct texture texture_button2;
+struct texture texture_menu_ss;
 
 static uint64_t board[2] = {0x55aa55, 0xaa55aa0000000000};
 
-static float __attribute__((aligned(16))) logo_verts[] = {
-	0, 0,
-	0, 0, 0,
-	0, 128,
-	0, 50, 0,
-	256, 0,
-	100, 0, 0,
-	256, 0,
-	100, 0, 0,
-	0, 128,
-	0, 50, 0,
-	256, 128,
-	100, 50, 0
-};
 static float __attribute__((aligned(16))) button1_verts[] = {
 	0, 0,
 	0, 0, 0,
-	0, 64,
+	0, 50,
 	0, 30, 0,
-	128, 0,
+	150, 0,
 	60, 0, 0,
-	128, 0,
+	150, 0,
 	60, 0, 0,
-	0, 64,
+	0, 50,
 	0, 30, 0,
-	128, 64,
+	150, 50,
 	60, 30, 0
 };
 static float __attribute__((aligned(16))) button2_verts[] = {
-	0, 0,
+	0, 50,
 	0, 0, 0,
-	0, 64,
+	0, 100,
 	0, 30, 0,
-	128, 0,
+	150, 50,
 	60, 0, 0,
-	128, 0,
+	150, 50,
 	60, 0, 0,
-	0, 64,
+	0, 100,
 	0, 30, 0,
-	128, 64,
+	150, 100,
 	60, 30, 0
 };
 
-void
-menu_render_logo(struct scenegraph *scenegraph)
-{
-	struct sg_object obj;
-	obj.color = ~0;
-	obj.flags = SG_OBJ_2D | SG_OBJ_TEXTURED | SG_OBJ_NOLIGHTING;
-	obj.texture = &texture_logo;
-	obj.vertices = logo_verts;
-	obj.num_vertices = sizeof (logo_verts)/(5*sizeof (float));
-	obj.x = 0;
-	obj.y = 0;
-	obj.z = 0;
-	sg_render_object(scenegraph, &obj);
-}
 int selected_button = 0;
+
 void
 menu_render_buttons(struct scenegraph *scenegraph)
 {
 	struct sg_object obj;
 	obj.color = (selected_button == 0 ? ~0 : 0xffaaaaaa);
 	obj.flags = SG_OBJ_2D | SG_OBJ_TEXTURED;
-	obj.texture = &texture_button1;
+	obj.texture = &texture_menu_ss;
 	obj.vertices = button1_verts;
 	obj.num_vertices = sizeof (button1_verts)/(5*sizeof (float));
 	obj.x = 0;
@@ -87,11 +58,9 @@ menu_render_buttons(struct scenegraph *scenegraph)
 	obj.z = 0;
 	sg_render_object(scenegraph, &obj);
 	obj.color = (selected_button == 1 ? ~0 : 0xffaaaaaa);
-	obj.texture = &texture_button2;
 	obj.vertices = button2_verts;
 	sg_render_object(scenegraph, &obj);
 }
-
 
 void
 menu_render_pieces(struct scenegraph *scenegraph)
@@ -148,20 +117,16 @@ menu_render_pieces(struct scenegraph *scenegraph)
 void (*menu_render_functions[])(struct scenegraph *) = {
 	render_board,
 	menu_render_pieces,
-	menu_render_logo,
 	menu_render_buttons
 };
 
-size_t num_menu_render_functions = 4;
+size_t num_menu_render_functions = 3;
 
 
 void
 menu_init(void)
 {
 	for (int i = 2; i < 30; i += 5) {
-		logo_verts[i] += 180;
-		logo_verts[i+1] += 40;
-
 		button1_verts[i] += 200;
 		button1_verts[i+1] += 100;
 
@@ -170,30 +135,20 @@ menu_init(void)
 	}
 #ifndef __psp__
 	for (int i = 0; i < 30; i += 5) {
-		logo_verts[i] /= 256.0;
-		logo_verts[i+1] /= 128.0;
-		logo_verts[i+2] /= 240.0;
-		logo_verts[i+2] -= 1;
-		logo_verts[i+3] /= -136.0;
-		logo_verts[i+3] += 1;
-		button1_verts[i] /= 128.0;
-		button1_verts[i+1] /= 64.0;
+		button1_verts[i] /= 512.0;
+		button1_verts[i+1] /= 256.0;
 		button1_verts[i+2] /= 240.0;
 		button1_verts[i+2] -= 1;
 		button1_verts[i+3] /= -136.0;
 		button1_verts[i+3] += 1;
-		button2_verts[i] /= 128.0;
-		button2_verts[i+1] /= 64.0;
+		button2_verts[i] /= 512.0;
+		button2_verts[i+1] /= 256.0;
 		button2_verts[i+2] /= 240.0;
 		button2_verts[i+2] -= 1;
 		button2_verts[i+3] /= -136.0;
 		button2_verts[i+3] += 1;
 	}
 #endif
-	texture_init_from_file(&texture_logo, 256, 128,
-			       "assets/textures/logo");
-	texture_init_from_file(&texture_button1, 128, 64,
-			       "assets/textures/menu1");
-	texture_init_from_file(&texture_button2, 128, 64,
-			       "assets/textures/menu2");
+	texture_init_from_file(&texture_menu_ss, 512, 256,
+			       "assets/textures/menu-ss");
 }

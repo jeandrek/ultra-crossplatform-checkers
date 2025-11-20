@@ -31,4 +31,10 @@ void	sg_init(struct scenegraph *scenegraph);
 void	sg_render(struct scenegraph *scenegraph);
 void	sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj);
 
+#ifdef __psp__
+#define TEXCOORD(x, l) x
+#else
+#define TEXCOORD(x, l) x/(float)l
+#endif
+
 #endif /* !_SCENEGRAPH_H_ */
