@@ -58,13 +58,11 @@ static float __attribute__((aligned(16))) button2_verts[] = {
 	60, 30, 0
 };
 
-int alpha = 0;
-
 void
 menu_render_logo(struct scenegraph *scenegraph)
 {
 	struct sg_object obj;
-	obj.color = 0xffffff | alpha<<24;
+	obj.color = ~0;
 	obj.flags = SG_OBJ_2D | SG_OBJ_TEXTURED | SG_OBJ_NOLIGHTING;
 	obj.texture = &texture_logo;
 	obj.vertices = logo_verts;
@@ -79,7 +77,7 @@ void
 menu_render_buttons(struct scenegraph *scenegraph)
 {
 	struct sg_object obj;
-	obj.color = (selected_button == 0 ? 0xffffff : 0xaaaaaa) | alpha<<24;
+	obj.color = (selected_button == 0 ? ~0 : 0xffaaaaaa);
 	obj.flags = SG_OBJ_2D | SG_OBJ_TEXTURED;
 	obj.texture = &texture_button1;
 	obj.vertices = button1_verts;
@@ -88,7 +86,7 @@ menu_render_buttons(struct scenegraph *scenegraph)
 	obj.y = 0;
 	obj.z = 0;
 	sg_render_object(scenegraph, &obj);
-	obj.color = (selected_button == 1 ? 0xffffff : 0xaaaaaa) | alpha<<24;
+	obj.color = (selected_button == 1 ? ~0 : 0xffaaaaaa);
 	obj.texture = &texture_button2;
 	obj.vertices = button2_verts;
 	sg_render_object(scenegraph, &obj);
