@@ -9,10 +9,12 @@
 #include "scenegraph.h"
 #include "texture.h"
 #include "models.h"
+#include "input.h"
 
 struct texture texture_board;
 
 static uint64_t board[2] = {0x55aa55, 0xaa55aa0000000000};
+int menu = 1;
 
 void
 render_board(struct scenegraph *scenegraph)
@@ -80,10 +82,8 @@ void (*render_functions[])(struct scenegraph *) = {
 void
 checkers_init(struct scenegraph *scenegraph, int width, int height)
 {
-	scenegraph->num_render = num_menu_render_functions;
-	scenegraph->render = menu_render_functions;
-	/* scenegraph->num_render = 3; */
-	/* scenegraph->render = render_functions; */
+	scenegraph->num_render = 3;
+	scenegraph->render = render_functions;
 	scenegraph->width = width;
 	scenegraph->height = height;
 	scenegraph->fov = 70.0;
@@ -104,5 +104,26 @@ checkers_init(struct scenegraph *scenegraph, int width, int height)
 
 	texture_init_from_file(&texture_board, 128, 128,
 			       "assets/textures/board");
-	menu_init();
+	menu_init(scenegraph);
+}
+
+void
+newgame(struct scenegraph *scenegraph)		/* XXX */
+{
+	menu = 0;
+	scenegraph->num_render = 3;
+	scenegraph->render = render_functions;
+}
+
+void
+checkers_update(struct scenegraph *scenegraph)
+{
+	if (menu) {
+		menu_update(scenegraph);
+	} else {
+		if (input_read() == 4) {
+			menu = 1;
+			menu_init(scenegraph);
+		}
+	}
 }

@@ -1,6 +1,6 @@
 TARGET = checkers
 
-OBJS = checkers.o init-psp.o menu.o scenegraph-psp.o texture.o
+OBJS = checkers.o init-psp.o menu.o scenegraph-psp.o texture.o input.o
 
 BUILD_PRX=0
 CFLAGS=-g

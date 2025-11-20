@@ -52,6 +52,7 @@ main(void)
 		}
 		// Run at as close to 60 FPS as possible
 		if (SDL_GetTicks() - ticks >= 16) {
+			checkers_update(&scenegraph);
 			sg_render(&scenegraph);
 			SDL_GL_SwapWindow(window);
 			ticks = SDL_GetTicks();

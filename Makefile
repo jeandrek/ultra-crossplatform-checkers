@@ -1,5 +1,5 @@
 PROGRAM=checkers
-OBJECTS=checkers.o menu.o init-sdl.o scenegraph-gl.o texture.o
+OBJECTS=checkers.o menu.o init-sdl.o scenegraph-gl.o texture.o input.o
 LDFLAGS=-lSDL2 -lGL -lGLU -lm
 CFLAGS=	-Wall -W -O2
 

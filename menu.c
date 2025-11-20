@@ -8,6 +8,7 @@
 #include "menu.h"
 #include "scenegraph.h"
 #include "texture.h"
+#include "input.h"
 
 struct texture texture_menu_ss;
 
@@ -43,6 +44,7 @@ static float __attribute__((aligned(16))) button2_verts[] = {
 };
 
 int selected_button = 0;
+int firsttime = 1;
 
 void
 menu_render_buttons(struct scenegraph *scenegraph)
@@ -62,61 +64,7 @@ menu_render_buttons(struct scenegraph *scenegraph)
 	sg_render_object(scenegraph, &obj);
 }
 
-void
-menu_render_pieces(struct scenegraph *scenegraph)
-{
-	static int t = 0;
-	static int waiting = 0;
-	int num = 0;
-	int speed = 7;
-	if (waiting == 0 && t < 80+12*speed) t++;
-	else if (waiting < 200) waiting++;
-	else if (t > 0) t--;
-	else waiting = 0;
-
-	for (int i = 0; i < 64; i++) {
-		if ((board[0] >> i) & 1) {
-			float x0 = -0.875;
-			float y0 = 0.13 + 0.07*(11 - num);
-			float z0 = 0;
-			float x1 = -0.875 + 0.25*(i % 8);
-			float y1 = 0.13;
-			float z1 = -(-0.875 + 0.25*(i / 8));
-			int t_thres = 80 + speed*num;
-			float fac = (t < t_thres ? 0 : (t > t_thres + speed ? 1 : (t - t_thres)/(float)speed));
-			render_piece(scenegraph,
-				     (1 - fac)*x0 + fac*x1,
-				     (1 - fac)*y0 + fac*y1,
-				     (1 - fac)*z0 + fac*z1,
-				     0xff0000ff);
-			num++;
-		}
-	}
-
-	num=0;
-	for (int i = 0; i < 64; i++) {
-		if ((board[1] >> i) & 1) {
-			float x0 = 0.875;
-			float y0 = 0.13 + 0.07*(11 - num);
-			float z0 = 0;
-			float x1 = -0.875 + 0.25*(i % 8);
-			float y1 = 0.13;
-			float z1 = -(-0.875 + 0.25*(i / 8));
-			int t_thres = 80 + speed*num;
-			float fac = (t < t_thres ? 0 : (t > t_thres + speed ? 1 : (t - t_thres)/(float)speed));
-			render_piece(scenegraph,
-				     (1 - fac)*x0 + fac*x1,
-				     (1 - fac)*y0 + fac*y1,
-				     (1 - fac)*z0 + fac*z1,
-				     0xff4d4d4d);
-			num++;
-		}
-	}
-}
-
 void (*menu_render_functions[])(struct scenegraph *) = {
-	//render_board,
-	//menu_render_pieces,
 	menu_render_buttons
 };
 
@@ -124,8 +72,10 @@ size_t num_menu_render_functions = 1;
 
 
 void
-menu_init(void)
+menu_init(struct scenegraph *scenegraph)
 {
+	if (!firsttime) goto hack;	/* XXX */
+
 	for (int i = 2; i < 30; i += 5) {
 		button1_verts[i] += 202;
 		button1_verts[i+1] += 100;
@@ -151,4 +101,24 @@ menu_init(void)
 #endif
 	texture_init_from_file(&texture_menu_ss, 512, 256,
 			       "assets/textures/menu-ss");
+	firsttime = 0;
+hack:
+
+	scenegraph->num_render = num_menu_render_functions;
+	scenegraph->render = menu_render_functions;
+}
+
+void
+menu_update(struct scenegraph *scenegraph)
+{
+	switch (input_read()) {
+	case 1:
+	case 2:
+		selected_button = !selected_button;
+		break;
+	case 3:
+		newgame(scenegraph);
+		break;
+	default:
+	}
 }
