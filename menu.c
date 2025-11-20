@@ -17,29 +17,29 @@ static float __attribute__((aligned(16))) button1_verts[] = {
 	0, 0,
 	0, 0, 0,
 	0, 50,
-	0, 30, 0,
+	0, 50, 0,
 	150, 0,
-	60, 0, 0,
+	150, 0, 0,
 	150, 0,
-	60, 0, 0,
+	150, 0, 0,
 	0, 50,
-	0, 30, 0,
+	0, 50, 0,
 	150, 50,
-	60, 30, 0
+	150, 50, 0
 };
 static float __attribute__((aligned(16))) button2_verts[] = {
 	0, 50,
 	0, 0, 0,
 	0, 100,
-	0, 30, 0,
+	0, 50, 0,
 	150, 50,
-	60, 0, 0,
+	150, 0, 0,
 	150, 50,
-	60, 0, 0,
+	150, 0, 0,
 	0, 100,
-	0, 30, 0,
+	0, 50, 0,
 	150, 100,
-	60, 30, 0
+	150, 50, 0
 };
 
 int selected_button = 0;
@@ -49,7 +49,7 @@ menu_render_buttons(struct scenegraph *scenegraph)
 {
 	struct sg_object obj;
 	obj.color = (selected_button == 0 ? ~0 : 0xffaaaaaa);
-	obj.flags = SG_OBJ_2D | SG_OBJ_TEXTURED;
+	obj.flags = SG_OBJ_2D | SG_OBJ_TEXTURED | SG_OBJ_NOLIGHTING;
 	obj.texture = &texture_menu_ss;
 	obj.vertices = button1_verts;
 	obj.num_vertices = sizeof (button1_verts)/(5*sizeof (float));
@@ -115,23 +115,23 @@ menu_render_pieces(struct scenegraph *scenegraph)
 }
 
 void (*menu_render_functions[])(struct scenegraph *) = {
-	render_board,
-	menu_render_pieces,
+	//render_board,
+	//menu_render_pieces,
 	menu_render_buttons
 };
 
-size_t num_menu_render_functions = 3;
+size_t num_menu_render_functions = 1;
 
 
 void
 menu_init(void)
 {
 	for (int i = 2; i < 30; i += 5) {
-		button1_verts[i] += 200;
-		button1_verts[i+1] += 100;
+		button1_verts[i] += 150;
+		button1_verts[i+1] += 75;
 
-		button2_verts[i] += 200;
-		button2_verts[i+1] += 140;
+		button2_verts[i] += 150;
+		button2_verts[i+1] += 150;
 	}
 #ifndef __psp__
 	for (int i = 0; i < 30; i += 5) {
