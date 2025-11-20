@@ -16,30 +16,30 @@ static uint64_t board[2] = {0x55aa55, 0xaa55aa0000000000};
 static float __attribute__((aligned(16))) button1_verts[] = {
 	0, 0,
 	0, 0, 0,
-	0, 50,
-	0, 50, 0,
-	150, 0,
-	150, 0, 0,
-	150, 0,
-	150, 0, 0,
-	0, 50,
-	0, 50, 0,
-	150, 50,
-	150, 50, 0
+	0, 25,
+	0, 25, 0,
+	75, 0,
+	75, 0, 0,
+	75, 0,
+	75, 0, 0,
+	0, 25,
+	0, 25, 0,
+	75, 25,
+	75, 25, 0
 };
 static float __attribute__((aligned(16))) button2_verts[] = {
-	0, 50,
+	0, 25,
 	0, 0, 0,
-	0, 100,
-	0, 50, 0,
-	150, 50,
-	150, 0, 0,
-	150, 50,
-	150, 0, 0,
-	0, 100,
-	0, 50, 0,
-	150, 100,
-	150, 50, 0
+	0, 50,
+	0, 25, 0,
+	75, 25,
+	75, 0, 0,
+	75, 25,
+	75, 0, 0,
+	0, 50,
+	0, 25, 0,
+	75, 50,
+	75, 25, 0
 };
 
 int selected_button = 0;
@@ -127,10 +127,10 @@ void
 menu_init(void)
 {
 	for (int i = 2; i < 30; i += 5) {
-		button1_verts[i] += 150;
-		button1_verts[i+1] += 75;
+		button1_verts[i] += 202;
+		button1_verts[i+1] += 100;
 
-		button2_verts[i] += 150;
+		button2_verts[i] += 202;
 		button2_verts[i+1] += 150;
 	}
 #ifndef __psp__

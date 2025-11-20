@@ -27,7 +27,7 @@ main(void)
 
 	window = SDL_CreateWindow("Hello", SDL_WINDOWPOS_CENTERED,
 				  SDL_WINDOWPOS_CENTERED,
-				  1280, 720,
+				  800, 500,
 				  SDL_WINDOW_SHOWN|SDL_WINDOW_OPENGL);
 
 	if (!window) {
@@ -37,7 +37,7 @@ main(void)
 
 	context = SDL_GL_CreateContext(window);
 
-	checkers_init(&scenegraph, 1280, 720);
+	checkers_init(&scenegraph, 800, 500);
 
 	for (;;) {
 		if (SDL_PollEvent(&ev)) {
