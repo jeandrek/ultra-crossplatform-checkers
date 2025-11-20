@@ -105,13 +105,19 @@ sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 	};
 
 	if (obj->flags & SG_OBJ_NOLIGHTING)	sceGuDisable(GU_LIGHTING);
-	vert_type = GU_VERTEX_32BITF | GU_NORMAL_32BITF | GU_TRANSFORM_3D;
+	vert_type = GU_VERTEX_32BITF;
+	if (obj->flags & SG_OBJ_2D) {
+		sceGuDisable(GU_DEPTH_TEST);
+		vert_type |= GU_TRANSFORM_2D;
+	} else {
+		vert_type |= GU_NORMAL_32BITF | GU_TRANSFORM_3D;
+	}
 	if (obj->flags & SG_OBJ_TEXTURED) {
 		struct texture *texture = obj->texture;
 		vert_type |= GU_TEXTURE_32BITF;
 		sceGuEnable(GU_TEXTURE_2D);
 		sceGuTexMode(GU_PSM_8888, 0, 0, 0);
-		sceGuTexFunc(GU_TFX_MODULATE, GU_TCC_RGB);
+		sceGuTexFunc(GU_TFX_MODULATE, GU_TCC_RGBA);
 		sceGuTexImage(0, texture->width, texture->height,
 			      texture->width, texture->buffer);
 	}
@@ -122,5 +128,6 @@ sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 			obj->num_vertices, 0, obj->vertices);
 	sceGumPopMatrix();
 	if (obj->flags & SG_OBJ_TEXTURED)	sceGuDisable(GU_TEXTURE_2D);
+	if (obj->flags & SG_OBJ_2D)		sceGuEnable(GU_DEPTH_TEST);
 	if (obj->flags & SG_OBJ_NOLIGHTING)	sceGuEnable(GU_LIGHTING);
 }

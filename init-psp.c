@@ -9,6 +9,7 @@
 
 #include <pspsdk.h>
 #include <pspkernel.h>
+#include <pspctrl.h>
 
 PSP_MODULE_INFO("checkers", 0, 1, 1);
 
@@ -37,9 +38,13 @@ main(void)
 	if (thread >= 0)
 		sceKernelStartThread(thread, 0, NULL);
 
+	/* XXX */
+	sceCtrlSetSamplingCycle(0);
+
 	checkers_init(&scenegraph, 480, 272);
 
 	for (;;) {
+		checkers_update(&scenegraph);
 		sg_render(&scenegraph);
 	}
 }

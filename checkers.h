@@ -3,6 +3,12 @@
 
 struct scenegraph;
 
+void newgame(struct scenegraph *scenegraph);
 void checkers_init(struct scenegraph *scenegraph, int width, int height);
+void checkers_update(struct scenegraph *scenegraph);
+void render_board(struct scenegraph *scenegraph);
+void render_pieces(struct scenegraph *scenegraph);
+void render_piece(struct scenegraph *scenegraph, float x, float y, float z,
+		  uint32_t color);
 
 #endif /* !_CHECKERS_H_ */

@@ -1,0 +1,123 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <stdint.h>
+
+#include "checkers.h"
+#include "menu.h"
+#include "scenegraph.h"
+#include "texture.h"
+#include "input.h"
+
+struct texture texture_menu_ss;
+
+static uint64_t board[2] = {0x55aa55, 0xaa55aa0000000000};
+
+static float __attribute__((aligned(16))) button1_verts[] = {
+	0, 0,
+	0, 0, 0,
+	0, 25,
+	0, 25, 0,
+	75, 0,
+	75, 0, 0,
+	75, 0,
+	75, 0, 0,
+	0, 25,
+	0, 25, 0,
+	75, 25,
+	75, 25, 0
+};
+static float __attribute__((aligned(16))) button2_verts[] = {
+	0, 25,
+	0, 0, 0,
+	0, 50,
+	0, 25, 0,
+	75, 25,
+	75, 0, 0,
+	75, 25,
+	75, 0, 0,
+	0, 50,
+	0, 25, 0,
+	75, 50,
+	75, 25, 0
+};
+
+int selected_button = 0;
+
+void
+menu_render_buttons(struct scenegraph *scenegraph)
+{
+	struct sg_object obj;
+	obj.color = (selected_button == 0 ? ~0 : 0xffaaaaaa);
+	obj.flags = SG_OBJ_2D | SG_OBJ_TEXTURED | SG_OBJ_NOLIGHTING;
+	obj.texture = &texture_menu_ss;
+	obj.vertices = button1_verts;
+	obj.num_vertices = sizeof (button1_verts)/(5*sizeof (float));
+	obj.x = 0;
+	obj.y = 0;
+	obj.z = 0;
+	sg_render_object(scenegraph, &obj);
+	obj.color = (selected_button == 1 ? ~0 : 0xffaaaaaa);
+	obj.vertices = button2_verts;
+	sg_render_object(scenegraph, &obj);
+}
+
+void (*menu_render_functions[])(struct scenegraph *) = {
+	menu_render_buttons
+};
+
+size_t num_menu_render_functions = 1;
+
+
+void
+menu_load(struct scenegraph *scenegraph)
+{
+	for (int i = 2; i < 30; i += 5) {
+		button1_verts[i] += 202;
+		button1_verts[i+1] += 100;
+
+		button2_verts[i] += 202;
+		button2_verts[i+1] += 150;
+	}
+#ifndef __psp__
+	for (int i = 0; i < 30; i += 5) {
+		button1_verts[i] /= 512.0;
+		button1_verts[i+1] /= 256.0;
+		button1_verts[i+2] /= 240.0;
+		button1_verts[i+2] -= 1;
+		button1_verts[i+3] /= -136.0;
+		button1_verts[i+3] += 1;
+		button2_verts[i] /= 512.0;
+		button2_verts[i+1] /= 256.0;
+		button2_verts[i+2] /= 240.0;
+		button2_verts[i+2] -= 1;
+		button2_verts[i+3] /= -136.0;
+		button2_verts[i+3] += 1;
+	}
+#endif
+	texture_init_from_file(&texture_menu_ss, 512, 256,
+			       "assets/textures/menu-ss");
+}
+
+void
+menu_init(struct scenegraph *scenegraph)
+{
+	scenegraph->num_render = num_menu_render_functions;
+	scenegraph->render = menu_render_functions;
+}
+
+void
+menu_update(struct scenegraph *scenegraph)
+{
+	switch (input_read()) {
+	case 1:
+	case 2:
+		selected_button = !selected_button;
+		break;
+	case 3:
+		newgame(scenegraph);
+		break;
+	default:
+	}
+}

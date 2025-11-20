@@ -5,13 +5,16 @@
 #include <stdint.h>
 
 #include "checkers.h"
+#include "menu.h"
 #include "scenegraph.h"
 #include "texture.h"
 #include "models.h"
+#include "input.h"
 
 struct texture texture_board;
 
-uint64_t board[2] = {0x55aa55, 0xaa55aa0000000000};
+static uint64_t board[2] = {0x55aa55, 0xaa55aa0000000000};
+int menu = 1;
 
 void
 render_board(struct scenegraph *scenegraph)
@@ -34,29 +37,38 @@ render_highlight(struct scenegraph *scenegraph)
 }
 
 void
-render_pieces(struct scenegraph *scenegraph)
+render_piece(struct scenegraph *scenegraph, float x, float y, float z,
+	     uint32_t color)
 {
 	struct sg_object obj;
 	obj.flags = 0;
+	obj.color = color;
 	obj.vertices = oct_verts;
 	obj.num_vertices = 96;
-	obj.y = 0.13;
+	obj.x = x;
+	obj.y = y;
+	obj.z = z;
+	sg_render_object(scenegraph, &obj);
+}
 
-	obj.color = 0xff0000ff;
+void
+render_pieces(struct scenegraph *scenegraph)
+{
 	for (int i = 0; i < 64; i++) {
 		if ((board[0] >> i) & 1) {
-			obj.x = -0.875 + 0.25*(i % 8);
-			obj.z = -(-0.875 + 0.25*(i / 8));
-			sg_render_object(scenegraph, &obj);
+			render_piece(scenegraph,
+				     -0.875 + 0.25*(i % 8),
+				     0.13, -(-0.875 + 0.25*(i / 8)),
+				     0xff0000ff);
 		}
 	}
 
-	obj.color = 0xff4d4d4d;
 	for (int i = 0; i < 64; i++) {
 		if ((board[1] >> i) & 1) {
-			obj.x = -0.875 + 0.25*(i % 8);
-			obj.z = -(-0.875 + 0.25*(i / 8));
-			sg_render_object(scenegraph, &obj);
+			render_piece(scenegraph,
+				     -0.875 + 0.25*(i % 8),
+				     0.13, -(-0.875 + 0.25*(i / 8)),
+				     0xff4d4d4d);
 		}
 	}
 }
@@ -70,8 +82,6 @@ void (*render_functions[])(struct scenegraph *) = {
 void
 checkers_init(struct scenegraph *scenegraph, int width, int height)
 {
-	void (*render[3])(struct scenegraph *);
-
 	scenegraph->num_render = 3;
 	scenegraph->render = render_functions;
 	scenegraph->width = width;
@@ -94,4 +104,27 @@ checkers_init(struct scenegraph *scenegraph, int width, int height)
 
 	texture_init_from_file(&texture_board, 128, 128,
 			       "assets/textures/board");
+	menu_load(scenegraph);
+	menu_init(scenegraph);
+}
+
+void
+newgame(struct scenegraph *scenegraph)		/* XXX */
+{
+	menu = 0;
+	scenegraph->num_render = 3;
+	scenegraph->render = render_functions;
+}
+
+void
+checkers_update(struct scenegraph *scenegraph)
+{
+	if (menu) {
+		menu_update(scenegraph);
+	} else {
+		if (input_read() == 4) {
+			menu = 1;
+			menu_init(scenegraph);
+		}
+	}
 }
