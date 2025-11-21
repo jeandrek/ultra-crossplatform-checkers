@@ -4,11 +4,12 @@
 #include "menu.h"
 #include "input.h"
 
-int game_selected_square = 0;
+int game_selected_square;
 
 static void
 game_init(void)
 {
+	game_selected_square = 0;
 	game_display_init();
 }
 
