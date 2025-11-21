@@ -68,9 +68,8 @@ void (*menu_render_functions[])(struct scenegraph *) = {
 
 size_t num_menu_render_functions = 1;
 
-
 void
-menu_load(struct scenegraph *scenegraph)
+menu_load(void)
 {
 	for (int i = 2; i < 30; i += 5) {
 		button1_verts[i] += 202;
@@ -104,7 +103,7 @@ menu_init(struct scenegraph *scenegraph)
 {
 	scenegraph->num_render = num_menu_render_functions;
 	scenegraph->render = menu_render_functions;
-	sg_init(scenegraph);
+	sg_init_scenegraph(scenegraph);
 
 	update = menu_update;
 }

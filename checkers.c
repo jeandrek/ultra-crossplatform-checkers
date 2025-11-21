@@ -8,8 +8,9 @@ void (*update)(struct scenegraph *);
 void
 checkers_init(struct scenegraph *scenegraph)
 {
-	menu_load(scenegraph);
-	menu_init(scenegraph);
+	game_load();
+	menu_load();
+	game_init(scenegraph);
 }
 
 void

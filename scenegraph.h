@@ -31,7 +31,8 @@ struct sg_object {
 	float		x, y, z;
 };
 
-void	sg_init(struct scenegraph *scenegraph);
+void	sg_init(void);
+void	sg_init_scenegraph(struct scenegraph *scenegraph);
 void	sg_render(struct scenegraph *scenegraph);
 void	sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj);
 

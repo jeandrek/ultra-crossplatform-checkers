@@ -11,7 +11,7 @@
 #include <GL/glu.h>
 
 void
-sg_init(struct scenegraph *scenegraph)
+sg_init(void)
 {
 	glEnable(GL_CULL_FACE);
 	glShadeModel(GL_SMOOTH);
@@ -20,6 +20,11 @@ sg_init(struct scenegraph *scenegraph)
 	glEnable(GL_BLEND);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
+}
+
+void
+sg_init_scenegraph(struct scenegraph *scenegraph)
+{
 	if (scenegraph->light0_enabled) {
 		GLfloat params[] = {
 			scenegraph->light0_x, scenegraph->light0_y,
@@ -37,13 +42,15 @@ sg_render(struct scenegraph *scenegraph)
 {
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(scenegraph->fov,
-		       (float)scenegraph->width/(float)scenegraph->height,
-		       scenegraph->near_plane, scenegraph->far_plane);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	if (scenegraph->cam3d_enabled) {
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(scenegraph->fov,
+			       (float)scenegraph->width/(float)scenegraph->height,
+			       scenegraph->near_plane, scenegraph->far_plane);
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+	}
 	glRotatef(-scenegraph->cam_dir_vert * 180/M_PI, 1, 0, 0);
 	glRotatef(-scenegraph->cam_dir_horiz * 180/M_PI, 0, 1, 0);
 	glTranslatef(-scenegraph->cam_x, -scenegraph->cam_y,

@@ -37,6 +37,7 @@ main(void)
 
 	context = SDL_GL_CreateContext(window);
 
+	sg_init();
 	bzero(&scenegraph, sizeof (scenegraph));
 	scenegraph.width = 800;
 	scenegraph.height = 450;

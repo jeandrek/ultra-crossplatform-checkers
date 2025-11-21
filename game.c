@@ -81,10 +81,18 @@ void (*render_functions[])(struct scenegraph *) = {
 };
 
 void
+game_load(void)
+{
+	texture_init_from_file(&texture_board, 128, 128,
+			       "assets/textures/board");
+}
+
+void
 game_init(struct scenegraph *scenegraph)
 {
 	scenegraph->num_render = 3;
 	scenegraph->render = render_functions;
+	scenegraph->cam3d_enabled = 1;
 	scenegraph->fov = 70.0;
 	scenegraph->near_plane = 0.1;
 	scenegraph->far_plane = 24;
@@ -99,10 +107,7 @@ game_init(struct scenegraph *scenegraph)
 	scenegraph->light0_z = 2;
 	scenegraph->light0_color = 0xffffffff;
 
-	sg_init(scenegraph);
-
-	texture_init_from_file(&texture_board, 128, 128,
-			       "assets/textures/board");
+	sg_init_scenegraph(scenegraph);
 
 	update = game_update;
 }

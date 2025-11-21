@@ -19,10 +19,8 @@
 
 static unsigned int __attribute__((aligned(16))) list[262144];
 
-static int graph_initialized = 0;
-
-static void
-initialize_graph(void)
+void
+sg_init(void)
 {
 	void *draw_buffer, *disp_buffer, *depth_buffer;
 
@@ -37,14 +35,10 @@ initialize_graph(void)
 }
 
 void
-sg_init(struct scenegraph *scenegraph)
+sg_init_scenegraph(struct scenegraph *scenegraph)
 {
 	ScePspFVector3 light0_pos;
 
-	if (!graph_initialized) {
-		initialize_graph();
-		graph_initialized = 1;
-	}
 	sceGuOffset(2048 - 480/2, 2048 - 272/2);
 	sceGuViewport(2048, 2048, 480, 272);
 	sceGuScissor(0, 0, 480, 272);

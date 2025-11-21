@@ -3,6 +3,7 @@
 
 struct scenegraph;
 
+void game_load(void);
 void game_init(struct scenegraph *scenegraph);
 void game_update(struct scenegraph *scenegraph);
 

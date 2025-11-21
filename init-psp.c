@@ -41,6 +41,7 @@ main(void)
 	/* XXX */
 	sceCtrlSetSamplingCycle(0);
 
+	sg_init();
 	bzero(&scenegraph, sizeof (scenegraph));
 	scenegraph.width = 480;
 	scenegraph.height = 272;
