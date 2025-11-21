@@ -5,14 +5,13 @@
 #include <stdint.h>
 
 #include "checkers.h"
+#include "game.h"
 #include "menu.h"
 #include "scenegraph.h"
 #include "texture.h"
 #include "input.h"
 
 struct texture texture_menu_ss;
-
-static uint64_t board[2] = {0x55aa55, 0xaa55aa0000000000};
 
 static float __attribute__((aligned(16))) button1_verts[] = {
 	0, 0,
@@ -105,6 +104,9 @@ menu_init(struct scenegraph *scenegraph)
 {
 	scenegraph->num_render = num_menu_render_functions;
 	scenegraph->render = menu_render_functions;
+	sg_init(scenegraph);
+
+	update = menu_update;
 }
 
 void
@@ -116,7 +118,7 @@ menu_update(struct scenegraph *scenegraph)
 		selected_button = !selected_button;
 		break;
 	case 3:
-		newgame(scenegraph);
+		game_init(scenegraph);
 		break;
 	default:
 	}

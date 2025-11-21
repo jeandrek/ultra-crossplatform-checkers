@@ -1,11 +1,15 @@
 #ifndef _SCENEGRAPH_H_
 #define _SCENEGRAPH_H_
 
+#include <stddef.h>
+#include <stdint.h>
+
 struct scenegraph {
 	void	(**render)(struct scenegraph *);
 	size_t	num_render;
 	int	width;
 	int	height;
+	int	cam3d_enabled;
 	float	fov, near_plane, far_plane;
 	float	cam_x, cam_y, cam_z;
 	float	cam_dir_horiz, cam_dir_vert;

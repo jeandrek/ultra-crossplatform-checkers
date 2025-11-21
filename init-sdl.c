@@ -37,7 +37,10 @@ main(void)
 
 	context = SDL_GL_CreateContext(window);
 
-	checkers_init(&scenegraph, 800, 450);
+	bzero(&scenegraph, sizeof (scenegraph));
+	scenegraph.width = 800;
+	scenegraph.height = 450;
+	checkers_init(&scenegraph);
 
 	for (;;) {
 		if (SDL_PollEvent(&ev)) {

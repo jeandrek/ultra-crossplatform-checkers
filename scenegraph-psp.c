@@ -19,10 +19,11 @@
 
 static unsigned int __attribute__((aligned(16))) list[262144];
 
-void
-sg_init(struct scenegraph *scenegraph)
+static int graph_initialized = 0;
+
+static void
+initialize_graph(void)
 {
-	ScePspFVector3 light0_pos;
 	void *draw_buffer, *disp_buffer, *depth_buffer;
 
 	sceGuInit();
@@ -33,6 +34,17 @@ sg_init(struct scenegraph *scenegraph)
 	sceGuDrawBuffer(GU_PSM_8888, draw_buffer, 512);
 	sceGuDispBuffer(480, 272, disp_buffer, 512);
 	sceGuDepthBuffer(depth_buffer, 512);
+}
+
+void
+sg_init(struct scenegraph *scenegraph)
+{
+	ScePspFVector3 light0_pos;
+
+	if (!graph_initialized) {
+		initialize_graph();
+		graph_initialized = 1;
+	}
 	sceGuOffset(2048 - 480/2, 2048 - 272/2);
 	sceGuViewport(2048, 2048, 480, 272);
 	sceGuScissor(0, 0, 480, 272);
@@ -75,17 +87,19 @@ sg_render(struct scenegraph *scenegraph)
 	sceGuClearColor(GU_COLOR(0.0, 0.0, 0.0, 1.0));
 	sceGuClearDepth(0);
 	sceGuClear(GU_COLOR_BUFFER_BIT|GU_DEPTH_BUFFER_BIT);
-	sceGumMatrixMode(GU_PROJECTION);
-	sceGumLoadIdentity();
-	sceGumPerspective(scenegraph->fov,
-			  (float)scenegraph->width/(float)scenegraph->height,
-			  scenegraph->near_plane, scenegraph->far_plane);
-	sceGumMatrixMode(GU_VIEW);
-	sceGumLoadIdentity();
-	sceGumRotateX(-scenegraph->cam_dir_vert);
-	sceGumRotateY(-scenegraph->cam_dir_horiz);
-	sceGumMatrixMode(GU_MODEL);
-	sceGumLoadIdentity();
+	if (scenegraph->cam3d_enabled) {
+		sceGumMatrixMode(GU_PROJECTION);
+		sceGumLoadIdentity();
+		sceGumPerspective(scenegraph->fov,
+				  (float)scenegraph->width/(float)scenegraph->height,
+				  scenegraph->near_plane, scenegraph->far_plane);
+		sceGumMatrixMode(GU_VIEW);
+		sceGumLoadIdentity();
+		sceGumRotateX(-scenegraph->cam_dir_vert);
+		sceGumRotateY(-scenegraph->cam_dir_horiz);
+		sceGumMatrixMode(GU_MODEL);
+		sceGumLoadIdentity();
+	}
 	sceGumTranslate(&translate);
 	for (int i = 0; i < scenegraph->num_render; i++) {
 		scenegraph->render[i](scenegraph);

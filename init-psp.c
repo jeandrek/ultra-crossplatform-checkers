@@ -41,7 +41,10 @@ main(void)
 	/* XXX */
 	sceCtrlSetSamplingCycle(0);
 
-	checkers_init(&scenegraph, 480, 272);
+	bzero(&scenegraph, sizeof (scenegraph));
+	scenegraph.width = 480;
+	scenegraph.height = 272;
+	checkers_init(&scenegraph);
 
 	for (;;) {
 		checkers_update(&scenegraph);
