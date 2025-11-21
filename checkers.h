@@ -1,11 +1,10 @@
 #ifndef _CHECKERS_H_
 #define _CHECKERS_H_
 
-struct scenegraph;
+extern void (*update)(void);
 
-extern void (*update)(struct scenegraph *);
-
-void checkers_init(struct scenegraph *scenegraph);
-void checkers_update(struct scenegraph *scenegraph);
+void checkers_init(void);
+void checkers_update(void);
 
 #endif /* !_CHECKERS_H_ */
+

@@ -19,11 +19,15 @@
 
 static unsigned int __attribute__((aligned(16))) list[262144];
 
+static int width, height;
+
 void
-sg_init(void)
+sg_init(int w, int h)
 {
 	void *draw_buffer, *disp_buffer, *depth_buffer;
 
+	width = w;
+	height = h;
 	sceGuInit();
 	sceGuStart(GU_DIRECT, list);
 	draw_buffer = guGetStaticVramBuffer(512, 272, GU_PSM_8888);
@@ -85,7 +89,7 @@ sg_render(struct scenegraph *scenegraph)
 		sceGumMatrixMode(GU_PROJECTION);
 		sceGumLoadIdentity();
 		sceGumPerspective(scenegraph->fov,
-				  (float)scenegraph->width/(float)scenegraph->height,
+				  (float)width/(float)height,
 				  scenegraph->near_plane, scenegraph->far_plane);
 		sceGumMatrixMode(GU_VIEW);
 		sceGumLoadIdentity();

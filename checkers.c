@@ -1,20 +1,19 @@
 #include "checkers.h"
 #include "game.h"
 #include "menu.h"
-#include "scenegraph.h"
 
-void (*update)(struct scenegraph *);
+void (*update)(void);
 
 void
-checkers_init(struct scenegraph *scenegraph)
+checkers_init(void)
 {
 	game_load();
 	menu_load();
-	game_init(scenegraph);
+	game_init();
 }
 
 void
-checkers_update(struct scenegraph *scenegraph)
+checkers_update(void)
 {
-	update(scenegraph);
+	update();
 }

@@ -15,7 +15,6 @@ static SDL_Window *window;
 int
 main(void)
 {
-	struct scenegraph scenegraph;
 	SDL_GLContext context;
 	SDL_Event ev;
 	uint32_t ticks;
@@ -37,11 +36,8 @@ main(void)
 
 	context = SDL_GL_CreateContext(window);
 
-	sg_init();
-	bzero(&scenegraph, sizeof (scenegraph));
-	scenegraph.width = 800;
-	scenegraph.height = 450;
-	checkers_init(&scenegraph);
+	sg_init(800, 450);
+	checkers_init();
 
 	for (;;) {
 		if (SDL_PollEvent(&ev)) {
@@ -56,8 +52,7 @@ main(void)
 		}
 		// Run at as close to 60 FPS as possible
 		if (SDL_GetTicks() - ticks >= 16) {
-			checkers_update(&scenegraph);
-			sg_render(&scenegraph);
+			checkers_update();
 			SDL_GL_SwapWindow(window);
 			ticks = SDL_GetTicks();
 		} else {

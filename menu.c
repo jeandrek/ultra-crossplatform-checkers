@@ -11,7 +11,9 @@
 #include "texture.h"
 #include "input.h"
 
-struct texture texture_menu_ss;
+static struct scenegraph scenegraph;
+
+static struct texture texture_menu_ss;
 
 static float __attribute__((aligned(16))) button1_verts[] = {
 	0, 0,
@@ -99,17 +101,18 @@ menu_load(void)
 }
 
 void
-menu_init(struct scenegraph *scenegraph)
+menu_init(void)
 {
-	scenegraph->num_render = num_menu_render_functions;
-	scenegraph->render = menu_render_functions;
-	sg_init_scenegraph(scenegraph);
+	bzero(&scenegraph, sizeof (scenegraph));
+	scenegraph.num_render = num_menu_render_functions;
+	scenegraph.render = menu_render_functions;
+	sg_init_scenegraph(&scenegraph);
 
 	update = menu_update;
 }
 
 void
-menu_update(struct scenegraph *scenegraph)
+menu_update(void)
 {
 	switch (input_read()) {
 	case 1:
@@ -117,8 +120,9 @@ menu_update(struct scenegraph *scenegraph)
 		selected_button = !selected_button;
 		break;
 	case 3:
-		game_init(scenegraph);
+		game_init();
 		break;
 	default:
 	}
+	sg_render(&scenegraph);
 }

@@ -12,6 +12,8 @@
 #include "models.h"
 #include "input.h"
 
+static struct scenegraph scenegraph;
+
 struct texture texture_board;
 
 static uint64_t board[2] = {0x55aa55, 0xaa55aa0000000000};
@@ -88,34 +90,35 @@ game_load(void)
 }
 
 void
-game_init(struct scenegraph *scenegraph)
+game_init(void)
 {
-	scenegraph->num_render = 3;
-	scenegraph->render = render_functions;
-	scenegraph->cam3d_enabled = 1;
-	scenegraph->fov = 70.0;
-	scenegraph->near_plane = 0.1;
-	scenegraph->far_plane = 24;
-	scenegraph->cam_x = 0;
-	scenegraph->cam_y = 1.5;
-	scenegraph->cam_z = 1.5;
-	scenegraph->cam_dir_horiz = 0;
-	scenegraph->cam_dir_vert = -M_PI/4;
-	scenegraph->light0_enabled = 1;
-	scenegraph->light0_x = 0;
-	scenegraph->light0_y = 2;
-	scenegraph->light0_z = 2;
-	scenegraph->light0_color = 0xffffffff;
-
-	sg_init_scenegraph(scenegraph);
+	bzero(&scenegraph, sizeof (scenegraph));
+	scenegraph.num_render = 3;
+	scenegraph.render = render_functions;
+	scenegraph.cam3d_enabled = 1;
+	scenegraph.fov = 70.0;
+	scenegraph.near_plane = 0.1;
+	scenegraph.far_plane = 24;
+	scenegraph.cam_x = 0;
+	scenegraph.cam_y = 1.5;
+	scenegraph.cam_z = 1.5;
+	scenegraph.cam_dir_horiz = 0;
+	scenegraph.cam_dir_vert = -M_PI/4;
+	scenegraph.light0_enabled = 1;
+	scenegraph.light0_x = 0;
+	scenegraph.light0_y = 2;
+	scenegraph.light0_z = 2;
+	scenegraph.light0_color = 0xffffffff;
+	sg_init_scenegraph(&scenegraph);
 
 	update = game_update;
 }
 
 void
-game_update(struct scenegraph *scenegraph)
+game_update(void)
 {
 	if (input_read() == 4) {
-		menu_init(scenegraph);
+		menu_init();
 	}
+	sg_render(&scenegraph);
 }

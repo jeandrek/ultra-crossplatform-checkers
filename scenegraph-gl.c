@@ -10,9 +10,13 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+static int width, height;
+
 void
-sg_init(void)
+sg_init(int w, int h)
 {
+	width = w;
+	height = h;
 	glEnable(GL_CULL_FACE);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
@@ -46,7 +50,7 @@ sg_render(struct scenegraph *scenegraph)
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		gluPerspective(scenegraph->fov,
-			       (float)scenegraph->width/(float)scenegraph->height,
+			       (float)width/(float)height,
 			       scenegraph->near_plane, scenegraph->far_plane);
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();

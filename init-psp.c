@@ -32,7 +32,6 @@ callback_thread(SceSize args, void *arg)
 int
 main(void)
 {
-	struct scenegraph scenegraph;
 	int thread = sceKernelCreateThread("update_thread", callback_thread,
 					   0x11, 0xfa0, 0, NULL);
 	if (thread >= 0)
@@ -41,14 +40,10 @@ main(void)
 	/* XXX */
 	sceCtrlSetSamplingCycle(0);
 
-	sg_init();
-	bzero(&scenegraph, sizeof (scenegraph));
-	scenegraph.width = 480;
-	scenegraph.height = 272;
-	checkers_init(&scenegraph);
+	sg_init(480, 272);
+	checkers_init();
 
 	for (;;) {
-		checkers_update(&scenegraph);
-		sg_render(&scenegraph);
+		checkers_update();
 	}
 }
