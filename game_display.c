@@ -29,6 +29,15 @@ render_board(struct scenegraph *scenegraph)
 static void
 render_highlight(struct scenegraph *scenegraph)
 {
+	struct sg_object obj;
+	obj.color = 0x8080ffff;
+	obj.flags = SG_OBJ_NOLIGHTDEPTH;
+	obj.vertices = highlight_verts;
+	obj.num_vertices = sizeof (highlight_verts)/(6*sizeof (float));
+	obj.x = -0.875 + 0.25*(game_selected_square % 8);
+	obj.y = 0.1;
+	obj.z = -(-0.875 + 0.25*(game_selected_square / 8));
+	sg_render_object(scenegraph, &obj);
 }
 
 static void
@@ -36,8 +45,8 @@ render_piece(struct scenegraph *scenegraph, float x, float y, float z,
 	     uint32_t color)
 {
 	struct sg_object obj;
-	obj.flags = 0;
 	obj.color = color;
+	obj.flags = 0;
 	obj.vertices = oct_verts;
 	obj.num_vertices = 96;
 	obj.x = x;

@@ -4,5 +4,6 @@
 #include "checkers.h"
 
 extern struct state game;
+extern int game_selected_square;
 
 #endif /* !_GAME_H_ */

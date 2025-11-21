@@ -46,7 +46,7 @@ menu_render_buttons(struct scenegraph *scenegraph)
 {
 	struct sg_object obj;
 	obj.color = (selected_button == 0 ? ~0 : 0xffaaaaaa);
-	obj.flags = SG_OBJ_2D | SG_OBJ_TEXTURED | SG_OBJ_NOLIGHTING;
+	obj.flags = SG_OBJ_2D | SG_OBJ_TEXTURED | SG_OBJ_NOLIGHTDEPTH;
 	obj.texture = &texture_menu_ss;
 	obj.vertices = button1_verts;
 	obj.num_vertices = sizeof (button1_verts)/(5*sizeof (float));

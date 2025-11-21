@@ -67,13 +67,14 @@ sg_render(struct scenegraph *scenegraph)
 void
 sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 {
-	if (obj->flags & SG_OBJ_NOLIGHTING)	glDisable(GL_LIGHTING);
+	if (obj->flags & SG_OBJ_NOLIGHTDEPTH)	glDisable(GL_LIGHTING);
 	if (obj->flags & SG_OBJ_TEXTURED) {
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, obj->texture->gl_tex);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	}
-	if (obj->flags & SG_OBJ_2D)		glDisable(GL_DEPTH_TEST);
+	if (obj->flags & SG_OBJ_2D || obj->flags & SG_OBJ_NOLIGHTDEPTH)
+		glDisable(GL_DEPTH_TEST);
 	glColor4f((obj->color & 0xff)/255.0,
 		  ((obj->color >> 8) & 0xff)/255.0,
 		  ((obj->color >> 16) & 0xff)/255.0,
@@ -112,10 +113,11 @@ sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 	} else {
 		glPopMatrix();
 	}
-	if (obj->flags & SG_OBJ_2D)		glEnable(GL_DEPTH_TEST);
+	if (obj->flags & SG_OBJ_2D || obj->flags & SG_OBJ_NOLIGHTDEPTH)
+		glEnable(GL_DEPTH_TEST);
 	if (obj->flags & SG_OBJ_TEXTURED) {
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisable(GL_TEXTURE_2D);
 	}
-	if (obj->flags & SG_OBJ_NOLIGHTING)	glEnable(GL_LIGHTING);
+	if (obj->flags & SG_OBJ_NOLIGHTDEPTH)	glEnable(GL_LIGHTING);
 }
