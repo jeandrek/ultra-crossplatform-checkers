@@ -2,18 +2,27 @@
 #include "game.h"
 #include "menu.h"
 
-void (*update)(void);
+static struct state *current_state = NULL;
 
 void
 checkers_init(void)
 {
-	game_load();
-	menu_load();
-	game_init();
+	game.load();
+	game.init();
+	menu.load();
+	menu.init();
+	current_state = &game;
+}
+
+void
+checkers_switch_state(struct state *new_state)
+{
+	current_state = new_state;
 }
 
 void
 checkers_update(void)
 {
-	update();
+	current_state->update();
+	sg_render(&current_state->sg);
 }

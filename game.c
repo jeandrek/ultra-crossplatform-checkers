@@ -12,12 +12,9 @@
 #include "models.h"
 #include "input.h"
 
-static struct scenegraph scenegraph;
-
 struct texture texture_board;
 
 static uint64_t board[2] = {0x55aa55, 0xaa55aa0000000000};
-int menu = 1;
 
 void
 render_board(struct scenegraph *scenegraph)
@@ -92,33 +89,37 @@ game_load(void)
 void
 game_init(void)
 {
-	bzero(&scenegraph, sizeof (scenegraph));
-	scenegraph.num_render = 3;
-	scenegraph.render = render_functions;
-	scenegraph.cam3d_enabled = 1;
-	scenegraph.fov = 70.0;
-	scenegraph.near_plane = 0.1;
-	scenegraph.far_plane = 24;
-	scenegraph.cam_x = 0;
-	scenegraph.cam_y = 1.5;
-	scenegraph.cam_z = 1.5;
-	scenegraph.cam_dir_horiz = 0;
-	scenegraph.cam_dir_vert = -M_PI/4;
-	scenegraph.light0_enabled = 1;
-	scenegraph.light0_x = 0;
-	scenegraph.light0_y = 2;
-	scenegraph.light0_z = 2;
-	scenegraph.light0_color = 0xffffffff;
-	sg_init_scenegraph(&scenegraph);
-
-	update = game_update;
+	bzero(&game.sg, sizeof (game.sg));
+	game.sg.num_render = 3;
+	game.sg.render = render_functions;
+	game.sg.cam3d_enabled = 1;
+	game.sg.fov = 70.0;
+	game.sg.near_plane = 0.1;
+	game.sg.far_plane = 24;
+	game.sg.cam_x = 0;
+	game.sg.cam_y = 1.5;
+	game.sg.cam_z = 1.5;
+	game.sg.cam_dir_horiz = 0;
+	game.sg.cam_dir_vert = -M_PI/4;
+	game.sg.light0_enabled = 1;
+	game.sg.light0_x = 0;
+	game.sg.light0_y = 2;
+	game.sg.light0_z = 2;
+	game.sg.light0_color = 0xffffffff;
+	sg_init_scenegraph(&game.sg);
 }
 
 void
 game_update(void)
 {
 	if (input_read() == 4) {
-		menu_init();
+		menu.init();
+		checkers_switch_state(&menu);
 	}
-	sg_render(&scenegraph);
 }
+
+struct state game = {
+	.load = game_load,
+	.init = game_init,
+	.update = game_update
+};

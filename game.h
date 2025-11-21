@@ -1,8 +1,8 @@
 #ifndef _GAME_H_
 #define _GAME_H_
 
-void game_load(void);
-void game_init(void);
-void game_update(void);
+#include "checkers.h"
+
+extern struct state game;
 
 #endif /* !_GAME_H_ */
