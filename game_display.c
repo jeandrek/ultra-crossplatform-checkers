@@ -63,7 +63,8 @@ render_pieces(struct scenegraph *scenegraph)
 			render_piece(scenegraph,
 				     -0.875 + 0.25*(i % 8),
 				     0.13, -(-0.875 + 0.25*(i / 8)),
-				     0xff0000ff);
+				     (i == game_selected_square ?
+				      0xff8080ff : 0xff0000ff));
 		}
 	}
 

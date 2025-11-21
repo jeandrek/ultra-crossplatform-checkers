@@ -24,11 +24,11 @@ game_update(void)
 		game_selected_square = (game_selected_square + 8) % 64;
 		break;
 	case INPUT_DOWN:
-		game_selected_square = (game_selected_square - 8) % 64;
+		game_selected_square -= 8;
 		if (game_selected_square < 0) game_selected_square += 64;
 		break;
 	case INPUT_LEFT:
-		game_selected_square = game_selected_square - 1;
+		game_selected_square -= 1;
 		if (game_selected_square < 0) game_selected_square = 63;
 		break;
 	case INPUT_RIGHT:
