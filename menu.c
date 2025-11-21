@@ -1,4 +1,5 @@
 #include <math.h>
+#include <string.h>
 
 #include "checkers.h"
 #include "game.h"
@@ -107,11 +108,11 @@ static void
 menu_update(void)
 {
 	switch (input_read()) {
-	case 1:
-	case 2:
+	case INPUT_UP:
+	case INPUT_DOWN:
 		selected_button = !selected_button;
 		break;
-	case 3:
+	case INPUT_ACCEPT:
 		switch (selected_button) {
 		case 0:
 			game.init();

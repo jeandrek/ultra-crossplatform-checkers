@@ -13,7 +13,7 @@ game_init(void)
 static void
 game_update(void)
 {
-	if (input_read() == 4) {
+	if (input_read() == INPUT_PAUSE) {
 		menu.init();
 		checkers_switch_state(&menu);
 	}
