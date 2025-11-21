@@ -1,8 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <math.h>
-#include <stdint.h>
 
 #include "checkers.h"
 #include "game.h"
@@ -44,7 +40,7 @@ static float __attribute__((aligned(16))) button2_verts[] = {
 
 int selected_button = 0;
 
-void
+static void
 menu_render_buttons(struct scenegraph *scenegraph)
 {
 	struct sg_object obj;
@@ -62,13 +58,13 @@ menu_render_buttons(struct scenegraph *scenegraph)
 	sg_render_object(scenegraph, &obj);
 }
 
-void (*menu_render_functions[])(struct scenegraph *) = {
+static void (*menu_render_functions[])(struct scenegraph *) = {
 	menu_render_buttons
 };
 
-size_t num_menu_render_functions = 1;
+static size_t num_menu_render_functions = 1;
 
-void
+static void
 menu_load(void)
 {
 	for (int i = 2; i < 30; i += 5) {
@@ -98,7 +94,7 @@ menu_load(void)
 			       "assets/textures/menu-ss");
 }
 
-void
+static void
 menu_init(void)
 {
 	bzero(&menu.sg, sizeof (menu.sg));
@@ -107,7 +103,7 @@ menu_init(void)
 	sg_init_scenegraph(&menu.sg);
 }
 
-void
+static void
 menu_update(void)
 {
 	switch (input_read()) {
