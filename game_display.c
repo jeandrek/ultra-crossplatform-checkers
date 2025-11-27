@@ -3,11 +3,11 @@
 
 #include "game.h"
 #include "game_display.h"
+#include "game_interaction.h"
+#include "game_checkers.h"
 #include "scenegraph.h"
 #include "texture.h"
 #include "models.h"
-
-static uint64_t board[2] = {0x55aa55, 0xaa55aa0000000000};
 
 static struct texture texture_board;
 
