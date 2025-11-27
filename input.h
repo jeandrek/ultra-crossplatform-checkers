@@ -8,6 +8,4 @@
 #define INPUT_PAUSE	5
 #define INPUT_ACCEPT	6
 
-int input_read(void);
-
 #endif /* !_INPUT_H_ */

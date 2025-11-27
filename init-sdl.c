@@ -9,12 +9,14 @@
 
 #include "checkers.h"
 #include "scenegraph.h"
+#include "input_mapping-sdl.h"
 
 static SDL_Window *window;
 
 int
 main(void)
 {
+	int rev_map[SDL_NUM_SCANCODES] = {0};
 	SDL_GLContext context;
 	SDL_Event ev;
 	uint32_t ticks;
@@ -39,6 +41,9 @@ main(void)
 	sg_init(800, 450);
 	checkers_init();
 
+	for (int i = 0; i < sizeof (input_mapping)/sizeof (int); i++)
+		rev_map[input_mapping[i]] = i;
+
 	for (;;) {
 		if (SDL_PollEvent(&ev)) {
 			switch (ev.type) {
@@ -48,6 +53,11 @@ main(void)
 				break;
 			case SDL_QUIT:
 				goto quit;
+			case SDL_KEYUP:
+				if (rev_map[ev.key.keysym.scancode]) {
+					checkers_input_event(rev_map[ev.key.keysym.scancode]);
+				}
+				break;
 			}
 		}
 		// Run at as close to 60 FPS as possible

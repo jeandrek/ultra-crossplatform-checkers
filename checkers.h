@@ -7,6 +7,7 @@ struct state {
 	void (*load)(void);
 	void (*init)(void);
 	void (*update)(void);
+	void (*input_event)(int);
 	struct scenegraph sg;
 };
 

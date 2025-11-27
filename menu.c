@@ -107,7 +107,12 @@ menu_init(void)
 static void
 menu_update(void)
 {
-	switch (input_read()) {
+}
+
+static void
+menu_input_event(int button)
+{
+	switch (button) {
 	case INPUT_UP:
 	case INPUT_DOWN:
 		selected_button = !selected_button;
@@ -128,5 +133,6 @@ menu_update(void)
 struct state menu = {
 	.load = menu_load,
 	.init = menu_init,
-	.update = menu_update
+	.update = menu_update,
+	.input_event = menu_input_event
 };
