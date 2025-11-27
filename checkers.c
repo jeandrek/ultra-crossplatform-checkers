@@ -26,9 +26,3 @@ checkers_update(void)
 	current_state->update();
 	sg_render(&current_state->sg);
 }
-
-void
-checkers_input_event(int button)
-{
-	current_state->input_event(button);
-}

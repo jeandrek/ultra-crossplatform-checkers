@@ -1,7 +1,3 @@
-#ifndef _INPUT_MAPPING_H_
-#define _INPUT_MAPPING_H_
-#include "input.h"
-
 static int input_mapping[] = {
 	[INPUT_UP] = PSP_CTRL_UP,
 	[INPUT_DOWN] = PSP_CTRL_DOWN,
@@ -10,5 +6,3 @@ static int input_mapping[] = {
 	[INPUT_PAUSE] = PSP_CTRL_START,
 	[INPUT_ACCEPT] = PSP_CTRL_CROSS
 };
-
-#endif /* !_INPUT_MAPPING_H_ */

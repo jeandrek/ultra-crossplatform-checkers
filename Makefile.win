@@ -1,7 +1,7 @@
 CC=	x86_64-w64-mingw32-gcc
 #CC=	gcc
 PROGRAM=checkers.exe
-OBJECTS=checkers.o game.o game_display.o menu.o init-sdl.o scenegraph-gl.o texture.o
+OBJECTS=checkers.o game.o game_display.o menu.o init-sdl.o scenegraph-gl.o texture.o input.o
 LDFLAGS=-L. -lopengl32 -lglu32 -lSDL2 -mwindows
 CFLAGS=	-Wall -W -O2 -I. -fcommon
 
