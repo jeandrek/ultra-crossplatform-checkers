@@ -56,13 +56,22 @@ render_piece(struct scenegraph *scenegraph, float x, float y, float z,
 }
 
 static void
+board_pos_to_world_pos(float *x, float *y, float *z, int i)
+{
+	*x = -0.875 + 0.25*(i % 8);
+	*y = 0.13;
+	*z = -(-0.875 + 0.25*(i / 8));
+}
+
+static void
 render_pieces(struct scenegraph *scenegraph)
 {
+	float x, y, z;
+
 	for (int i = 0; i < 64; i++) {
 		if ((board[0] >> i) & 1) {
-			render_piece(scenegraph,
-				     -0.875 + 0.25*(i % 8),
-				     0.13, -(-0.875 + 0.25*(i / 8)),
+			board_pos_to_world_pos(&x, &y, &z, i);
+			render_piece(scenegraph, x, y, z,
 				     (i == game_sel_square ?
 				      0xff8080ff : 0xff0000ff));
 		}
@@ -70,9 +79,8 @@ render_pieces(struct scenegraph *scenegraph)
 
 	for (int i = 0; i < 64; i++) {
 		if ((board[1] >> i) & 1) {
-			render_piece(scenegraph,
-				     -0.875 + 0.25*(i % 8),
-				     0.13, -(-0.875 + 0.25*(i / 8)),
+			board_pos_to_world_pos(&x, &y, &z, i);
+			render_piece(scenegraph, x, y, z,
 				     0xff4d4d4d);
 		}
 	}
@@ -80,12 +88,12 @@ render_pieces(struct scenegraph *scenegraph)
 	if (!((board[0] >> game_sel_square) & 1))
 		return;
 	for (int i = 0; i < 64; i++) {
-		if ((game_sel_piece_moves >> i) & 1)
-			render_piece(scenegraph,
-				     -0.875 + 0.25*(i % 8),
-				     0.13, -(-0.875 + 0.25*(i / 8)),
+		if ((game_sel_piece_moves >> i) & 1) {
+			board_pos_to_world_pos(&x, &y, &z, i);
+			render_piece(scenegraph, x, y, z,
 				     (i == game_sel_move ?
 				      0x808080ff : 0x800000ff));
+		}
 	}
 }
 
