@@ -9,7 +9,8 @@
 #define INPUT_RIGHT	3
 #define INPUT_PAUSE	4
 #define INPUT_ACCEPT	5
-#define NUM_BUTTONS	6
+#define INPUT_BACK	6
+#define NUM_BUTTONS	7
 
 void input_handle(void);
 

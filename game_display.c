@@ -76,6 +76,18 @@ render_pieces(struct scenegraph *scenegraph)
 				     0xff4d4d4d);
 		}
 	}
+
+	if (!((board[0] >> game_selected_square) & 1))
+		return;
+	uint64_t moves = piece_moves(game_selected_square);
+	for (int i = 0; i < 64; i++) {
+		if ((moves >> i) & 1)
+			render_piece(scenegraph,
+				     -0.875 + 0.25*(i % 8),
+				     0.13, -(-0.875 + 0.25*(i / 8)),
+				     (i == game_selected_move ?
+				      0x808080ff : 0x800000ff));
+	}
 }
 
 static void (*render_functions[])(struct scenegraph *) = {
