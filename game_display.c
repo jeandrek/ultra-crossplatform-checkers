@@ -34,9 +34,9 @@ render_highlight(struct scenegraph *scenegraph)
 	obj.flags = SG_OBJ_NOLIGHTDEPTH;
 	obj.vertices = highlight_verts;
 	obj.num_vertices = sizeof (highlight_verts)/(6*sizeof (float));
-	obj.x = -0.875 + 0.25*(game_selected_square % 8);
+	obj.x = -0.875 + 0.25*(game_sel_square % 8);
 	obj.y = 0.1;
-	obj.z = -(-0.875 + 0.25*(game_selected_square / 8));
+	obj.z = -(-0.875 + 0.25*(game_sel_square / 8));
 	sg_render_object(scenegraph, &obj);
 }
 
@@ -63,7 +63,7 @@ render_pieces(struct scenegraph *scenegraph)
 			render_piece(scenegraph,
 				     -0.875 + 0.25*(i % 8),
 				     0.13, -(-0.875 + 0.25*(i / 8)),
-				     (i == game_selected_square ?
+				     (i == game_sel_square ?
 				      0xff8080ff : 0xff0000ff));
 		}
 	}
@@ -77,15 +77,14 @@ render_pieces(struct scenegraph *scenegraph)
 		}
 	}
 
-	if (!((board[0] >> game_selected_square) & 1))
+	if (!((board[0] >> game_sel_square) & 1))
 		return;
-	uint64_t moves = piece_moves(game_selected_square);
 	for (int i = 0; i < 64; i++) {
-		if ((moves >> i) & 1)
+		if ((game_sel_piece_moves >> i) & 1)
 			render_piece(scenegraph,
 				     -0.875 + 0.25*(i % 8),
 				     0.13, -(-0.875 + 0.25*(i / 8)),
-				     (i == game_selected_move ?
+				     (i == game_sel_move ?
 				      0x808080ff : 0x800000ff));
 	}
 }
