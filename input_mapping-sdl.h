@@ -1,3 +1,7 @@
+#ifndef _INPUT_MAPPING_H_
+#define _INPUT_MAPPING_H_
+#include "input.h"
+
 static int input_mapping[] = {
 	[INPUT_UP] = SDL_SCANCODE_UP,
 	[INPUT_DOWN] = SDL_SCANCODE_DOWN,
@@ -6,3 +10,5 @@ static int input_mapping[] = {
 	[INPUT_PAUSE] = SDL_SCANCODE_ESCAPE,
 	[INPUT_ACCEPT] = SDL_SCANCODE_SPACE
 };
+
+#endif /* !_INPUT_MAPPING_H_ */
