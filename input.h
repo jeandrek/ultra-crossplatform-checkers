@@ -1,13 +1,16 @@
 #ifndef _INPUT_H_
 #define _INPUT_H_
 
-#define INPUT_UP	1
-#define INPUT_DOWN	2
-#define INPUT_LEFT	3
-#define INPUT_RIGHT	4
-#define INPUT_PAUSE	5
-#define INPUT_ACCEPT	6
+#define REPEAT_DELAY	7
 
-int input_read(void);
+#define INPUT_UP	0
+#define INPUT_DOWN	1
+#define INPUT_LEFT	2
+#define INPUT_RIGHT	3
+#define INPUT_PAUSE	4
+#define INPUT_ACCEPT	5
+#define NUM_BUTTONS	6
+
+void input_handle(void);
 
 #endif /* !_INPUT_H_ */

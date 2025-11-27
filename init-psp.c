@@ -4,12 +4,13 @@
 #include <math.h>
 #include <stdint.h>
 
-#include "checkers.h"
-#include "scenegraph.h"
-
 #include <pspsdk.h>
 #include <pspkernel.h>
 #include <pspctrl.h>
+
+#include "checkers.h"
+#include "scenegraph.h"
+#include "input.h"
 
 PSP_MODULE_INFO("checkers", 0, 1, 1);
 
@@ -44,6 +45,7 @@ main(void)
 	checkers_init();
 
 	for (;;) {
+		input_handle();
 		checkers_update();
 	}
 }

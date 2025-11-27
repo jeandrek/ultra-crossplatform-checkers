@@ -9,6 +9,7 @@
 
 #include "checkers.h"
 #include "scenegraph.h"
+#include "input.h"
 
 static SDL_Window *window;
 
@@ -52,6 +53,7 @@ main(void)
 		}
 		// Run at as close to 60 FPS as possible
 		if (SDL_GetTicks() - ticks >= 16) {
+			input_handle();
 			checkers_update();
 			SDL_GL_SwapWindow(window);
 			ticks = SDL_GetTicks();

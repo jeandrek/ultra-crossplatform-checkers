@@ -16,7 +16,12 @@ game_init(void)
 static void
 game_update(void)
 {
-	switch (input_read()) {
+}
+
+static void
+game_input_event(int button)
+{
+	switch (button) {
 	case INPUT_PAUSE:
 		menu.init();
 		checkers_switch_state(&menu);
@@ -41,5 +46,6 @@ game_update(void)
 struct state game = {
 	.load = game_display_load,
 	.init = game_init,
-	.update = game_update
+	.update = game_update,
+	.input_event = game_input_event
 };
