@@ -5,10 +5,10 @@
 #include "menu.h"
 #include "input.h"
 
-int game_sel_square;
-int game_sel_piece_moves_len;
-int game_sel_piece_moves[MAX_MOVES];
-int game_sel_move_idx;
+int sel_square;
+int sel_piece_moves_len;
+int sel_piece_moves[MAX_MOVES];
+int sel_move_idx;
 static enum {
 	SELECT_PIECE,
 	SELECT_MOVE
@@ -17,33 +17,33 @@ static enum {
 void
 game_interaction_init(void)
 {
-	game_sel_square = 0;
-	game_sel_move_idx = 0;
-	game_sel_piece_moves_len = piece_moves(game_sel_piece_moves, game_sel_square);
+	sel_square = 0;
+	sel_move_idx = 0;
+	sel_piece_moves_len = piece_moves(sel_piece_moves, sel_square);
 	cur_mode = SELECT_PIECE;
 }
 
 static void
 move_sel_square(int num)
 {
-	if (game_sel_square + num < 0)
-		game_sel_square = 0;
-	else if (game_sel_square + num > 63)
-		game_sel_square = 63;
+	if (sel_square + num < 0)
+		sel_square = 0;
+	else if (sel_square + num > 63)
+		sel_square = 63;
 	else
-		game_sel_square += num;
-	game_sel_piece_moves_len = piece_moves(game_sel_piece_moves, game_sel_square);
+		sel_square += num;
+	sel_piece_moves_len = piece_moves(sel_piece_moves, sel_square);
 }
 
 static void
 move_piece(void)
 {
-	board[0] ^= (uint64_t)1<<(uint64_t)game_sel_square;
-	game_sel_square = game_sel_piece_moves[game_sel_move_idx];
-	board[0] |= (uint64_t)1<<(uint64_t)game_sel_square;
-	game_sel_move_idx = 0;
+	board[0] ^= (uint64_t)1<<(uint64_t)sel_square;
+	sel_square = sel_piece_moves[sel_move_idx];
+	board[0] |= (uint64_t)1<<(uint64_t)sel_square;
+	sel_move_idx = 0;
 	cur_mode = SELECT_PIECE;
-	game_sel_piece_moves_len = piece_moves(game_sel_piece_moves, game_sel_square);
+	sel_piece_moves_len = piece_moves(sel_piece_moves, sel_square);
 }
 
 void
@@ -77,7 +77,7 @@ game_input_event(int button)
 		switch (button) {
 		case INPUT_BACK:
 			cur_mode = SELECT_PIECE;
-			game_sel_move_idx = 0;
+			sel_move_idx = 0;
 			break;
 		case INPUT_ACCEPT:
 			move_piece();
@@ -86,7 +86,7 @@ game_input_event(int button)
 		case INPUT_DOWN:
 		case INPUT_LEFT:
 		case INPUT_RIGHT:
-			game_sel_move_idx = (game_sel_move_idx + 1) % game_sel_piece_moves_len;
+			sel_move_idx = (sel_move_idx + 1) % sel_piece_moves_len;
 			break;
 		}
 	}

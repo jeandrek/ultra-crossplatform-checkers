@@ -34,9 +34,9 @@ render_highlight(struct scenegraph *scenegraph)
 	obj.flags = SG_OBJ_NOLIGHTDEPTH;
 	obj.vertices = highlight_verts;
 	obj.num_vertices = sizeof (highlight_verts)/(6*sizeof (float));
-	obj.x = -0.875 + 0.25*(game_sel_square % 8);
+	obj.x = -0.875 + 0.25*(sel_square % 8);
 	obj.y = 0.1;
-	obj.z = -(-0.875 + 0.25*(game_sel_square / 8));
+	obj.z = -(-0.875 + 0.25*(sel_square / 8));
 	sg_render_object(scenegraph, &obj);
 }
 
@@ -72,7 +72,7 @@ render_pieces(struct scenegraph *scenegraph)
 		if ((board[0] >> i) & 1) {
 			board_pos_to_world_pos(&x, &y, &z, i);
 			render_piece(scenegraph, x, y, z,
-				     (i == game_sel_square ?
+				     (i == sel_square ?
 				      0xff8080ff : 0xff0000ff));
 		}
 	}
@@ -85,12 +85,12 @@ render_pieces(struct scenegraph *scenegraph)
 		}
 	}
 
-	if (!((board[0] >> game_sel_square) & 1))
+	if (!((board[0] >> sel_square) & 1))
 		return;
-	for (int i = 0; i < game_sel_piece_moves_len; i++) {
-		board_pos_to_world_pos(&x, &y, &z, game_sel_piece_moves[i]);
+	for (int i = 0; i < sel_piece_moves_len; i++) {
+		board_pos_to_world_pos(&x, &y, &z, sel_piece_moves[i]);
 		render_piece(scenegraph, x, y, z,
-			     (i == game_sel_move_idx ?
+			     (i == sel_move_idx ?
 			      0x808080ff : 0x800000ff));
 	}
 }

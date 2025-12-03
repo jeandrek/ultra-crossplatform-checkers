@@ -3,10 +3,10 @@
 
 #include "game_checkers.h"
 
-extern int game_sel_square;
-extern int game_sel_piece_moves_len;
-extern int game_sel_piece_moves[MAX_MOVES];
-extern int game_sel_move_idx;
+extern int sel_square;
+extern int sel_piece_moves_len;
+extern int sel_piece_moves[MAX_MOVES];
+extern int sel_move_idx;
 
 void game_interaction_init(void);
 void game_input_event(int button);
