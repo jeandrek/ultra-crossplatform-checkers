@@ -13,4 +13,7 @@ enum mode {
 extern struct state game;
 extern enum mode cur_mode;
 
+void game_start_anim_rotate(void);
+void game_anim_rotate_finished(void);
+
 #endif /* !_GAME_H_ */
