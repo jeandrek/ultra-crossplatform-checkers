@@ -1,8 +1,12 @@
 #ifndef _GAME_INTERACTION_H_
 #define _GAME_INTERACTION_H_
 
-extern int game_sel_square, game_sel_move;
-extern uint64_t game_sel_piece_moves;
+#include "game_checkers.h"
+
+extern int game_sel_square;
+extern int game_sel_piece_moves_len;
+extern int game_sel_piece_moves[MAX_MOVES];
+extern int game_sel_move_idx;
 
 void game_interaction_init(void);
 void game_input_event(int button);

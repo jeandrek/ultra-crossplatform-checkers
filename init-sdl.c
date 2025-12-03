@@ -17,8 +17,8 @@ int
 main(void)
 {
 	SDL_GLContext context;
+	uint32_t ticks = 0;
 	SDL_Event ev;
-	uint32_t ticks;
 
 	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) == -1) {
 		fprintf(stderr, "Error: %s\n", SDL_GetError());

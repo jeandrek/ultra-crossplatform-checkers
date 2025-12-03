@@ -5,6 +5,8 @@
 
 extern uint64_t board[2];
 
-uint64_t piece_moves(int i);
+#define MAX_MOVES	2
+
+int piece_moves(int *moves, int i);
 
 #endif /* !_GAME_CHECKERS_H_ */

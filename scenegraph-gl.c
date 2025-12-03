@@ -59,7 +59,7 @@ sg_render(struct scenegraph *scenegraph)
 	glRotatef(-scenegraph->cam_dir_horiz * 180/M_PI, 0, 1, 0);
 	glTranslatef(-scenegraph->cam_x, -scenegraph->cam_y,
 		     -scenegraph->cam_z);
-	for (int i = 0; i < scenegraph->num_render; i++) {
+	for (size_t i = 0; i < scenegraph->num_render; i++) {
 		scenegraph->render[i](scenegraph);
 	}
 }

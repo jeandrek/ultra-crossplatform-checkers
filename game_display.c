@@ -87,13 +87,11 @@ render_pieces(struct scenegraph *scenegraph)
 
 	if (!((board[0] >> game_sel_square) & 1))
 		return;
-	for (int i = 0; i < 64; i++) {
-		if ((game_sel_piece_moves >> i) & 1) {
-			board_pos_to_world_pos(&x, &y, &z, i);
-			render_piece(scenegraph, x, y, z,
-				     (i == game_sel_move ?
-				      0x808080ff : 0x800000ff));
-		}
+	for (int i = 0; i < game_sel_piece_moves_len; i++) {
+		board_pos_to_world_pos(&x, &y, &z, game_sel_piece_moves[i]);
+		render_piece(scenegraph, x, y, z,
+			     (i == game_sel_move_idx ?
+			      0x808080ff : 0x800000ff));
 	}
 }
 
