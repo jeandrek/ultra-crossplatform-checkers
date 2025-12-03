@@ -9,41 +9,47 @@ int sel_square;
 int sel_piece_moves_len;
 int sel_piece_moves[MAX_MOVES];
 int sel_move_idx;
+int player_turn = 0;
 static enum {
 	SELECT_PIECE,
 	SELECT_MOVE
 } cur_mode;
 
-void
-game_interaction_init(void)
+static void
+set_sel_square(int i)
 {
-	sel_square = 0;
-	sel_move_idx = 0;
-	sel_piece_moves_len = piece_moves(sel_piece_moves, sel_square);
-	cur_mode = SELECT_PIECE;
+	sel_square = i;
+	if ((board[player_turn] >> i) & 1)
+		sel_piece_moves_len = piece_moves(sel_piece_moves, i);
+	else
+		sel_piece_moves_len = 0;
 }
 
 static void
 move_sel_square(int num)
 {
-	if (sel_square + num < 0)
-		sel_square = 0;
-	else if (sel_square + num > 63)
-		sel_square = 63;
-	else
-		sel_square += num;
-	sel_piece_moves_len = piece_moves(sel_piece_moves, sel_square);
+	if (sel_square + num > 63)	set_sel_square(63);
+	else if (sel_square + num < 0)	set_sel_square(0);
+	else				set_sel_square(sel_square + num);
+}
+
+void
+game_interaction_init(void)
+{
+	cur_mode = SELECT_PIECE;
+	set_sel_square(0);
 }
 
 static void
 move_piece(void)
 {
-	board[0] ^= (uint64_t)1<<(uint64_t)sel_square;
+	board[player_turn] ^= (uint64_t)1<<(uint64_t)sel_square;
 	sel_square = sel_piece_moves[sel_move_idx];
-	board[0] |= (uint64_t)1<<(uint64_t)sel_square;
+	board[player_turn] |= (uint64_t)1<<(uint64_t)sel_square;
 	sel_move_idx = 0;
 	cur_mode = SELECT_PIECE;
-	sel_piece_moves_len = piece_moves(sel_piece_moves, sel_square);
+	player_turn = !player_turn;
+	set_sel_square(player_turn == 0 ? 0 : 63);
 }
 
 void

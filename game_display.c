@@ -9,6 +9,13 @@
 #include "texture.h"
 #include "models.h"
 
+#define COLOR_PLAYER_0		0xff0000ff
+#define COLOR_PLAYER_0_SEL	0xff8080ff
+#define COLOR_PLAYER_1		0xff4d4d4d
+#define COLOR_PLAYER_1_SEL	0xffa6a6a6
+
+#define HALF_ALPHA(col)		(((col) & 0xffffff) | (0x80 << 24))
+
 static struct texture texture_board;
 
 static void
@@ -70,28 +77,33 @@ render_pieces(struct scenegraph *scenegraph)
 
 	for (int i = 0; i < 64; i++) {
 		if ((board[0] >> i) & 1) {
+			int color = (player_turn == 0 && i == sel_square ?
+				     COLOR_PLAYER_0_SEL : COLOR_PLAYER_0);
 			board_pos_to_world_pos(&x, &y, &z, i);
-			render_piece(scenegraph, x, y, z,
-				     (i == sel_square ?
-				      0xff8080ff : 0xff0000ff));
+			render_piece(scenegraph, x, y, z, color);
 		}
 	}
 
 	for (int i = 0; i < 64; i++) {
 		if ((board[1] >> i) & 1) {
+			int color = (player_turn == 1 && i == sel_square ?
+				     COLOR_PLAYER_1_SEL : COLOR_PLAYER_1);
 			board_pos_to_world_pos(&x, &y, &z, i);
-			render_piece(scenegraph, x, y, z,
-				     0xff4d4d4d);
+			render_piece(scenegraph, x, y, z, color);
 		}
 	}
 
-	if (!((board[0] >> sel_square) & 1))
-		return;
 	for (int i = 0; i < sel_piece_moves_len; i++) {
+		int color;
+		if (player_turn == 0)
+			color = (i == sel_move_idx ?
+				 COLOR_PLAYER_0_SEL : COLOR_PLAYER_0);
+		else
+			color = (i == sel_move_idx ?
+				 COLOR_PLAYER_1_SEL : COLOR_PLAYER_1);
+		color = HALF_ALPHA(color);
 		board_pos_to_world_pos(&x, &y, &z, sel_piece_moves[i]);
-		render_piece(scenegraph, x, y, z,
-			     (i == sel_move_idx ?
-			      0x808080ff : 0x800000ff));
+		render_piece(scenegraph, x, y, z, color);
 	}
 }
 
