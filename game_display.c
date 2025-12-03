@@ -130,15 +130,29 @@ game_display_init(void)
 	game.sg.fov = 70.0;
 	game.sg.near_plane = 0.1;
 	game.sg.far_plane = 24;
-	game.sg.cam_x = 0;
-	game.sg.cam_y = 1.5;
-	game.sg.cam_z = 1.5;
-	game.sg.cam_dir_horiz = 0;
-	game.sg.cam_dir_vert = -M_PI/4;
 	game.sg.light0_enabled = 1;
 	game.sg.light0_x = 0;
 	game.sg.light0_y = 2;
 	game.sg.light0_z = 2;
 	game.sg.light0_color = 0xffffffff;
+	game_display_set_viewpoint(0);
 	sg_init_scenegraph(&game.sg);
+}
+
+void
+game_display_set_viewpoint(int player)
+{
+	if (player == 0) {
+		game.sg.cam_x = 0;
+		game.sg.cam_y = 1.5;
+		game.sg.cam_z = 1.5;
+		game.sg.cam_dir_horiz = 0;
+		game.sg.cam_dir_vert = -M_PI/4;
+	} else {
+		game.sg.cam_x = 0;
+		game.sg.cam_y = 1.5;
+		game.sg.cam_z = -1.5;
+		game.sg.cam_dir_horiz = M_PI;
+		game.sg.cam_dir_vert = -M_PI/4;
+	}
 }

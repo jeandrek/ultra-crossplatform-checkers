@@ -64,26 +64,29 @@ game_input_event(int button)
 	if (cur_mode == SELECT_PIECE) {
 		switch (button) {
 		case INPUT_ACCEPT:
-			cur_mode = SELECT_MOVE;
+			if ((board[player_turn] >> sel_square) & 1) {
+				cur_mode = SELECT_MOVE;
+				sel_move_idx = (player_turn == 0 ?
+						0 : sel_piece_moves_len - 1);
+			}
 			break;
 		case INPUT_UP:
-			move_sel_square(8);
+			move_sel_square(player_turn == 0 ? 8 : -8);
 			break;
 		case INPUT_DOWN:
-			move_sel_square(-8);
+			move_sel_square(player_turn == 0 ? -8 : 8);
 			break;
 		case INPUT_LEFT:
-			move_sel_square(-1);
+			move_sel_square(player_turn == 0 ? -1 : 1);
 			break;
 		case INPUT_RIGHT:
-			move_sel_square(1);
+			move_sel_square(player_turn == 0 ? 1 : -1);
 			break;
 		}
 	} else if (cur_mode == SELECT_MOVE) {
 		switch (button) {
 		case INPUT_BACK:
 			cur_mode = SELECT_PIECE;
-			sel_move_idx = 0;
 			break;
 		case INPUT_ACCEPT:
 			move_piece();

@@ -13,6 +13,7 @@ game_init(void)
 static void
 game_update(void)
 {
+	game_display_set_viewpoint(player_turn);
 }
 
 struct state game = {
