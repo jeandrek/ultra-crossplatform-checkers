@@ -96,10 +96,10 @@ render_pieces(struct scenegraph *scenegraph)
 	for (int i = 0; i < sel_piece_moves_len; i++) {
 		int color;
 		if (player_turn == 0)
-			color = (i == sel_move_idx ?
+			color = (cur_mode == SELECT_MOVE && i == sel_move_idx ?
 				 COLOR_PLAYER_0_SEL : COLOR_PLAYER_0);
 		else
-			color = (i == sel_move_idx ?
+			color = (cur_mode == SELECT_MOVE && i == sel_move_idx ?
 				 COLOR_PLAYER_1_SEL : COLOR_PLAYER_1);
 		color = HALF_ALPHA(color);
 		board_pos_to_world_pos(&x, &y, &z, sel_piece_moves[i]);
@@ -137,6 +137,21 @@ game_display_init(void)
 	game.sg.light0_color = 0xffffffff;
 	game_display_set_viewpoint(0);
 	sg_init_scenegraph(&game.sg);
+}
+
+static int anim_ticks = 0;
+
+void
+game_anim(void)
+{
+	anim_ticks++;
+	game.sg.cam_dir_horiz += 1 / 30.0 * M_PI;
+	game.sg.cam_x = 1.5 * sinf(game.sg.cam_dir_horiz);
+	game.sg.cam_z = 1.5 * cosf(game.sg.cam_dir_horiz);
+	if (anim_ticks == 30) {
+		anim_ticks = 0;
+		game_anim_rotate_finished();
+	}
 }
 
 void

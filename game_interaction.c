@@ -10,10 +10,6 @@ int sel_piece_moves_len;
 int sel_piece_moves[MAX_MOVES];
 int sel_move_idx;
 int player_turn = 0;
-static enum {
-	SELECT_PIECE,
-	SELECT_MOVE
-} cur_mode;
 
 static void
 set_sel_square(int i)
@@ -47,8 +43,8 @@ move_piece(void)
 	sel_square = sel_piece_moves[sel_move_idx];
 	board[player_turn] |= (uint64_t)1<<(uint64_t)sel_square;
 	sel_move_idx = 0;
-	cur_mode = SELECT_PIECE;
 	player_turn = !player_turn;
+	game_start_anim_rotate();
 	set_sel_square(player_turn == 0 ? 0 : 63);
 }
 
