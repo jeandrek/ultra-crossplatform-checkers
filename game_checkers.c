@@ -2,6 +2,13 @@
 
 uint64_t board[2] = {0x55aa55, 0xaa55aa0000000000};
 
+void
+board_init(void)
+{
+	board[0] = 0x55aa55;
+	board[1] = 0xaa55aa0000000000;
+}
+
 int
 piece_moves(int *moves, int i)
 {

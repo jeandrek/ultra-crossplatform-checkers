@@ -32,6 +32,7 @@ move_sel_square(int num)
 void
 game_interaction_init(void)
 {
+	player_turn = 0;
 	cur_mode = SELECT_PIECE;
 	set_sel_square(0);
 }

@@ -8,6 +8,7 @@ enum mode cur_mode;
 static void
 game_init(void)
 {
+	board_init();
 	game_interaction_init();
 	game_display_init();
 }
