@@ -10,10 +10,10 @@ static float __attribute__((aligned(16))) sprite_verts[30];
 #include <GL/glu.h>
 
 static float sprite_verts[] = {
-	-0.5, -0.5,
-	0.5, -0.5,
-	0.5, 0.5,
-	-0.5, 0.5,
+	-1, -1,
+	1, -1,
+	1, 1,
+	-1, 1
 };
 
 static int sprite_indices[] = {0, 1, 2, 0, 2, 3};
@@ -94,7 +94,8 @@ draw_sprite(struct scenegraph *scenegraph, int left, int top,
 	glPushMatrix();
 	glLoadIdentity();
 	glTranslatef(centre_x, centre_y, 0);
-	glScalef(scale * width/225.0, scale * height/225.0, 1);
+	glScalef(scale * width/scenegraph->height,
+		 scale * height/scenegraph->height, 1);
 
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, tex->gl_tex);
