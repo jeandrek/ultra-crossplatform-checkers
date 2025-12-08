@@ -16,26 +16,9 @@ int selected_button = 0;
 static void
 menu_render_buttons(struct scenegraph *scenegraph)
 {
-#if 0
-	struct sg_object obj;
-	obj.color = (selected_button == 0 ? ~0 : 0xffaaaaaa);
-	obj.flags = SG_OBJ_2D | SG_OBJ_TEXTURED | SG_OBJ_NOLIGHTDEPTH;
-	obj.texture = &texture_menu_ss;
-	obj.vertices = button1_verts;
-	obj.num_vertices = sizeof (button1_verts)/(5*sizeof (float));
-	obj.x = 0;
-	obj.y = 0.2;
-	obj.z = 0;
-	sg_render_object(scenegraph, &obj);
-	obj.color = (selected_button == 1 ? ~0 : 0xffaaaaaa);
-	obj.vertices = button2_verts;
-	obj.x = 0;
-	obj.y = -0.2;
-	sg_render_object(scenegraph, &obj);
-#endif
-	draw_sprite(0, 0, 72, 24,
+	draw_sprite(scenegraph, 0, 0, 72, 24,
 		    0, 0.2, 1, &texture_menu_ss);
-	draw_sprite(0, 24, 72, 24,
+	draw_sprite(scenegraph, 0, 24, 72, 24,
 		    0, -0.2, 1, &texture_menu_ss);
 }
 

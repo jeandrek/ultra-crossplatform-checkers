@@ -14,6 +14,7 @@ struct scenegraph {
 	int	light0_enabled;
 	float	light0_x, light0_y, light0_z;
 	uint32_t	light0_color;
+	int	width, height;	/* XXX */
 };
 
 #define SG_OBJ_NOLIGHTDEPTH	(1<<0)

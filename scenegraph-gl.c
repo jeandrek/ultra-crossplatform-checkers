@@ -39,6 +39,8 @@ sg_init_scenegraph(struct scenegraph *scenegraph)
 		glEnable(GL_COLOR_MATERIAL);
 		glLightfv(GL_LIGHT0, GL_POSITION, params);
 	}
+	scenegraph->width = width;
+	scenegraph->height = height;
 }
 
 void

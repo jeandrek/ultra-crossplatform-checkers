@@ -21,12 +21,11 @@ static int sprite_indices[] = {0, 1, 2, 0, 2, 3};
 #endif
 
 void
-draw_sprite(int left, int top, int width, int height, float centre_x, float centre_y, float scale,
+draw_sprite(struct scenegraph *scenegraph, int left, int top,
+	    int width, int height,
+	    float centre_x, float centre_y, float scale,
 	    struct texture *tex)
 {
-	float aspect = 800.0 / 450.0;
-	float ss_w = 512;
-	float ss_h = 256;
 #ifdef __psp__
 	sprite_verts[0] = left;
 	sprite_verts[1] = top;
@@ -64,19 +63,22 @@ draw_sprite(int left, int top, int width, int height, float centre_x, float cent
 		obj.texture = tex;
 		obj.vertices = sprite_verts;
 		obj.num_vertices = sizeof (sprite_verts)/(5*sizeof (float));
-		sg_render_object(NULL, &obj);
+		sg_render_object(sg, &obj);
 	}
 #else
+	float aspect = (float)scenegraph->width / (float)scenegraph->height;
+	float ss_w = tex->width;
+	float ss_h = tex->height;
 	float sprite_tex_coord[8];
 
-	sprite_tex_coord[0] = left/512.0;
-	sprite_tex_coord[1] = (top + height)/256.0;
-	sprite_tex_coord[2] = (left + width)/512.0;
-	sprite_tex_coord[3] = (top + height)/256.0;
-	sprite_tex_coord[4] = (left + width)/512.0;
-	sprite_tex_coord[5] = top/256.0;
-	sprite_tex_coord[6] = left/512.0;
-	sprite_tex_coord[7] = top/256.0;
+	sprite_tex_coord[0] = left/ss_w;
+	sprite_tex_coord[1] = (top + height)/ss_h;
+	sprite_tex_coord[2] = (left + width)/ss_w;
+	sprite_tex_coord[3] = (top + height)/ss_h;
+	sprite_tex_coord[4] = (left + width)/ss_w;
+	sprite_tex_coord[5] = top/ss_h;
+	sprite_tex_coord[6] = left/ss_w;
+	sprite_tex_coord[7] = top/ss_h;
 
 	glDisable(GL_LIGHTING);
 	glDisable(GL_DEPTH_TEST);
