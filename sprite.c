@@ -62,7 +62,7 @@ sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 	sceGuTexFunc(GU_TFX_MODULATE, GU_TCC_RGBA);
 	sceGuTexImage(0, sprite->texture->width, sprite->texture->height,
 		      sprite->texture->width, sprite->texture->buffer);
-	sceGuColor(0xffffffff);
+	sceGuColor(sprite->base_color);
 	sceGumDrawArray(GU_TRIANGLES,
 			GU_VERTEX_32BITF | GU_TEXTURE_32BITF | GU_TRANSFORM_2D,
 			6, 0, sprite_verts);
@@ -102,7 +102,10 @@ sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, sprite->texture->gl_tex);
-	glColor3f(1, 1, 1);
+	glColor4f((sprite->base_color & 0xff)/255.0,
+		  ((sprite->base_color >> 8) & 0xff)/255.0,
+		  ((sprite->base_color >> 16) & 0xff)/255.0,
+		  (sprite->base_color >> 24)/255.0);
 
 	glVertexPointer(2, GL_FLOAT, 0, sprite_verts);
 	glTexCoordPointer(2, GL_FLOAT, 0, sprite_tex_coord);
