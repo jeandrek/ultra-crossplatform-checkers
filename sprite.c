@@ -23,6 +23,35 @@ static int sprite_indices[] = {0, 1, 2, 0, 2, 3};
 #endif
 
 void
+sprite_init(struct sprite *sprite, struct texture *texture,
+	    int tex_left, int tex_top, int width, int height)
+{
+	sprite->texture = texture;
+	sprite->tex_left = tex_left;
+	sprite->tex_top = tex_top;
+	sprite->width = width;
+	sprite->height = height;
+	sprite->x = 0;
+	sprite->y = 0;
+	sprite->scale = 1.0;
+	sprite->base_color = ~0;
+
+#ifndef __psp__
+	float ss_w = sprite->texture->width;
+	float ss_h = sprite->texture->height;
+
+	sprite->tex_coord[0] = sprite->tex_left/ss_w;
+	sprite->tex_coord[1] = (sprite->tex_top + sprite->height)/ss_h;
+	sprite->tex_coord[2] = (sprite->tex_left + sprite->width)/ss_w;
+	sprite->tex_coord[3] = (sprite->tex_top + sprite->height)/ss_h;
+	sprite->tex_coord[4] = (sprite->tex_left + sprite->width)/ss_w;
+	sprite->tex_coord[5] = sprite->tex_top/ss_h;
+	sprite->tex_coord[6] = sprite->tex_left/ss_w;
+	sprite->tex_coord[7] = sprite->tex_top/ss_h;
+#endif
+}
+
+void
 sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 {
 #ifdef __psp__
@@ -70,18 +99,6 @@ sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 	sceGuEnable(GU_DEPTH_TEST);
 #else
 	float aspect = (float)scenegraph->width / (float)scenegraph->height;
-	float ss_w = sprite->texture->width;
-	float ss_h = sprite->texture->height;
-	float sprite_tex_coord[8];
-
-	sprite_tex_coord[0] = sprite->tex_left/ss_w;
-	sprite_tex_coord[1] = (sprite->tex_top + sprite->height)/ss_h;
-	sprite_tex_coord[2] = (sprite->tex_left + sprite->width)/ss_w;
-	sprite_tex_coord[3] = (sprite->tex_top + sprite->height)/ss_h;
-	sprite_tex_coord[4] = (sprite->tex_left + sprite->width)/ss_w;
-	sprite_tex_coord[5] = sprite->tex_top/ss_h;
-	sprite_tex_coord[6] = sprite->tex_left/ss_w;
-	sprite_tex_coord[7] = sprite->tex_top/ss_h;
 
 	glDisable(GL_LIGHTING);
 	glDisable(GL_DEPTH_TEST);
@@ -108,7 +125,7 @@ sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 		  (sprite->base_color >> 24)/255.0);
 
 	glVertexPointer(2, GL_FLOAT, 0, sprite_verts);
-	glTexCoordPointer(2, GL_FLOAT, 0, sprite_tex_coord);
+	glTexCoordPointer(2, GL_FLOAT, 0, sprite->tex_coord);
  	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, sprite_indices);
 
 	glPopMatrix();

@@ -11,31 +11,14 @@
 
 static struct texture texture_menu_ss;
 
+static struct sprite button1;
+static struct sprite button2;
+
 int selected_button = 0;
 
 static void
 menu_render_buttons(struct scenegraph *scenegraph)
 {
-	struct sprite button1, button2;
-
-	button1.texture = &texture_menu_ss;
-	button1.tex_left = 0;
-	button1.tex_top = 0;
-	button1.width = 72;
-	button1.height = 24;
-	button1.x = 0;
-	button1.y = 0.2;
-	button1.scale = 1;
-
-	button2.texture = &texture_menu_ss;
-	button2.tex_left = 0;
-	button2.tex_top = 24;
-	button2.width = 72;
-	button2.height = 24;
-	button2.x = 0;
-	button2.y = -0.2;
-	button2.scale = 1;
-
 	if (selected_button == 0) {
 		button1.base_color = 0xffffffff;
 		button2.base_color = 0xffaaaaaa;
@@ -58,6 +41,16 @@ menu_load(void)
 {
 	texture_init_from_file(&texture_menu_ss, 512, 256,
 			       "assets/textures/menu-ss");
+
+	sprite_init(&button1, &texture_menu_ss, 0, 0, 72, 24);
+	button1.x = 0;
+	button1.y = 0.2;
+	button1.scale = 1;
+
+	sprite_init(&button2, &texture_menu_ss, 0, 24, 72, 24);
+	button2.x = 0;
+	button2.y = -0.2;
+	button2.scale = 1;
 }
 
 static void
