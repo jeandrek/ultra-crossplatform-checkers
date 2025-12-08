@@ -7,7 +7,6 @@ enum mode {
 	SELECT_PIECE,
 	SELECT_MOVE,
 	ANIM_ROTATE_BOARD,
-	ANIM_DONE
 };
 
 extern struct state game;

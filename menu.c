@@ -12,31 +12,31 @@ static struct texture texture_menu_ss;
 
 static float __attribute__((aligned(16))) button1_verts[] = {
 	0, 0,
-	0, 0, 0,
+	-0.275735, 0.0919118, 0,
 	0, 25,
-	0, 25, 0,
+	-0.275735, -0.0919118, 0,
 	75, 0,
-	75, 0, 0,
+	0.275375, 0.0919118, 0,
 	75, 0,
-	75, 0, 0,
+	0.275375, 0.0919118, 0,
 	0, 25,
-	0, 25, 0,
+	-0.275375, -0.0919118, 0,
 	75, 25,
-	75, 25, 0
+	0.275375, -0.0919118, 0
 };
 static float __attribute__((aligned(16))) button2_verts[] = {
 	0, 25,
-	0, 0, 0,
+	-0.275735, 0.0919118, 0,
 	0, 50,
-	0, 25, 0,
+	-0.275735, -0.0919118, 0,
 	75, 25,
-	75, 0, 0,
+	0.275375, 0.0919118, 0,
 	75, 25,
-	75, 0, 0,
+	0.275375, 0.0919118, 0,
 	0, 50,
-	0, 25, 0,
+	-0.275375, -0.0919118, 0,
 	75, 50,
-	75, 25, 0
+	0.275375, -0.0919118, 0
 };
 
 int selected_button = 0;
@@ -51,11 +51,13 @@ menu_render_buttons(struct scenegraph *scenegraph)
 	obj.vertices = button1_verts;
 	obj.num_vertices = sizeof (button1_verts)/(5*sizeof (float));
 	obj.x = 0;
-	obj.y = 0;
+	obj.y = 0.2;
 	obj.z = 0;
 	sg_render_object(scenegraph, &obj);
 	obj.color = (selected_button == 1 ? ~0 : 0xffaaaaaa);
 	obj.vertices = button2_verts;
+	obj.x = 0;
+	obj.y = -0.2;
 	sg_render_object(scenegraph, &obj);
 }
 
@@ -68,27 +70,21 @@ static size_t num_menu_render_functions = 1;
 static void
 menu_load(void)
 {
-	for (int i = 2; i < 30; i += 5) {
-		button1_verts[i] += 202;
-		button1_verts[i+1] += 100;
-
-		button2_verts[i] += 202;
-		button2_verts[i+1] += 150;
-	}
 #ifndef __psp__
 	for (int i = 0; i < 30; i += 5) {
 		button1_verts[i] /= 512.0;
 		button1_verts[i+1] /= 256.0;
-		button1_verts[i+2] /= 240.0;
-		button1_verts[i+2] -= 1;
-		button1_verts[i+3] /= -136.0;
-		button1_verts[i+3] += 1;
+
 		button2_verts[i] /= 512.0;
 		button2_verts[i+1] /= 256.0;
-		button2_verts[i+2] /= 240.0;
-		button2_verts[i+2] -= 1;
-		button2_verts[i+3] /= -136.0;
-		button2_verts[i+3] += 1;
+	}
+#else
+	for (int i = 0; i < 30; i += 5) {
+		button1_verts[i+2] *= 272;
+		button1_verts[i+3] *= 272;
+
+		button2_verts[i+2] *= 272;
+		button2_verts[i+3] *= 272;
 	}
 #endif
 	texture_init_from_file(&texture_menu_ss, 512, 256,

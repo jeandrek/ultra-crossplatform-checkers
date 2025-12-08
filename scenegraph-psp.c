@@ -48,7 +48,7 @@ sg_init_scenegraph(struct scenegraph *scenegraph)
 	sceGuScissor(0, 0, 480, 272);
 	sceGuEnable(GU_SCISSOR_TEST);
 	sceGuEnable(GU_CLIP_PLANES);
-	sceGuEnable(GU_CULL_FACE);
+	//sceGuEnable(GU_CULL_FACE);
 	sceGuFrontFace(GU_CCW);
 	sceGuShadeModel(GU_SMOOTH);
 	sceGuDepthRange(65535, 0);

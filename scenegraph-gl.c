@@ -80,16 +80,18 @@ sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 		  ((obj->color >> 16) & 0xff)/255.0,
 		  (obj->color >> 24)/255.0);
 	if (obj->flags & SG_OBJ_2D) {
+		float aspect = (float)width/(float)height;
 		glMatrixMode(GL_PROJECTION);
 		glPushMatrix();
 		glLoadIdentity();
+		glOrtho(-aspect, aspect, -1, 1, -1, 1);
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 		glLoadIdentity();
 	} else {
 		glPushMatrix();
-		glTranslatef(obj->x, obj->y, obj->z);
 	}
+	glTranslatef(obj->x, obj->y, obj->z);
 	if (obj->flags & SG_OBJ_2D) {
 		int stride = 5*sizeof (float);
 		glTexCoordPointer(2, GL_FLOAT, stride, obj->vertices);
