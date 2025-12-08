@@ -4,46 +4,19 @@
 #include "checkers.h"
 #include "game.h"
 #include "menu.h"
+#include "sprite.h"
 #include "scenegraph.h"
 #include "texture.h"
 #include "input.h"
 
 static struct texture texture_menu_ss;
 
-static float __attribute__((aligned(16))) button1_verts[] = {
-	0, 0,
-	-0.275735, 0.0919118, 0,
-	0, 25,
-	-0.275735, -0.0919118, 0,
-	75, 0,
-	0.275375, 0.0919118, 0,
-	75, 0,
-	0.275375, 0.0919118, 0,
-	0, 25,
-	-0.275375, -0.0919118, 0,
-	75, 25,
-	0.275375, -0.0919118, 0
-};
-static float __attribute__((aligned(16))) button2_verts[] = {
-	0, 25,
-	-0.275735, 0.0919118, 0,
-	0, 50,
-	-0.275735, -0.0919118, 0,
-	75, 25,
-	0.275375, 0.0919118, 0,
-	75, 25,
-	0.275375, 0.0919118, 0,
-	0, 50,
-	-0.275375, -0.0919118, 0,
-	75, 50,
-	0.275375, -0.0919118, 0
-};
-
 int selected_button = 0;
 
 static void
 menu_render_buttons(struct scenegraph *scenegraph)
 {
+#if 0
 	struct sg_object obj;
 	obj.color = (selected_button == 0 ? ~0 : 0xffaaaaaa);
 	obj.flags = SG_OBJ_2D | SG_OBJ_TEXTURED | SG_OBJ_NOLIGHTDEPTH;
@@ -59,6 +32,11 @@ menu_render_buttons(struct scenegraph *scenegraph)
 	obj.x = 0;
 	obj.y = -0.2;
 	sg_render_object(scenegraph, &obj);
+#endif
+	draw_sprite(0, 0, 72, 24,
+		    0, 0.2, 1, &texture_menu_ss);
+	draw_sprite(0, 24, 72, 48,
+		    0, -0.2, 1, &texture_menu_ss);
 }
 
 static void (*menu_render_functions[])(struct scenegraph *) = {
