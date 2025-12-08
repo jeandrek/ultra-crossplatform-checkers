@@ -1,4 +1,3 @@
-#include <math.h>
 #include <string.h>
 
 #include "checkers.h"
@@ -60,6 +59,11 @@ menu_init(void)
 	menu.sg.num_render = num_menu_render_functions;
 	menu.sg.render = menu_render_functions;
 	sg_init_scenegraph(&menu.sg);
+
+	if (menu.sg.height > 300) {
+		button1.scale = 2;
+		button2.scale = 2;
+	}
 }
 
 static void
