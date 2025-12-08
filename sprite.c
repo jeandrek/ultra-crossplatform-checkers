@@ -3,12 +3,22 @@
 
 #ifdef __psp__
 #include <pspgu.h>
+
+static float __attribute__((aligned(16))) sprite_verts[30];
 #else
 #include <GL/gl.h>
 #include <GL/glu.h>
-#endif
 
-static float __attribute__((aligned(16))) sprite_verts[30] = {0};
+static float sprite_verts[] = {
+	-0.5, -0.5,
+	0.5, -0.5,
+	0.5, 0.5,
+	-0.5, 0.5,
+};
+
+static int sprite_indices[] = {0, 1, 2, 0, 2, 3};
+
+#endif
 
 void
 draw_sprite(int left, int top, int width, int height, float centre_x, float centre_y, float scale,
@@ -57,40 +67,48 @@ draw_sprite(int left, int top, int width, int height, float centre_x, float cent
 		sg_render_object(NULL, &obj);
 	}
 #else
+	float sprite_tex_coord[8];
+
+	sprite_tex_coord[0] = left/512.0;
+	sprite_tex_coord[1] = (top + height)/256.0;
+	sprite_tex_coord[2] = (left + width)/512.0;
+	sprite_tex_coord[3] = (top + height)/256.0;
+	sprite_tex_coord[4] = (left + width)/512.0;
+	sprite_tex_coord[5] = top/256.0;
+	sprite_tex_coord[6] = left/512.0;
+	sprite_tex_coord[7] = top/256.0;
+
 	glDisable(GL_LIGHTING);
 	glDisable(GL_DEPTH_TEST);
-	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
 	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
 	glLoadIdentity();
 	glOrtho(-aspect, aspect, -1, 1, -1, 1);
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	glTranslatef(centre_x, centre_y, 0);
+	glScalef(scale * width/225.0, scale * height/225.0, 1);
 
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, tex->gl_tex);
 	glColor3f(1, 1, 1);
 
-	glBegin(GL_TRIANGLES);
-	glTexCoord2f(left/ss_w, (top + height)/ss_h);
-	glVertex2f(centre_x - scale*width/450, centre_y - scale*height/450);
-	glTexCoord2f((left + width)/ss_w, (top + height)/ss_h);
-	glVertex2f(centre_x + scale*width/450, centre_y - scale*height/450);
-	glTexCoord2f((left + width)/ss_w, top/ss_h);
-	glVertex2f(centre_x + scale*width/450, centre_y + scale*height/450);
+	glVertexPointer(2, GL_FLOAT, 0, sprite_verts);
+	glTexCoordPointer(2, GL_FLOAT, 0, sprite_tex_coord);
+ 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, sprite_indices);
 
-	glTexCoord2f(left/ss_w, (top + height)/ss_h);
-	glVertex2f(centre_x - scale*width/450, centre_y - scale*height/450);
-	glTexCoord2f((left + width)/ss_w, top/ss_h);
-	glVertex2f(centre_x + scale*width/450, centre_y + scale*height/450);
-	glTexCoord2f(left/ss_w, top/ss_h);
-	glVertex2f(centre_x - scale*width/450, centre_y + scale*height/450);
-	glEnd();
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);
-	glEnableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 #endif
 }

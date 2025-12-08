@@ -35,7 +35,7 @@ menu_render_buttons(struct scenegraph *scenegraph)
 #endif
 	draw_sprite(0, 0, 72, 24,
 		    0, 0.2, 1, &texture_menu_ss);
-	draw_sprite(0, 24, 72, 48,
+	draw_sprite(0, 24, 72, 24,
 		    0, -0.2, 1, &texture_menu_ss);
 }
 
@@ -48,23 +48,6 @@ static size_t num_menu_render_functions = 1;
 static void
 menu_load(void)
 {
-#ifndef __psp__
-	for (int i = 0; i < 30; i += 5) {
-		button1_verts[i] /= 512.0;
-		button1_verts[i+1] /= 256.0;
-
-		button2_verts[i] /= 512.0;
-		button2_verts[i+1] /= 256.0;
-	}
-#else
-	for (int i = 0; i < 30; i += 5) {
-		button1_verts[i+2] *= 272;
-		button1_verts[i+3] *= 272;
-
-		button2_verts[i+2] *= 272;
-		button2_verts[i+3] *= 272;
-	}
-#endif
 	texture_init_from_file(&texture_menu_ss, 512, 256,
 			       "assets/textures/menu-ss");
 }
