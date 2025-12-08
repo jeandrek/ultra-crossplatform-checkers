@@ -69,36 +69,22 @@ sg_render(struct scenegraph *scenegraph)
 void
 sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 {
-	if (obj->flags & SG_OBJ_NOLIGHTDEPTH)	glDisable(GL_LIGHTING);
+	if (obj->flags & SG_OBJ_NOLIGHTDEPTH) {
+		glDisable(GL_LIGHTING);
+		glDisable(GL_DEPTH_TEST);
+	}
 	if (obj->flags & SG_OBJ_TEXTURED) {
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, obj->texture->gl_tex);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	}
-	if (obj->flags & SG_OBJ_2D || obj->flags & SG_OBJ_NOLIGHTDEPTH)
-		glDisable(GL_DEPTH_TEST);
 	glColor4f((obj->color & 0xff)/255.0,
 		  ((obj->color >> 8) & 0xff)/255.0,
 		  ((obj->color >> 16) & 0xff)/255.0,
 		  (obj->color >> 24)/255.0);
-	if (obj->flags & SG_OBJ_2D) {
-		float aspect = (float)width/(float)height;
-		glMatrixMode(GL_PROJECTION);
-		glPushMatrix();
-		glLoadIdentity();
-		glOrtho(-aspect, aspect, -1, 1, -1, 1);
-		glMatrixMode(GL_MODELVIEW);
-		glPushMatrix();
-		glLoadIdentity();
-	} else {
-		glPushMatrix();
-	}
+	glPushMatrix();
 	glTranslatef(obj->x, obj->y, obj->z);
-	if (obj->flags & SG_OBJ_2D) {
-		int stride = 5*sizeof (float);
-		glTexCoordPointer(2, GL_FLOAT, stride, obj->vertices);
-		glVertexPointer(3, GL_FLOAT, stride, &obj->vertices[2]);
-	} else if (obj->flags & SG_OBJ_TEXTURED) {
+	if (obj->flags & SG_OBJ_TEXTURED) {
 		int stride = 8*sizeof (float);
 		glTexCoordPointer(2, GL_FLOAT, stride, obj->vertices);
 		glNormalPointer(GL_FLOAT, stride, &obj->vertices[2]);
@@ -109,19 +95,13 @@ sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 		glVertexPointer(3, GL_FLOAT, stride, &obj->vertices[3]);
 	}
 	glDrawArrays(GL_TRIANGLES, 0, obj->num_vertices);
-	if (obj->flags & SG_OBJ_2D) {
-		glMatrixMode(GL_PROJECTION);
-		glPopMatrix();
-		glMatrixMode(GL_MODELVIEW);
-		glPopMatrix();
-	} else {
-		glPopMatrix();
-	}
-	if (obj->flags & SG_OBJ_2D || obj->flags & SG_OBJ_NOLIGHTDEPTH)
-		glEnable(GL_DEPTH_TEST);
+	glPopMatrix();
 	if (obj->flags & SG_OBJ_TEXTURED) {
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisable(GL_TEXTURE_2D);
 	}
-	if (obj->flags & SG_OBJ_NOLIGHTDEPTH)	glEnable(GL_LIGHTING);
+	if (obj->flags & SG_OBJ_NOLIGHTDEPTH) {
+		glEnable(GL_LIGHTING);
+		glEnable(GL_DEPTH_TEST);
+	}
 }

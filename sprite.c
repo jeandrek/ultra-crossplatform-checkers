@@ -3,6 +3,7 @@
 
 #ifdef __psp__
 #include <pspgu.h>
+#include <pspgum.h>
 
 static float __attribute__((aligned(16))) sprite_verts[30];
 #else
@@ -56,15 +57,19 @@ draw_sprite(struct scenegraph *scenegraph, int left, int top,
 	sprite_verts[26] = top + height;
 	sprite_verts[27] = 240 + 240 * centre_x - width / 2.0;
 	sprite_verts[28] = 136 - 136 * centre_y + height / 2.0;
-	{
-		struct sg_object obj;
-		obj.color = 0xffffffff;
-		obj.flags = SG_OBJ_2D | SG_OBJ_TEXTURED | SG_OBJ_NOLIGHTDEPTH;
-		obj.texture = tex;
-		obj.vertices = sprite_verts;
-		obj.num_vertices = sizeof (sprite_verts)/(5*sizeof (float));
-		sg_render_object(sg, &obj);
-	}
+
+	sceGuDisable(GU_DEPTH_TEST);
+	sceGuEnable(GU_TEXTURE_2D);
+	sceGuTexMode(GU_PSM_8888, 0, 0, 0);
+	sceGuTexFunc(GU_TFX_MODULATE, GU_TCC_RGBA);
+	sceGuTexImage(0, tex->width, tex->height,
+		      tex->width, tex->buffer);
+	sceGuColor(0xffffffff);
+	sceGumDrawArray(GU_TRIANGLES,
+			GU_VERTEX_32BITF | GU_TEXTURE_32BITF | GU_TRANSFORM_2D,
+			6, 0, sprite_verts);
+	sceGuDisable(GU_TEXTURE_2D);
+	sceGuEnable(GU_DEPTH_TEST);
 #else
 	float aspect = (float)scenegraph->width / (float)scenegraph->height;
 	float ss_w = tex->width;

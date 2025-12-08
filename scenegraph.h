@@ -19,7 +19,6 @@ struct scenegraph {
 
 #define SG_OBJ_NOLIGHTDEPTH	(1<<0)
 #define SG_OBJ_TEXTURED		(1<<1)
-#define SG_OBJ_2D		(1<<2)
 
 struct sg_object {
 	uint32_t	color;
@@ -34,11 +33,5 @@ void	sg_init(int w, int h);
 void	sg_init_scenegraph(struct scenegraph *scenegraph);
 void	sg_render(struct scenegraph *scenegraph);
 void	sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj);
-
-#ifdef __psp__
-#define TEXCOORD(x, l) x
-#else
-#define TEXCOORD(x, l) x/(float)l
-#endif
 
 #endif /* !_SCENEGRAPH_H_ */
