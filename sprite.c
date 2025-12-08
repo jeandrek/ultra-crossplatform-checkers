@@ -126,7 +126,7 @@ sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 
 	glVertexPointer(2, GL_FLOAT, 0, sprite_verts);
 	glTexCoordPointer(2, GL_FLOAT, 0, sprite->tex_coord);
- 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, sprite_indices);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, sprite_indices);
 
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);

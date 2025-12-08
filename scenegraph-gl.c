@@ -34,6 +34,8 @@ sg_init_scenegraph(struct scenegraph *scenegraph)
 			scenegraph->light0_x, scenegraph->light0_y,
 			scenegraph->light0_z, 1
 		};
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
 		glEnable(GL_LIGHTING);
 		glEnable(GL_LIGHT0);
 		glEnable(GL_COLOR_MATERIAL);
