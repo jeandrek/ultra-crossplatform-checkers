@@ -62,4 +62,7 @@ main(void)
 		}
 	}
 quit:
+	SDL_GL_DeleteContext(context);
+	SDL_Quit();
+	return 0;
 }

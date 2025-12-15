@@ -55,7 +55,7 @@ menu_load(void)
 static void
 menu_init(void)
 {
-	bzero(&menu.sg, sizeof (menu.sg));
+	memset(&menu.sg, 0, sizeof (menu.sg));
 	menu.sg.num_render = num_menu_render_functions;
 	menu.sg.render = menu_render_functions;
 	sg_init_scenegraph(&menu.sg);
@@ -83,6 +83,8 @@ menu_input_event(int button)
 		switch (selected_button) {
 		case 0:
 			game.init();
+			checkers_switch_state(&game);
+			break;
 		case 1:
 			checkers_switch_state(&game);
 			break;

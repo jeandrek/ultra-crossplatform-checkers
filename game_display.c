@@ -123,7 +123,7 @@ game_display_load(void)
 void
 game_display_init(void)
 {
-	bzero(&game.sg, sizeof (game.sg));
+	memset(&game.sg, 0, sizeof (game.sg));
 	game.sg.num_render = 3;
 	game.sg.render = render_functions;
 	game.sg.cam3d_enabled = 1;
