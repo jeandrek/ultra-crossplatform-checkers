@@ -16,4 +16,6 @@ void board_init(void); /* Rename? */
 
 int piece_moves(struct move *moves, int i);
 
+void perform_move(struct move *move);
+
 #endif /* !_GAME_CHECKERS_H_ */

@@ -40,9 +40,8 @@ game_interaction_init(void)
 static void
 move_piece(void)
 {
+	perform_move(&sel_piece_moves[sel_move_idx]);
 	sel_square = sel_piece_moves[sel_move_idx].location;
-	board[0] = sel_piece_moves[sel_move_idx].resulting_board[0];
-	board[1] = sel_piece_moves[sel_move_idx].resulting_board[1];
 	sel_move_idx = 0;
 	player_turn = !player_turn;
 	game_start_anim_rotate();

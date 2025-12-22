@@ -65,3 +65,10 @@ piece_moves(struct move *moves, int i)
 	}
 	return n;
 }
+
+void
+perform_move(struct move *move)
+{
+	board[0] = move->resulting_board[0];
+	board[1] = move->resulting_board[1];
+}
