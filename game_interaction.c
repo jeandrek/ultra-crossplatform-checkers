@@ -86,13 +86,15 @@ game_input_event(int button)
 			cur_mode = SELECT_PIECE;
 			break;
 		case INPUT_ACCEPT:
-			move_piece();
+			if (sel_piece_moves_len > 0)
+				move_piece();
 			break;
 		case INPUT_UP:
 		case INPUT_DOWN:
 		case INPUT_LEFT:
 		case INPUT_RIGHT:
-			sel_move_idx = (sel_move_idx + 1) % sel_piece_moves_len;
+			if (sel_piece_moves_len > 0)
+				sel_move_idx = (sel_move_idx + 1) % sel_piece_moves_len;
 			break;
 		}
 	}
