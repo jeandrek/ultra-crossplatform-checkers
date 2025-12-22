@@ -17,7 +17,6 @@ int
 main(void)
 {
 	SDL_GLContext context;
-	uint32_t ticks = 0;
 	SDL_Event ev;
 
 	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) == -1) {
@@ -37,6 +36,8 @@ main(void)
 
 	context = SDL_GL_CreateContext(window);
 
+	SDL_GL_SetSwapInterval(1);
+
 	sg_init(800, 600);
 	checkers_init();
 
@@ -51,15 +52,9 @@ main(void)
 				goto quit;
 			}
 		}
-		// Run at as close to 60 FPS as possible
-		if (SDL_GetTicks() - ticks >= 16) {
-			input_handle();
-			checkers_update();
-			SDL_GL_SwapWindow(window);
-			ticks = SDL_GetTicks();
-		} else {
-			SDL_Delay(2); // Idle
-		}
+		input_handle();
+		checkers_update();
+		SDL_GL_SwapWindow(window);
 	}
 quit:
 	SDL_GL_DeleteContext(context);
