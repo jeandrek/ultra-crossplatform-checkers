@@ -61,28 +61,33 @@ diag_adj_squares(int x, int y)
 	return result;
 }
 
-static void
-move_capture(struct move *move, int player, int capturing, int captured,
-	     int i, int j, int k)
-{
-	move->location = k;
-	move->resulting_board[player][capturing] =
-		(board[player][capturing] ^ (uint64_t)1<<i) | (uint64_t)1<<k;
-	move->resulting_board[!player][captured] =
-		(board[!player][captured] ^ (uint64_t)1<<j);
-	move->resulting_board[player][!capturing] = board[player][!capturing];
-	move->resulting_board[!player][!captured] = board[!player][!captured];
-}
+#define LAST_ROW(player) ((player) == 0 ? 7 : 0)
 
 static void
 move_go_to_square(struct move *move, int player, int piece, int i, int j)
 {
 	move->location = j;
-	move->resulting_board[player][piece] =
-		(board[player][piece] ^ (uint64_t)1<<i) | (uint64_t)1<<j;
+	if (piece == MAN && j / 8 == LAST_ROW(player)) {
+		/* Promotion */
+		move->resulting_board[player][MAN] =
+			board[player][MAN] ^ (uint64_t)1<<i;
+		move->resulting_board[player][KING] =
+			board[player][KING] | (uint64_t)1<<j;
+	} else {
+		move->resulting_board[player][piece] =
+			(board[player][piece] ^ (uint64_t)1<<i) | (uint64_t)1<<j;
+		move->resulting_board[player][!piece] = board[player][!piece];
+	}
 	move->resulting_board[!player][piece] = board[!player][piece];
-	move->resulting_board[player][!piece] = board[player][!piece];
 	move->resulting_board[!player][!piece] = board[!player][!piece];
+}
+
+static void
+move_capture(struct move *move, int player, int capturing, int captured,
+	     int i, int j, int k)
+{
+	move_go_to_square(move, player, capturing, i, k);
+	move->resulting_board[!player][captured] ^= (uint64_t)1<<j;
 }
 
 int
