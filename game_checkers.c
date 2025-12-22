@@ -1,12 +1,23 @@
 #include "game_checkers.h"
 
-uint64_t board[2] = {0x55aa55, 0xaa55aa0000000000};
+struct board board;
 
 void
 board_init(void)
 {
-	board[0] = 0x55aa55;
-	board[1] = 0xaa55aa0000000000;
+	board.men[0] = 0x55aa55;
+	board.men[1] = 0xaa55aa0000000000;
+	board.kings[0] = 0;
+	board.kings[1] = 0;
+}
+
+static int
+is_square_empty(int i)
+{
+	return !(((board.men[0] >> i) & 1)
+		 || ((board.men[1] >> i) & 1)
+		 || ((board.kings[0] >> i) & 1)
+		 || ((board.kings[1] >> i) & 1));
 }
 
 static uint64_t
@@ -30,7 +41,7 @@ diag_forward_squares(int player, int x, int y)
 int
 piece_moves(struct move *moves, int i)
 {
-	int player = (board[1] >> i) & 1;
+	int player = (board.men[1] >> i) & 1;
 	int x = i % 8;
 	int y = i / 8;
 	int n = 0;
@@ -38,7 +49,7 @@ piece_moves(struct move *moves, int i)
 
 	for (int j = 0; j < 64; j++) {
 		if ((squares >> j) & 1) {
-			if ((board[!player] >> j) & 1) {
+			if ((board.men[!player] >> j) & 1) {
 				int x2 = j % 8;
 				int y2 = j / 8;
 				int x3, y3;
@@ -48,17 +59,16 @@ piece_moves(struct move *moves, int i)
 				if (y3 < 0 || y3 > 7) continue;
 				if (x3 < 0 || x3 > 7) continue;
 				k = 8 * y3 + x3;
-				if (!((board[0] >> k) & 1)
-				    && !((board[1] >> k) & 1)) {
+				if (is_square_empty(k)) {
 					moves[n].location = k;
-					moves[n].resulting_board[player] = (board[player] ^ ((uint64_t)1<<i)) | ((uint64_t)1<<k);
-					moves[n].resulting_board[!player] = (board[!player] ^ ((uint64_t)1<<j));
+					moves[n].resulting_board.men[player] = (board.men[player] ^ ((uint64_t)1<<i)) | ((uint64_t)1<<k);
+					moves[n].resulting_board.men[!player] = (board.men[!player] ^ ((uint64_t)1<<j));
 					n++;
 				}
-			} else if (!((board[player] >> j) & 1)) {
+			} else if (!((board.men[player] >> j) & 1)) {
 				moves[n].location = j;
-				moves[n].resulting_board[player] = (board[player] ^ ((uint64_t)1<<i)) | ((uint64_t)1<<j);
-				moves[n].resulting_board[!player] = board[!player];
+				moves[n].resulting_board.men[player] = (board.men[player] ^ ((uint64_t)1<<i)) | ((uint64_t)1<<j);
+				moves[n].resulting_board.men[!player] = board.men[!player];
 				n++;
 			}
 		}
@@ -69,6 +79,8 @@ piece_moves(struct move *moves, int i)
 void
 perform_move(struct move *move)
 {
-	board[0] = move->resulting_board[0];
-	board[1] = move->resulting_board[1];
+	board.men[0] = move->resulting_board.men[0];
+	board.men[1] = move->resulting_board.men[1];
+	board.kings[0] = move->resulting_board.kings[0];
+	board.kings[1] = move->resulting_board.kings[1];
 }

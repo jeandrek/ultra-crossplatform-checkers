@@ -3,12 +3,17 @@
 
 #include <stdint.h>
 
-struct move {
-	int		location;
-	uint64_t	resulting_board[2];
+struct board {
+	uint64_t	men[2];
+	uint64_t	kings[2];
 };
 
-extern uint64_t board[2];
+struct move {
+	int		location;
+	struct board	resulting_board;
+};
+
+extern struct board board;
 
 #define MAX_MOVES	2
 
