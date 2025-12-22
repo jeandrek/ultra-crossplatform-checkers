@@ -48,8 +48,8 @@ render_highlight(struct scenegraph *scenegraph)
 }
 
 static void
-render_piece(struct scenegraph *scenegraph, float x, float y, float z,
-	     uint32_t color)
+render_piece(struct scenegraph *scenegraph, int piece_type,
+	     float x, float y, float z, uint32_t color)
 {
 	struct sg_object obj;
 	obj.color = color;
@@ -60,6 +60,10 @@ render_piece(struct scenegraph *scenegraph, float x, float y, float z,
 	obj.y = y;
 	obj.z = z;
 	sg_render_object(scenegraph, &obj);
+	if (piece_type == KING) {
+		obj.y += 0.065;
+		sg_render_object(scenegraph, &obj);
+	}
 }
 
 static void
@@ -75,21 +79,25 @@ render_pieces(struct scenegraph *scenegraph)
 {
 	float x, y, z;
 
-	for (int i = 0; i < 64; i++) {
-		if ((board[0][MAN] >> i) & 1) {
-			int color = (player_turn == 0 && i == sel_square ?
-				     COLOR_PLAYER_0_SEL : COLOR_PLAYER_0);
-			board_pos_to_world_pos(&x, &y, &z, i);
-			render_piece(scenegraph, x, y, z, color);
+	for (int piece = 0; piece < NUM_PIECE_TYPES; piece++) {
+		for (int i = 0; i < 64; i++) {
+			if ((board[0][piece] >> i) & 1) {
+				int color = (player_turn == 0 && i == sel_square ?
+					     COLOR_PLAYER_0_SEL : COLOR_PLAYER_0);
+				board_pos_to_world_pos(&x, &y, &z, i);
+				render_piece(scenegraph, piece, x, y, z, color);
+			}
 		}
 	}
 
-	for (int i = 0; i < 64; i++) {
-		if ((board[1][MAN] >> i) & 1) {
-			int color = (player_turn == 1 && i == sel_square ?
-				     COLOR_PLAYER_1_SEL : COLOR_PLAYER_1);
-			board_pos_to_world_pos(&x, &y, &z, i);
-			render_piece(scenegraph, x, y, z, color);
+	for (int piece = 0; piece < NUM_PIECE_TYPES; piece++) {
+		for (int i = 0; i < 64; i++) {
+			if ((board[1][piece] >> i) & 1) {
+				int color = (player_turn == 1 && i == sel_square ?
+					     COLOR_PLAYER_1_SEL : COLOR_PLAYER_1);
+				board_pos_to_world_pos(&x, &y, &z, i);
+				render_piece(scenegraph, piece, x, y, z, color);
+			}
 		}
 	}
 
@@ -103,7 +111,7 @@ render_pieces(struct scenegraph *scenegraph)
 				 COLOR_PLAYER_1_SEL : COLOR_PLAYER_1);
 		color = HALF_ALPHA(color);
 		board_pos_to_world_pos(&x, &y, &z, sel_piece_moves[i].location);
-		render_piece(scenegraph, x, y, z, color);
+		render_piece(scenegraph, sel_piece_type, x, y, z, color);
 	}
 }
 

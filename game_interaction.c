@@ -6,6 +6,7 @@
 #include "input.h"
 
 int sel_square;
+int sel_piece_type;
 int sel_piece_moves_len;
 struct move sel_piece_moves[MAX_MOVES];
 int sel_move_idx;
@@ -15,7 +16,9 @@ static void
 set_sel_square(int i)
 {
 	sel_square = i;
-	if ((board[player_turn][MAN] >> i) & 1)
+	sel_piece_type =
+		piece_occupying_square_belonging_to_player(i, player_turn);
+	if (sel_piece_type != -1)
 		sel_piece_moves_len = piece_moves(sel_piece_moves, i);
 	else
 		sel_piece_moves_len = 0;
@@ -60,7 +63,7 @@ game_input_event(int button)
 	if (cur_mode == SELECT_PIECE) {
 		switch (button) {
 		case INPUT_ACCEPT:
-			if ((board[player_turn][MAN] >> sel_square) & 1) {
+			if ((board[player_turn][sel_piece_type] >> sel_square) & 1) {
 				cur_mode = SELECT_MOVE;
 				sel_move_idx = (player_turn == 0 ?
 						0 : sel_piece_moves_len - 1);

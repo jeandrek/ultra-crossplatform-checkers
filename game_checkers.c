@@ -20,7 +20,7 @@ is_square_empty(int i)
 		 || ((board[1][KING] >> i) & 1));
 }
 
-static int
+int
 piece_occupying_square_belonging_to_player(int i, int player)
 {
 	if ((board[player][MAN] >> i) & 1) return MAN;
@@ -46,18 +46,66 @@ diag_forward_squares(int player, int x, int y)
 	return result;
 }
 
-int
-man_moves(struct move *moves, int i, int player)
+static uint64_t
+diag_adj_squares(int x, int y)
 {
+	uint64_t result = 0;
+	if (x > 0 && y < 7)
+		result |= (uint64_t)1 << (8 * (y + 1) + x - 1);
+	if (x < 7 && y < 7)
+		result |= (uint64_t)1 << (8 * (y + 1) + x + 1);
+	if (x > 0 && y > 0)
+		result |= (uint64_t)1 << (8 * (y - 1) + x - 1);
+	if (x < 7 && y > 0)
+		result |= (uint64_t)1 << (8 * (y - 1) + x + 1);
+	return result;
+}
+
+static void
+move_capture(struct move *move, int player, int capturing, int captured,
+	     int i, int j, int k)
+{
+	move->location = k;
+	move->resulting_board[player][capturing] =
+		(board[player][capturing] ^ (uint64_t)1<<i) | (uint64_t)1<<k;
+	move->resulting_board[!player][captured] =
+		(board[!player][captured] ^ (uint64_t)1<<j);
+	move->resulting_board[player][!capturing] = board[player][!capturing];
+	move->resulting_board[!player][!captured] = board[!player][!captured];
+}
+
+static void
+move_go_to_square(struct move *move, int player, int piece, int i, int j)
+{
+	move->location = j;
+	move->resulting_board[player][piece] =
+		(board[player][piece] ^ (uint64_t)1<<i) | (uint64_t)1<<j;
+	move->resulting_board[!player][piece] = board[!player][piece];
+	move->resulting_board[player][!piece] = board[player][!piece];
+	move->resulting_board[!player][!piece] = board[!player][!piece];
+}
+
+int
+piece_moves(struct move *moves, int i)
+{
+	int player, piece;
+	uint64_t squares;
 	int x = i % 8;
 	int y = i / 8;
 	int n = 0;
-	uint64_t squares = diag_forward_squares(player, x, y);
+
+
+	if ((board[0][MAN] >> i) & 1) player = 0, piece = MAN;
+	if ((board[1][MAN] >> i) & 1) player = 1, piece = MAN;
+	if ((board[0][KING] >> i) & 1) player = 0, piece = KING;
+	if ((board[1][KING] >> i) & 1) player = 1, piece = KING;
+
+	squares = piece == MAN ? diag_forward_squares(player, x, y) : diag_adj_squares(x, y);
 
 	for (int j = 0; j < 64; j++) {
 		if ((squares >> j) & 1) {
-			int piece;
-			if ((piece = piece_occupying_square_belonging_to_player(j, !player)) != -1) {
+			int other;
+			if ((other = piece_occupying_square_belonging_to_player(j, !player)) != -1) {
 				int x2 = j % 8;
 				int y2 = j / 8;
 				int x3, y3;
@@ -68,39 +116,17 @@ man_moves(struct move *moves, int i, int player)
 				if (x3 < 0 || x3 > 7) continue;
 				k = 8 * y3 + x3;
 				if (is_square_empty(k)) {
-					moves[n].location = k;
-					moves[n].resulting_board[player][MAN] = (board[player][MAN] ^ ((uint64_t)1<<i)) | ((uint64_t)1<<k);
-					moves[n].resulting_board[!player][piece] = (board[!player][piece] ^ ((uint64_t)1<<j));
-					moves[n].resulting_board[player][KING] = board[player][KING];
-					moves[n].resulting_board[!player][!piece] = board[!player][!piece];
+					move_capture(&moves[n], player, piece,
+						     other, i, j, k);
 					n++;
 				}
 			} else if (piece_occupying_square_belonging_to_player(j, player) == -1) {
-				moves[n].location = j;
-				moves[n].resulting_board[player][MAN] = (board[player][MAN] ^ ((uint64_t)1<<i)) | ((uint64_t)1<<j);
-				moves[n].resulting_board[!player][MAN] = board[!player][MAN];
-				moves[n].resulting_board[player][KING] = board[player][KING];
-				moves[n].resulting_board[!player][KING] = board[!player][KING];
+				move_go_to_square(&moves[n], player, piece, i, j);
 				n++;
 			}
 		}
 	}
 	return n;
-}
-
-int
-king_moves(struct move *moves, int i, int player)
-{
-	return 0;
-}
-
-int
-piece_moves(struct move *moves, int i)
-{
-	if ((board[0][MAN] >> i) & 1) return man_moves(moves, i, 0);
-	if ((board[1][MAN] >> i) & 1) return man_moves(moves, i, 1);
-	if ((board[0][KING] >> i) & 1) return king_moves(moves, i, 0);
-	if ((board[1][KING] >> i) & 1) return king_moves(moves, i, 1);
 }
 
 void
