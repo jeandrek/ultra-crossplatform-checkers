@@ -31,26 +31,29 @@ int
 piece_moves(struct move *moves, int i)
 {
 	int player = (board[1] >> i) & 1;
-	int y = i / 8;
 	int x = i % 8;
+	int y = i / 8;
 	int n = 0;
 	uint64_t squares = diag_forward_squares(player, x, y);
 
 	for (int j = 0; j < 64; j++) {
 		if ((squares >> j) & 1) {
 			if ((board[!player] >> j) & 1) {
-				uint64_t squares2 =
-					diag_forward_squares(player, j % 8,
-							     j / 8);
-				for (int k = 0; k < 64; k++) {
-					if ((squares2 >> k) & 1)
-						if (!((board[0] >> k) & 1)
-						    && !((board[1] >> k) & 1)) {
-							moves[n].location = k;
-							moves[n].resulting_board[player] = (board[player] ^ ((uint64_t)1<<i)) | ((uint64_t)1<<k);
-							moves[n].resulting_board[!player] = (board[!player] ^ ((uint64_t)1<<j));
-							n++;
-						}
+				int x2 = j % 8;
+				int y2 = j / 8;
+				int x3, y3;
+				int k;
+				y3 = y2 + (y2 - y);
+				x3 = x2 + (x2 - x);
+				if (y3 < 0 || y3 > 7) continue;
+				if (x3 < 0 || x3 > 7) continue;
+				k = 8 * y3 + x3;
+				if (!((board[0] >> k) & 1)
+				    && !((board[1] >> k) & 1)) {
+					moves[n].location = k;
+					moves[n].resulting_board[player] = (board[player] ^ ((uint64_t)1<<i)) | ((uint64_t)1<<k);
+					moves[n].resulting_board[!player] = (board[!player] ^ ((uint64_t)1<<j));
+					n++;
 				}
 			} else if (!((board[player] >> j) & 1)) {
 				moves[n].location = j;
