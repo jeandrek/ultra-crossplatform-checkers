@@ -5,10 +5,13 @@
 #include "menu.h"
 #include "input.h"
 
+struct move board_moves[64][MAX_MOVES];
+int board_num_moves[64];
+
 int sel_square;
 int sel_piece_type;
 int sel_piece_moves_len;
-struct move sel_piece_moves[MAX_MOVES];
+struct move *sel_piece_moves;
 int sel_move_idx;
 int player_turn = 0;
 
@@ -18,10 +21,8 @@ set_sel_square(int i)
 	sel_square = i;
 	sel_piece_type =
 		piece_occupying_square_belonging_to_player(i, player_turn);
-	if (sel_piece_type != -1)
-		sel_piece_moves_len = piece_moves(sel_piece_moves, i);
-	else
-		sel_piece_moves_len = 0;
+	sel_piece_moves = board_moves[i];
+	sel_piece_moves_len = board_num_moves[i];
 }
 
 static void
@@ -37,6 +38,7 @@ game_interaction_init(void)
 {
 	player_turn = 0;
 	cur_mode = SELECT_PIECE;
+	board_available_moves(board_moves, board_num_moves, player_turn);
 	set_sel_square(0);
 }
 
@@ -44,9 +46,9 @@ static void
 move_piece(void)
 {
 	perform_move(&sel_piece_moves[sel_move_idx]);
-	sel_square = sel_piece_moves[sel_move_idx].location;
 	sel_move_idx = 0;
 	player_turn = !player_turn;
+	board_available_moves(board_moves, board_num_moves, player_turn);
 	game_start_anim_rotate();
 	set_sel_square(player_turn == 0 ? 0 : 63);
 }

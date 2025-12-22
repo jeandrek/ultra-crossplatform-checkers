@@ -21,7 +21,8 @@ extern board_t board;
 void board_init(void); /* Rename? */
 
 int piece_occupying_square_belonging_to_player(int i, int player);
-int piece_moves(struct move *moves, int i);
+void board_available_moves(struct move moves[64][MAX_MOVES], int *num_moves,
+			   int player);
 
 void perform_move(struct move *move);
 
