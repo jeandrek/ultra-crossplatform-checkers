@@ -9,29 +9,46 @@ board_init(void)
 	board[1] = 0xaa55aa0000000000;
 }
 
+static uint64_t
+diag_forward_squares(int player, int x, int y)
+{
+	uint64_t result = 0;
+	if (player == 0) {
+		if (x > 0 && y < 7)
+			result |= (uint64_t)1 << (8 * (y + 1) + x - 1);
+		if (x < 7 && y < 7)
+			result |= (uint64_t)1 << (8 * (y + 1) + x + 1);
+	} else {
+		if (x > 0 && y > 0)
+			result |= (uint64_t)1 << (8 * (y - 1) + x - 1);
+		if (x < 7 && y > 0)
+			result |= (uint64_t)1 << (8 * (y - 1) + x + 1);
+	}
+	return result;
+}
+
 int
 piece_moves(int *moves, int i)
 {
-	int n = 0;
+	int player = (board[1] >> i) & 1;
 	int y = i / 8;
 	int x = i % 8;
-	uint64_t diag_forward_squares = 0;
-
-	if ((board[0] >> i) & 1) {
-		if (x > 0 && y < 7)
-			diag_forward_squares |= (uint64_t)1 << (8 * (y + 1) + x - 1);
-		if (x < 7 && y < 7)
-			diag_forward_squares |= (uint64_t)1 << (8 * (y + 1) + x + 1);
-	} else if ((board[1] >> i) & 1) {
-		if (x > 0 && y > 0)
-			diag_forward_squares |= (uint64_t)1 << (8 * (y - 1) + x - 1);
-		if (x < 7 && y > 0)
-			diag_forward_squares |= (uint64_t)1 << (8 * (y - 1) + x + 1);
-	}
+	int n = 0;
+	uint64_t squares = diag_forward_squares(player, x, y);
 
 	for (int j = 0; j < 64; j++) {
-		if ((diag_forward_squares >> j) & 1) {
-			if (!((board[0] >> j) & 1) && !((board[1] >> j) & 1))
+		if ((squares >> j) & 1) {
+			if ((board[!player] >> j) & 1) {
+				uint64_t squares2 =
+					diag_forward_squares(player, j % 8,
+							     j / 8);
+				for (int k = 0; k < 64; k++) {
+					if ((squares2 >> k) & 1)
+						if (!((board[0] >> k) & 1)
+						    && !((board[1] >> k) & 1))
+							moves[n++] = k;
+				}
+			} else if (!((board[player] >> j) & 1))
 				moves[n++] = j;
 		}
 	}
