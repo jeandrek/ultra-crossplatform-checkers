@@ -1,23 +1,31 @@
 #include "game_checkers.h"
 
-struct board board;
+board_t board;
 
 void
 board_init(void)
 {
-	board.men[0] = 0x55aa55;
-	board.men[1] = 0xaa55aa0000000000;
-	board.kings[0] = 0;
-	board.kings[1] = 0;
+	board[0][MAN] = 0x55aa55;
+	board[1][MAN] = 0xaa55aa0000000000;
+	board[0][KING] = 0;
+	board[1][KING] = 0;
 }
 
 static int
 is_square_empty(int i)
 {
-	return !(((board.men[0] >> i) & 1)
-		 || ((board.men[1] >> i) & 1)
-		 || ((board.kings[0] >> i) & 1)
-		 || ((board.kings[1] >> i) & 1));
+	return !(((board[0][MAN] >> i) & 1)
+		 || ((board[1][MAN] >> i) & 1)
+		 || ((board[0][KING] >> i) & 1)
+		 || ((board[1][KING] >> i) & 1));
+}
+
+static int
+piece_occupying_square_belonging_to_player(int i, int player)
+{
+	if ((board[player][MAN] >> i) & 1) return MAN;
+	if ((board[player][KING] >> i) & 1) return KING;
+	return -1;
 }
 
 static uint64_t
@@ -39,9 +47,8 @@ diag_forward_squares(int player, int x, int y)
 }
 
 int
-piece_moves(struct move *moves, int i)
+man_moves(struct move *moves, int i, int player)
 {
-	int player = (board.men[1] >> i) & 1;
 	int x = i % 8;
 	int y = i / 8;
 	int n = 0;
@@ -49,7 +56,8 @@ piece_moves(struct move *moves, int i)
 
 	for (int j = 0; j < 64; j++) {
 		if ((squares >> j) & 1) {
-			if ((board.men[!player] >> j) & 1) {
+			int piece;
+			if ((piece = piece_occupying_square_belonging_to_player(j, !player)) != -1) {
 				int x2 = j % 8;
 				int y2 = j / 8;
 				int x3, y3;
@@ -61,14 +69,18 @@ piece_moves(struct move *moves, int i)
 				k = 8 * y3 + x3;
 				if (is_square_empty(k)) {
 					moves[n].location = k;
-					moves[n].resulting_board.men[player] = (board.men[player] ^ ((uint64_t)1<<i)) | ((uint64_t)1<<k);
-					moves[n].resulting_board.men[!player] = (board.men[!player] ^ ((uint64_t)1<<j));
+					moves[n].resulting_board[player][MAN] = (board[player][MAN] ^ ((uint64_t)1<<i)) | ((uint64_t)1<<k);
+					moves[n].resulting_board[!player][piece] = (board[!player][piece] ^ ((uint64_t)1<<j));
+					moves[n].resulting_board[player][KING] = board[player][KING];
+					moves[n].resulting_board[!player][!piece] = board[!player][!piece];
 					n++;
 				}
-			} else if (!((board.men[player] >> j) & 1)) {
+			} else if (piece_occupying_square_belonging_to_player(j, player) == -1) {
 				moves[n].location = j;
-				moves[n].resulting_board.men[player] = (board.men[player] ^ ((uint64_t)1<<i)) | ((uint64_t)1<<j);
-				moves[n].resulting_board.men[!player] = board.men[!player];
+				moves[n].resulting_board[player][MAN] = (board[player][MAN] ^ ((uint64_t)1<<i)) | ((uint64_t)1<<j);
+				moves[n].resulting_board[!player][MAN] = board[!player][MAN];
+				moves[n].resulting_board[player][KING] = board[player][KING];
+				moves[n].resulting_board[!player][KING] = board[!player][KING];
 				n++;
 			}
 		}
@@ -76,11 +88,26 @@ piece_moves(struct move *moves, int i)
 	return n;
 }
 
+int
+king_moves(struct move *moves, int i, int player)
+{
+	return 0;
+}
+
+int
+piece_moves(struct move *moves, int i)
+{
+	if ((board[0][MAN] >> i) & 1) return man_moves(moves, i, 0);
+	if ((board[1][MAN] >> i) & 1) return man_moves(moves, i, 1);
+	if ((board[0][KING] >> i) & 1) return king_moves(moves, i, 0);
+	if ((board[1][KING] >> i) & 1) return king_moves(moves, i, 1);
+}
+
 void
 perform_move(struct move *move)
 {
-	board.men[0] = move->resulting_board.men[0];
-	board.men[1] = move->resulting_board.men[1];
-	board.kings[0] = move->resulting_board.kings[0];
-	board.kings[1] = move->resulting_board.kings[1];
+	board[0][MAN] = move->resulting_board[0][MAN];
+	board[0][KING] = move->resulting_board[0][KING];
+	board[1][MAN] = move->resulting_board[1][MAN];
+	board[1][KING] = move->resulting_board[1][KING];
 }

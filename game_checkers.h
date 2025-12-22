@@ -3,17 +3,17 @@
 
 #include <stdint.h>
 
-struct board {
-	uint64_t	men[2];
-	uint64_t	kings[2];
-};
+#define MAN	0
+#define KING	1
+
+typedef uint64_t board_t[2][2];
 
 struct move {
-	int		location;
-	struct board	resulting_board;
+	int	location;
+	board_t	resulting_board;
 };
 
-extern struct board board;
+extern board_t board;
 
 #define MAX_MOVES	2
 
