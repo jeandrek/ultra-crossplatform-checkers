@@ -102,7 +102,7 @@ render_pieces(struct scenegraph *scenegraph)
 			color = (cur_mode == SELECT_MOVE && i == sel_move_idx ?
 				 COLOR_PLAYER_1_SEL : COLOR_PLAYER_1);
 		color = HALF_ALPHA(color);
-		board_pos_to_world_pos(&x, &y, &z, sel_piece_moves[i]);
+		board_pos_to_world_pos(&x, &y, &z, sel_piece_moves[i].location);
 		render_piece(scenegraph, x, y, z, color);
 	}
 }

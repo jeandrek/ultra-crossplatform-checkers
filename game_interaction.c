@@ -7,7 +7,7 @@
 
 int sel_square;
 int sel_piece_moves_len;
-int sel_piece_moves[MAX_MOVES];
+struct move sel_piece_moves[MAX_MOVES];
 int sel_move_idx;
 int player_turn = 0;
 
@@ -40,9 +40,9 @@ game_interaction_init(void)
 static void
 move_piece(void)
 {
-	board[player_turn] ^= (uint64_t)1<<(uint64_t)sel_square;
-	sel_square = sel_piece_moves[sel_move_idx];
-	board[player_turn] |= (uint64_t)1<<(uint64_t)sel_square;
+	sel_square = sel_piece_moves[sel_move_idx].location;
+	board[0] = sel_piece_moves[sel_move_idx].resulting_board[0];
+	board[1] = sel_piece_moves[sel_move_idx].resulting_board[1];
 	sel_move_idx = 0;
 	player_turn = !player_turn;
 	game_start_anim_rotate();

@@ -5,7 +5,7 @@
 
 extern int sel_square;
 extern int sel_piece_moves_len;
-extern int sel_piece_moves[MAX_MOVES];
+extern struct move sel_piece_moves[MAX_MOVES];
 extern int sel_move_idx;
 extern int player_turn;
 

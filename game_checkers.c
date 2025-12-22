@@ -28,7 +28,7 @@ diag_forward_squares(int player, int x, int y)
 }
 
 int
-piece_moves(int *moves, int i)
+piece_moves(struct move *moves, int i)
 {
 	int player = (board[1] >> i) & 1;
 	int y = i / 8;
@@ -45,11 +45,19 @@ piece_moves(int *moves, int i)
 				for (int k = 0; k < 64; k++) {
 					if ((squares2 >> k) & 1)
 						if (!((board[0] >> k) & 1)
-						    && !((board[1] >> k) & 1))
-							moves[n++] = k;
+						    && !((board[1] >> k) & 1)) {
+							moves[n].location = k;
+							moves[n].resulting_board[player] = (board[player] ^ ((uint64_t)1<<i)) | ((uint64_t)1<<k);
+							moves[n].resulting_board[!player] = (board[!player] ^ ((uint64_t)1<<j));
+							n++;
+						}
 				}
-			} else if (!((board[player] >> j) & 1))
-				moves[n++] = j;
+			} else if (!((board[player] >> j) & 1)) {
+				moves[n].location = j;
+				moves[n].resulting_board[player] = (board[player] ^ ((uint64_t)1<<i)) | ((uint64_t)1<<j);
+				moves[n].resulting_board[!player] = board[!player];
+				n++;
+			}
 		}
 	}
 	return n;
