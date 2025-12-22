@@ -4,6 +4,7 @@
 #include "game_checkers.h"
 
 extern int sel_square;
+extern int sel_piece_type;
 extern int sel_piece_moves_len;
 extern struct move sel_piece_moves[MAX_MOVES];
 extern int sel_move_idx;
