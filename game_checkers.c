@@ -67,13 +67,15 @@ static void
 move_go_to_square(struct move *move, int player, int piece, int i, int j)
 {
 	move->location = j;
+	move->capture = 0;
 	if (piece == MAN && j / 8 == LAST_ROW(player)) {
-		/* Promotion */
+		move->promotion = 1;
 		move->resulting_board[player][MAN] =
 			board[player][MAN] ^ (uint64_t)1<<i;
 		move->resulting_board[player][KING] =
 			board[player][KING] | (uint64_t)1<<j;
 	} else {
+		move->promotion = 0;
 		move->resulting_board[player][piece] =
 			(board[player][piece] ^ (uint64_t)1<<i) | (uint64_t)1<<j;
 		move->resulting_board[player][!piece] = board[player][!piece];
@@ -87,6 +89,7 @@ move_capture(struct move *move, int player, int capturing, int captured,
 	     int i, int j, int k)
 {
 	move_go_to_square(move, player, capturing, i, k);
+	move->capture = 1;
 	move->resulting_board[!player][captured] ^= (uint64_t)1<<j;
 }
 
@@ -123,7 +126,7 @@ piece_moves(struct move *moves, int player, int i, int capturing)
 						     other, i, j, k);
 					n++;
 				}
-			} else if (!capturing && piece_occupying_square_belonging_to_player(j, player) == -1) {
+			} else if (!capturing && is_square_empty(j)) {
 				move_go_to_square(&moves[n], player, piece, i, j);
 				n++;
 			}
@@ -134,9 +137,17 @@ piece_moves(struct move *moves, int player, int i, int capturing)
 
 void
 board_available_moves(struct move moves[64][MAX_MOVES], int *num_moves,
-		      int player)
+		      int player, int moved_piece_idx)
 {
 	int can_capture = 0;
+
+	if (moved_piece_idx != -1) {
+		for (int i = 0; i < 64; i++) num_moves[i] = 0;
+		num_moves[moved_piece_idx] =
+			piece_moves(moves[moved_piece_idx],
+				    player, moved_piece_idx, 1);
+		return;
+	}
 
 	/* Available captures */
 	for (int i = 0; i < 64; i++) {
@@ -148,16 +159,23 @@ board_available_moves(struct move moves[64][MAX_MOVES], int *num_moves,
 	if (can_capture)
 		return;
 	/* Available non-captures */
-	for (int i = 0; i < 64; i++) {
+	for (int i = 0; i < 64; i++)
 		num_moves[i] = piece_moves(moves[i], player, i, 0);
-	}
 }
 
-void
-perform_move(struct move *move)
+int
+perform_move(struct move *move, int player)
 {
+	struct move further_captures[MAX_MOVES];
+
 	board[0][MAN] = move->resulting_board[0][MAN];
 	board[0][KING] = move->resulting_board[0][KING];
 	board[1][MAN] = move->resulting_board[1][MAN];
 	board[1][KING] = move->resulting_board[1][KING];
+
+	if (move->capture && !move->promotion &&
+	    piece_moves(further_captures, player, move->location, 1) > 0)
+		return 0;
+	else
+		return 1;
 }

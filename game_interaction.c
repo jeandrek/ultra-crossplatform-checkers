@@ -38,19 +38,28 @@ game_interaction_init(void)
 {
 	player_turn = 0;
 	cur_mode = SELECT_PIECE;
-	board_available_moves(board_moves, board_num_moves, player_turn);
+	board_available_moves(board_moves, board_num_moves, player_turn, -1);
 	set_sel_square(0);
 }
 
 static void
 move_piece(void)
 {
-	perform_move(&sel_piece_moves[sel_move_idx]);
+	int location = sel_piece_moves[sel_move_idx].location;
+	int finished = perform_move(&sel_piece_moves[sel_move_idx],
+				    player_turn);
 	sel_move_idx = 0;
-	player_turn = !player_turn;
-	board_available_moves(board_moves, board_num_moves, player_turn);
-	game_start_anim_rotate();
-	set_sel_square(player_turn == 0 ? 0 : 63);
+	if (finished) {
+		player_turn = !player_turn;
+		board_available_moves(board_moves, board_num_moves,
+				      player_turn, -1);
+		game_start_anim_rotate();
+		set_sel_square(player_turn == 0 ? 0 : 63);
+	} else {
+		board_available_moves(board_moves, board_num_moves,
+				      player_turn, location);
+		set_sel_square(location);
+	}
 }
 
 void
