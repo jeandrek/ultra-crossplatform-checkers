@@ -1,7 +1,11 @@
-#ifdef __psp__
+#if defined(__psp__)
 #include <pspctrl.h>
 
 #include "input_mapping-psp.h"
+#elif defined(macintosh)
+#include <Carbon.h>
+
+#include "input_mapping-mac.h"
 #else
 #include <SDL2/SDL.h>
 
@@ -34,10 +38,14 @@ handle_button(int button)
 void
 input_handle(void)
 {
-#ifdef __psp__
+#if defined(__psp__)
 	SceCtrlData data;
 
 	sceCtrlReadBufferPositive(&data, 1);
+#elif defined(macintosh)
+	uint8_t keymap[16];
+
+	GetKeys(keymap);
 #else
 	const Uint8 *state;
 
@@ -45,8 +53,10 @@ input_handle(void)
 #endif
 	for (int i = 0; i < NUM_BUTTONS; i++) {
 		int val = input_mapping[i];
-#ifdef __psp__
+#if defined(__psp__)
 		if (data.Buttons & val) handle_button(i);
+#elif defined(macintosh)
+		if ((keymap[val >> 3] >> (val & 7)) & 1) handle_button(i);
 #else
 		if (state[val]) handle_button(i);
 #endif

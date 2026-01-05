@@ -137,11 +137,11 @@ void
 game_display_load(void)
 {
 	texture_init_from_file(&texture_board, 128, 128,
-			       "assets/textures/board");
+			       TEXTURES_DIR "board");
 	texture_init_from_file(&texture_win_red, 128, 64,
-			       "assets/textures/win_red");
+			       TEXTURES_DIR "win_red");
 	texture_init_from_file(&texture_win_black, 128, 64,
-			       "assets/textures/win_black");
+			       TEXTURES_DIR "win_black");
 }
 
 void

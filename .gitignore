@@ -7,3 +7,7 @@ SDL2.dll
 SDL2
 *.exe
 checkers
+AGL
+OpenGL
+GL
+*.a

@@ -1,0 +1,16 @@
+CC=powerpc-apple-macos-gcc
+PROGRAM=checkers
+OBJECTS=checkers.o game.o game_display.o game_interaction.o game_checkers.o menu.o sprite.o scenegraph-gl.o mac.o texture.o input.o
+LDFLAGS=-carbon -L. -lm -lOpenGLLibrary -lOpenGLUtility
+CFLAGS=	-Wall -W -Og -g -I. -IGL -IAGL
+RETRO68=$(HOME)/Retro68-build/toolchain
+
+$(PROGRAM): $(OBJECTS)
+	$(CC) -o $@ $(OBJECTS) $(LDFLAGS)
+	MakePEF $@ -o Checkers.pef
+	Rez $(RETRO68)/powerpc-apple-macos/RIncludes/RetroCarbonAPPL.r \
+	-DCFRAG_NAME="\"Checkers\"" -o Checkers.bin -t APPL -c ???? \
+	--data Checkers.pef
+
+clean:
+	rm -f $(PROGRAM) $(OBJECTS) Checkers.pef Checkers.bin

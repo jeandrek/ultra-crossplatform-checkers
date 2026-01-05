@@ -39,7 +39,7 @@ static void
 menu_load(void)
 {
 	texture_init_from_file(&texture_menu_ss, 512, 256,
-			       "assets/textures/menu-ss");
+			       TEXTURES_DIR "menu-ss");
 
 	sprite_init(&button1, &texture_menu_ss, 0, 0, 72, 24);
 	button1.x = 0;

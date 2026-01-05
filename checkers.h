@@ -1,6 +1,12 @@
 #ifndef _CHECKERS_H_
 #define _CHECKERS_H_
 
+#ifndef macintosh
+#define TEXTURES_DIR	"assets/textures/"
+#else
+#define TEXTURES_DIR	":assets:textures:"
+#endif
+
 #include "scenegraph.h"
 
 struct state {
