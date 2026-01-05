@@ -4,10 +4,13 @@
 #include <math.h>
 #include <stdint.h>
 
-#ifdef __psp__
+#if defined(__psp__)
 #include <pspkernel.h>
 #include <pspgu.h>
 #include <pspgum.h>
+#elif defined(__APPLE__)
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
 #else
 #include <GL/gl.h>
 #include <GL/glu.h>

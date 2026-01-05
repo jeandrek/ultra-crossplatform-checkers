@@ -4,10 +4,11 @@
 struct texture {
 	int	width;
 	int	height;
-	union {
-		void		*buffer;
-		unsigned	gl_tex;
-	};
+#ifdef __psp__
+	void	*buffer;
+#else
+	unsigned	gl_tex;
+#endif
 };
 
 void	texture_init(struct texture *texture, int width, int height,

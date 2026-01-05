@@ -1,0 +1,14 @@
+PROGRAM=Checkers
+OBJECTS=checkers.o game.o game_display.o game_interaction.o game_checkers.o menu.o mac.o sprite.o scenegraph-gl.o texture.o input.o
+LDFLAGS=-framework Carbon -framework OpenGL -framework AGL
+CFLAGS=	-Wall -O2 -std=c99
+
+Checkers.app: $(PROGRAM)
+	mkdir -p $@/Contents/MacOS
+	cp $< $@/Contents/MacOS
+
+$(PROGRAM): $(OBJECTS)
+	$(CC) -o $@ $(OBJECTS) $(LDFLAGS)
+
+clean:
+	rm -f $(PROGRAM) $(OBJECTS)

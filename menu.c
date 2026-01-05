@@ -90,7 +90,6 @@ menu_input_event(int button)
 			break;
 		}
 		break;
-	default:
 	}
 }
 

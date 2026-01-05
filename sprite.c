@@ -2,14 +2,20 @@
 #include "scenegraph.h"
 #include "texture.h"
 
-#ifdef __psp__
+#if defined(__psp__)
 #include <pspgu.h>
 #include <pspgum.h>
 
 static float __attribute__((aligned(16))) sprite_verts[30];
 #else
+
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else
 #include <GL/gl.h>
 #include <GL/glu.h>
+#endif
 
 static float sprite_verts[] = {
 	-1, -1,
