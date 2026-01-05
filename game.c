@@ -21,6 +21,13 @@ game_update(void)
 }
 
 void
+game_over(void)
+{
+	cur_mode = GAME_OVER;
+	game_display_game_over();
+}
+
+void
 game_start_anim_rotate(void)
 {
 	cur_mode = ANIM_ROTATE_BOARD;

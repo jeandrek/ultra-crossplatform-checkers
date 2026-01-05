@@ -7,11 +7,13 @@ enum mode {
 	SELECT_PIECE,
 	SELECT_MOVE,
 	ANIM_ROTATE_BOARD,
+	GAME_OVER
 };
 
 extern struct state game;
 extern enum mode cur_mode;
 
+void game_over(void);
 void game_start_anim_rotate(void);
 void game_anim_rotate_finished(void);
 

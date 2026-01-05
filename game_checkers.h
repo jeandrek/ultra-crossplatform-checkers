@@ -33,4 +33,6 @@ void board_available_moves(struct move moves[64][MAX_MOVES], int *num_moves,
 
 int perform_move(struct move *move, int player);
 
+int winner(void);
+
 #endif /* !_GAME_CHECKERS_H_ */

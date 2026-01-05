@@ -37,6 +37,7 @@ sprite_init(struct sprite *sprite, struct texture *texture,
 	sprite->base_color = ~0;
 
 #ifndef __psp__
+	if (texture == NULL) return;
 	float ss_w = sprite->texture->width;
 	float ss_h = sprite->texture->height;
 
@@ -86,11 +87,14 @@ sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 	sprite_verts[28] = 136 - 136 * sprite->y + sprite->height / 2.0;
 
 	sceGuDisable(GU_DEPTH_TEST);
-	sceGuEnable(GU_TEXTURE_2D);
-	sceGuTexMode(GU_PSM_8888, 0, 0, 0);
-	sceGuTexFunc(GU_TFX_MODULATE, GU_TCC_RGBA);
-	sceGuTexImage(0, sprite->texture->width, sprite->texture->height,
-		      sprite->texture->width, sprite->texture->buffer);
+	if (sprite->texture != NULL) {
+		sceGuEnable(GU_TEXTURE_2D);
+		sceGuTexMode(GU_PSM_8888, 0, 0, 0);
+		sceGuTexFunc(GU_TFX_MODULATE, GU_TCC_RGBA);
+		sceGuTexImage(0, sprite->texture->width,
+			      sprite->texture->height,
+			      sprite->texture->width, sprite->texture->buffer);
+	}
 	sceGuColor(sprite->base_color);
 	sceGumDrawArray(GU_TRIANGLES,
 			GU_VERTEX_32BITF | GU_TEXTURE_32BITF | GU_TRANSFORM_2D,
@@ -117,8 +121,10 @@ sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 	glScalef(sprite->scale * sprite->width/scenegraph->height,
 		 sprite->scale * sprite->height/scenegraph->height, 1);
 
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, sprite->texture->gl_tex);
+	if (sprite->texture != NULL) {
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, sprite->texture->gl_tex);
+	}
 	glColor4f((sprite->base_color & 0xff)/255.0,
 		  ((sprite->base_color >> 8) & 0xff)/255.0,
 		  ((sprite->base_color >> 16) & 0xff)/255.0,

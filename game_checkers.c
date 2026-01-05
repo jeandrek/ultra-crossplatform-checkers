@@ -179,3 +179,11 @@ perform_move(struct move *move, int player)
 	else
 		return 1;
 }
+
+int
+winner(void)
+{
+	if (board[0][MAN] == 0 && board[0][KING] == 0) return 1;
+	if (board[1][MAN] == 0 && board[1][KING] == 0) return 0;
+	return -1;
+}

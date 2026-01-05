@@ -50,6 +50,11 @@ move_piece(void)
 				    player_turn);
 	sel_move_idx = 0;
 	if (finished) {
+		if (winner() != -1) {
+			game_over();
+			return;
+		}
+
 		player_turn = !player_turn;
 		board_available_moves(board_moves, board_num_moves,
 				      player_turn, -1);
