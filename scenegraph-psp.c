@@ -43,6 +43,9 @@ sg_init_scenegraph(struct scenegraph *scenegraph)
 {
 	ScePspFVector3 light0_pos;
 
+	scenegraph->width = width;
+	scenegraph->height = height;
+
 	sceGuOffset(2048 - 480/2, 2048 - 272/2);
 	sceGuViewport(2048, 2048, 480, 272);
 	sceGuScissor(0, 0, 480, 272);
