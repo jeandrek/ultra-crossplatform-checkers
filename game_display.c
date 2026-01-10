@@ -155,9 +155,9 @@ game_display_init(void)
 	game.sg.near_plane = 0.1;
 	game.sg.far_plane = 24;
 	game.sg.light0_enabled = 1;
-	game.sg.light0_x = 0;
+	game.sg.light0_x = 1;
 	game.sg.light0_y = 2;
-	game.sg.light0_z = 2;
+	game.sg.light0_z = 0;
 	game.sg.light0_color = 0xffffffff;
 	game_display_set_viewpoint(0);
 	sg_init_scenegraph(&game.sg);
