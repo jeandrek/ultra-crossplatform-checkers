@@ -139,9 +139,9 @@ game_display_load(void)
 	texture_init_from_file(&texture_board, 128, 128,
 			       "assets/textures/board");
 	texture_init_from_file(&texture_win_red, 128, 64,
-			       "assets/textures/win_red");
+			       "assets/textures/win-red");
 	texture_init_from_file(&texture_win_black, 128, 64,
-			       "assets/textures/win_black");
+			       "assets/textures/win-black");
 }
 
 void
