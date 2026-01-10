@@ -6,7 +6,6 @@
 #include <pspgu.h>
 #include <pspgum.h>
 
-static float __attribute__((aligned(16))) sprite_verts[30];
 #else
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -56,6 +55,8 @@ void
 sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 {
 #ifdef __psp__
+	float *sprite_verts = sceGuGetMemory(30 * sizeof (float));
+
 	sprite_verts[0] = sprite->tex_left;
 	sprite_verts[1] = sprite->tex_top;
 	sprite_verts[2] = 240 + 240 * sprite->x - sprite->width / 2.0;
