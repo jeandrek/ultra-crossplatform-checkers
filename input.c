@@ -1,21 +1,25 @@
-#ifdef __psp__
+#if defined(__psp__)
 #include <pspctrl.h>
 
 #include "input_mapping-psp.h"
-#else
-#include <SDL2/SDL.h>
+#elif defined(_WIN32)
+#include <windows.h>
 
-#include "input_mapping-sdl.h"
+#include "input_mapping-win.h"
+#else
+#include <X11/Xlib.h>
+
+#include "input_mapping-x11.h"
 #endif
 
 #include "checkers.h"
 #include "input.h"
 
 static const int can_repeat[NUM_BUTTONS] = {
-  [INPUT_UP] = 1,
-  [INPUT_DOWN] = 1,
-  [INPUT_LEFT] = 1,
-  [INPUT_RIGHT] = 1
+	[INPUT_UP] = 1,
+	[INPUT_DOWN] = 1,
+	[INPUT_LEFT] = 1,
+	[INPUT_RIGHT] = 1
 };
 
 static int repeat_delay[NUM_BUTTONS] = {0};
@@ -31,24 +35,30 @@ handle_button(int button)
 	}
 }
 
+#if !defined(__psp__) && !defined(_WIN32)
+extern int state[NUM_BUTTONS];
+#endif
+
 void
 input_handle(void)
 {
-#ifdef __psp__
+#if defined(__psp__)
 	SceCtrlData data;
 
 	sceCtrlReadBufferPositive(&data, 1);
-#else
-	const Uint8 *state;
+#elif defined(_WIN32)
+	uint8_t state[256];
 
-	state = SDL_GetKeyboardState(NULL);
+	GetKeyboardState(state);
 #endif
 	for (int i = 0; i < NUM_BUTTONS; i++) {
+#if defined(__psp__) || defined(_WIN32)
 		int val = input_mapping[i];
+#endif
 #ifdef __psp__
 		if (data.Buttons & val) handle_button(i);
 #else
-		if (state[val]) handle_button(i);
+		if (state[val] >> 7) handle_button(i);
 #endif
 		else repeat_delay[i] = 0;
 	}
