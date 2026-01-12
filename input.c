@@ -6,10 +6,6 @@
 #include <windows.h>
 
 #include "input_mapping-win.h"
-#else
-#include <X11/Xlib.h>
-
-#include "input_mapping-x11.h"
 #endif
 
 #include "checkers.h"
@@ -52,13 +48,14 @@ input_handle(void)
 	GetKeyboardState(state);
 #endif
 	for (int i = 0; i < NUM_BUTTONS; i++) {
-#if defined(__psp__) || defined(_WIN32)
+#if defined(__psp__)
 		int val = input_mapping[i];
-#endif
-#ifdef __psp__
 		if (data.Buttons & val) handle_button(i);
-#else
+#elif defined(_WIN32)
+		int val = input_mapping[i];
 		if (state[val] >> 7) handle_button(i);
+#else
+		if (state[i]) handle_button(i);
 #endif
 		else repeat_delay[i] = 0;
 	}
