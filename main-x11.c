@@ -1,16 +1,16 @@
 #include <X11/Xlib.h>
-#include <X11/Xutil.h>
+#include <X11/XKBlib.h>
 #define GLX_GLXEXT_PROTOTYPES
 #include <GL/glx.h>
-#include <X11/XKBlib.h>
-#include<string.h>
+#include <string.h>
+
 #include "checkers.h"
 #include "scenegraph.h"
 #include "input.h"
 #include "input_mapping-x11.h"
 
 int
-respond_to(Display *dpy, XEvent *evt, XPointer arg)
+respond_to_event(Display *dpy, XEvent *evt, XPointer arg)
 {
 	return 1;
 }
@@ -90,7 +90,7 @@ main()
 		input_handle();
 		checkers_update();
 		glXSwapBuffers(dpy, glxWin);
-		if (!XCheckIfEvent(dpy, &evt, respond_to, NULL))
+		if (!XCheckIfEvent(dpy, &evt, respond_to_event, NULL))
 			continue;
 		switch (evt.type) {
 		case KeyPress:

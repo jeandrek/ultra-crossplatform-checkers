@@ -1,17 +1,17 @@
 #include <windows.h>
-#include <string.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/wgl.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "checkers.h"
 #include "scenegraph.h"
 #include "input.h"
 
-HGLRC hglrc;
-
 PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
+
+HGLRC hglrc;
 
 static void
 init_window(HWND hWnd)
@@ -63,12 +63,13 @@ WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 int state[NUM_BUTTONS] = {0};
 
 int WINAPI
-WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst,
+WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 	LPSTR lpCmdLine, int nCmdShow)
 {
-	WNDCLASS cls;
-	HINSTANCE hInst = GetModuleHandle(NULL);
 	RECT rect = {30, 30, 800+30, 600+30};
+	WNDCLASS cls;
+	HWND hWnd;
+	MSG msg;
 
 	memset(&cls, 0, sizeof cls);
 	cls.lpszClassName = "WindowClass";
@@ -80,15 +81,15 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst,
 
 	AdjustWindowRectEx(&rect, WS_OVERLAPPEDWINDOW, FALSE, 0);
 
-	HWND hWnd = CreateWindowEx(0, "WindowClass", "Checkers",
-				   WS_OVERLAPPEDWINDOW, rect.left, rect.top,
-				   rect.right - rect.left,
-				   rect.bottom - rect.top,
-				   NULL, NULL, hInst, NULL);
+	hWnd = CreateWindowEx(0, "WindowClass", "Checkers",
+			      WS_OVERLAPPEDWINDOW, rect.left, rect.top,
+			      rect.right - rect.left,
+			      rect.bottom - rect.top,
+			      NULL, NULL, hInst, NULL);
 	if (hWnd == NULL)
 		return 1;
 	ShowWindow(hWnd, 1);
-	MSG msg;
+
 	for (;;) {
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 			if (LOWORD(msg.message) == WM_QUIT)
