@@ -106,6 +106,8 @@ main()
 		}
 	}
 quit:
+	glXDestroyContext(dpy, ctx);
+	glXDestroyWindow(dpy, glxWin);
 	XDestroyWindow(dpy, win);
 	XCloseDisplay(dpy);
 	return 0;
