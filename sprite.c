@@ -6,7 +6,6 @@
 #include <pspgu.h>
 #include <pspgum.h>
 
-static float __attribute__((aligned(16))) sprite_verts[30];
 #else
 
 #ifdef __APPLE__
@@ -62,35 +61,17 @@ void
 sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 {
 #ifdef __psp__
+	float *sprite_verts = sceGuGetMemory(10 * sizeof (float));
+
 	sprite_verts[0] = sprite->tex_left;
 	sprite_verts[1] = sprite->tex_top;
 	sprite_verts[2] = 240 + 240 * sprite->x - sprite->width / 2.0;
 	sprite_verts[3] = 136 - 136 * sprite->y - sprite->height / 2.0;
 
 	sprite_verts[5] = sprite->tex_left + sprite->width;
-	sprite_verts[6] = sprite->tex_top;
+	sprite_verts[6] = sprite->tex_top + sprite->height;
 	sprite_verts[7] = 240 + 240 * sprite->x + sprite->width / 2.0;
-	sprite_verts[8] = 136 - 136 * sprite->y - sprite->height / 2.0;
-
-	sprite_verts[10] = sprite->tex_left + sprite->width;
-	sprite_verts[11] = sprite->tex_top + sprite->height;
-	sprite_verts[12] = 240 + 240 * sprite->x + sprite->width / 2.0;
-	sprite_verts[13] = 136 - 136 * sprite->y + sprite->height / 2.0;
-
-	sprite_verts[15] = sprite->tex_left;
-	sprite_verts[16] = sprite->tex_top;
-	sprite_verts[17] = 240 + 240 * sprite->x - sprite->width / 2.0;
-	sprite_verts[18] = 136 - 136 * sprite->y - sprite->height / 2.0;
-
-	sprite_verts[20] = sprite->tex_left + sprite->width;
-	sprite_verts[21] = sprite->tex_top + sprite->height;
-	sprite_verts[22] = 240 + 240 * sprite->x + sprite->width / 2.0;
-	sprite_verts[23] = 136 - 136 * sprite->y + sprite->height / 2.0;
-
-	sprite_verts[25] = sprite->tex_left;
-	sprite_verts[26] = sprite->tex_top + sprite->height;
-	sprite_verts[27] = 240 + 240 * sprite->x - sprite->width / 2.0;
-	sprite_verts[28] = 136 - 136 * sprite->y + sprite->height / 2.0;
+	sprite_verts[8] = 136 - 136 * sprite->y + sprite->height / 2.0;
 
 	sceGuDisable(GU_DEPTH_TEST);
 	if (sprite->texture != NULL) {
@@ -102,9 +83,9 @@ sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 			      sprite->texture->width, sprite->texture->buffer);
 	}
 	sceGuColor(sprite->base_color);
-	sceGumDrawArray(GU_TRIANGLES,
-			GU_VERTEX_32BITF | GU_TEXTURE_32BITF | GU_TRANSFORM_2D,
-			6, 0, sprite_verts);
+	sceGuDrawArray(GU_SPRITES,
+		       GU_VERTEX_32BITF | GU_TEXTURE_32BITF | GU_TRANSFORM_2D,
+		       2, 0, sprite_verts);
 	sceGuDisable(GU_TEXTURE_2D);
 	sceGuEnable(GU_DEPTH_TEST);
 #else

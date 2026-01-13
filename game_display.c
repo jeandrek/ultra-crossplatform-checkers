@@ -139,9 +139,9 @@ game_display_load(void)
 	texture_init_from_file(&texture_board, 128, 128,
 			       TEXTURES_DIR "board");
 	texture_init_from_file(&texture_win_red, 128, 64,
-			       TEXTURES_DIR "win_red");
+			       TEXTURES_DIR "win-red");
 	texture_init_from_file(&texture_win_black, 128, 64,
-			       TEXTURES_DIR "win_black");
+			       TEXTURES_DIR "win-black");
 }
 
 void
@@ -155,9 +155,9 @@ game_display_init(void)
 	game.sg.near_plane = 0.1;
 	game.sg.far_plane = 24;
 	game.sg.light0_enabled = 1;
-	game.sg.light0_x = 0;
+	game.sg.light0_x = 1;
 	game.sg.light0_y = 2;
-	game.sg.light0_z = 2;
+	game.sg.light0_z = 0;
 	game.sg.light0_color = 0xffffffff;
 	game_display_set_viewpoint(0);
 	sg_init_scenegraph(&game.sg);
