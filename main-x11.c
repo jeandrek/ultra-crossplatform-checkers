@@ -15,7 +15,7 @@ respond_to_event(Display *dpy, XEvent *evt, XPointer arg)
 	return 1;
 }
 
-int state[NUM_BUTTONS] = {0};
+int button_state[NUM_BUTTONS] = {0};
 
 int
 main()
@@ -39,7 +39,7 @@ main()
 	Window win;
 	XEvent evt;
 
-	dpy = XOpenDisplay(":0");
+	dpy = XOpenDisplay(NULL);
 
 	win_attribs.event_mask = (SubstructureNotifyMask
 				  | KeyPressMask
@@ -95,17 +95,17 @@ main()
 		switch (evt.type) {
 		case KeyPress:
 			if (keycode_buttons[evt.xkey.keycode] >= 0)
-				state[keycode_buttons[evt.xkey.keycode]] = 1;
+				button_state[keycode_buttons[evt.xkey.keycode]] = 1;
 			break;
 		case KeyRelease:
 			if (keycode_buttons[evt.xkey.keycode] >= 0)
-				state[keycode_buttons[evt.xkey.keycode]] = 0;
+				button_state[keycode_buttons[evt.xkey.keycode]] = 0;
 			break;
 		case ClientMessage:
 			goto quit;
 		}
 	}
- quit:
+quit:
 	XDestroyWindow(dpy, win);
 	XCloseDisplay(dpy);
 	return 0;

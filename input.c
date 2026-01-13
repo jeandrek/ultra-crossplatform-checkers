@@ -32,7 +32,7 @@ handle_button(int button)
 }
 
 #if !defined(__psp__) && !defined(_WIN32)
-extern int state[NUM_BUTTONS];
+extern int button_state[NUM_BUTTONS];
 #endif
 
 void
@@ -55,7 +55,7 @@ input_handle(void)
 		int val = input_mapping[i];
 		if (state[val] >> 7) handle_button(i);
 #else
-		if (state[i]) handle_button(i);
+		if (button_state[i]) handle_button(i);
 #endif
 		else repeat_delay[i] = 0;
 	}
