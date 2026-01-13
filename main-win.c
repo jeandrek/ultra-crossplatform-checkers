@@ -50,7 +50,7 @@ WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg) {
 	case WM_CREATE:
 		init_window(hWnd);
-		break;
+		return 0;
 	case WM_DESTROY:
 		wglDeleteContext(hglrc);
 		PostQuitMessage(0);
@@ -66,35 +66,35 @@ int WINAPI
 WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 	LPSTR lpCmdLine, int nCmdShow)
 {
-	RECT rect = {30, 30, 800+30, 600+30};
+	RECT rect = {0, 0, 800, 600};
 	WNDCLASS cls;
 	HWND hWnd;
 	MSG msg;
 
-	memset(&cls, 0, sizeof cls);
-	cls.lpszClassName = "WindowClass";
-	cls.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+	memset(&cls, 0, sizeof (cls));
+	cls.lpszClassName = "CheckersWindow";
+	cls.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	cls.hInstance     = hInst;
-	cls.style         = CS_VREDRAW | CS_HREDRAW | CS_SAVEBITS | CS_DBLCLKS;
+	cls.style         = CS_VREDRAW | CS_HREDRAW;
 	cls.lpfnWndProc   = (WNDPROC)WndProc;
 	RegisterClass(&cls);
 
 	AdjustWindowRectEx(&rect, WS_OVERLAPPEDWINDOW, FALSE, 0);
 
-	hWnd = CreateWindowEx(0, "WindowClass", "Checkers",
-			      WS_OVERLAPPEDWINDOW, rect.left, rect.top,
+	hWnd = CreateWindowEx(0, "CheckersWindow", "Checkers",
+			      WS_OVERLAPPEDWINDOW,
+			      CW_USEDEFAULT, CW_USEDEFAULT,
 			      rect.right - rect.left,
 			      rect.bottom - rect.top,
 			      NULL, NULL, hInst, NULL);
 	if (hWnd == NULL)
 		return 1;
-	ShowWindow(hWnd, 1);
+	ShowWindow(hWnd, nCmdShow);
 
 	for (;;) {
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 			if (LOWORD(msg.message) == WM_QUIT)
 				break;
-			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
 		HDC hdc = GetDC(hWnd);
