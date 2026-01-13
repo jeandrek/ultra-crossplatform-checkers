@@ -82,6 +82,7 @@ WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 
 	memset(&cls, 0, sizeof (cls));
 	cls.lpszClassName = "CheckersWindow";
+	cls.hCursor       = LoadCursor(NULL, IDC_ARROW);
 	cls.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	cls.hInstance     = hInst;
 	cls.style         = CS_VREDRAW | CS_HREDRAW;
