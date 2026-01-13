@@ -9,14 +9,16 @@
 #include "scenegraph.h"
 #include "input.h"
 
-PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
+static PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 
-HGLRC hglrc;
+static HGLRC hglrc;
+static int vsync = 0;
 
 static void
 init_window(HWND hWnd)
 {
 	PIXELFORMATDESCRIPTOR ppfd;
+	const char *extensions;
 	int format;
 	RECT rect;
 	HDC hdc;
@@ -37,8 +39,14 @@ init_window(HWND hWnd)
 
 	hglrc = wglCreateContext(hdc);
 	wglMakeCurrent(hdc, hglrc);
-	wglSwapIntervalEXT = (void *)wglGetProcAddress("wglSwapIntervalEXT");
-	wglSwapIntervalEXT(1);
+
+	extensions = glGetString(GL_EXTENSIONS);
+	if (strstr(extensions, "WGL_EXT_swap_control") != NULL) {
+		vsync = 1;
+		wglSwapIntervalEXT =
+			(void *)wglGetProcAddress("wglSwapIntervalEXT");
+		wglSwapIntervalEXT(1);
+	}
 	checkers_init();
 	sg_init(800, 600);
 	ReleaseDC(hWnd, hdc);
@@ -68,6 +76,7 @@ WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 {
 	RECT rect = {0, 0, 800, 600};
 	WNDCLASS cls;
+	DWORD ticks;
 	HWND hWnd;
 	MSG msg;
 
@@ -91,17 +100,24 @@ WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 		return 1;
 	ShowWindow(hWnd, nCmdShow);
 
+	if (!vsync) ticks = timeGetTime();
+
 	for (;;) {
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 			if (LOWORD(msg.message) == WM_QUIT)
 				break;
 			DispatchMessage(&msg);
 		}
-		HDC hdc = GetDC(hWnd);
-		input_handle();
-		checkers_update();
-		SwapBuffers(hdc);
-		ReleaseDC(hWnd, hdc);
+		if (vsync || timeGetTime() - ticks >= 15) {
+			HDC hdc = GetDC(hWnd);
+			input_handle();
+			checkers_update();
+			SwapBuffers(hdc);
+			ReleaseDC(hWnd, hdc);
+			ticks = timeGetTime();
+		} else {
+			Sleep(2);
+		}
 	}
 	return 0;
 }
