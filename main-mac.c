@@ -47,11 +47,20 @@ main(void)
 	AGLPixelFormat pix;
 	GLint swap_interval[] = {1};
 	Rect bounds = {100, 100, 100+HEIGHT, 100+WIDTH};
+	long gestalt_val;
 
 	err = CreateNewWindow(kDocumentWindowClass,
 			      (kWindowStandardFloatingAttributes |
 			       kWindowStandardHandlerAttribute),
 			      &bounds, &window);
+
+	Gestalt('menu', &gestalt_val);
+	if (!(gestalt_val & 0x2)) {
+		MenuRef menu = NewMenu(0, (ConstStringPtr)"\04File");
+		AppendMenu(menu, (ConstStringPtr)"\06Quit/Q");
+		SetMenuItemCommandID(menu, 1, 'quit');
+		InsertMenu(menu, 0);
+	}
 
 	InstallEventHandler(GetWindowEventTarget(window),
 			    NewEventHandlerUPP(WindowEventHandler),
@@ -73,6 +82,8 @@ main(void)
 	ShowWindow(window);
 
 	RunApplicationEventLoop();
+
+	aglDestroyContext(context);
 
 	return err;
 }

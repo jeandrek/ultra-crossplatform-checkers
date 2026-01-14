@@ -9,3 +9,5 @@ AGL
 OpenGL
 GL
 *.a
+*.bin
+*.pef

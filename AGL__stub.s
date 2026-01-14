@@ -20,6 +20,16 @@ aglCreateContext:
 	blr
 
 .text
+	.globl aglDestroyContext
+	.globl .aglDestroyContext
+	.csect aglDestroyContext[DS]
+aglDestroyContext:
+.long .aglDestroyContext, TOC[tc0], 0
+.text
+.aglDestroyContext:
+	blr
+
+.text
 	.globl aglDestroyPixelFormat
 	.globl .aglDestroyPixelFormat
 	.csect aglDestroyPixelFormat[DS]

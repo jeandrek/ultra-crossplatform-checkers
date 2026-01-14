@@ -27,3 +27,4 @@ OSStatus GetEventParameter(EventRef, uint32_t, uint32_t, void *, uint32_t, uint3
 OSStatus InstallEventHandler(void *, void *, uint32_t, EventTypeSpec *, void *, void *);
 void *NewEventHandlerUPP(void *);
 void *GetWindowEventTarget(WindowRef);
+OSErr SetMenuItemCommandID(MenuRef, int16_t, uint32_t);
