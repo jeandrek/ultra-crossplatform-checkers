@@ -1,10 +1,12 @@
 #ifndef _CHECKERS_H_
 #define _CHECKERS_H_
 
-#ifndef macintosh
-#define TEXTURES_DIR	"assets/textures/"
-#else
+#if defined(macintosh)
 #define TEXTURES_DIR	":assets:textures:"
+#elif defined(__APPLE__)
+#define TEXTURES_DIR	""
+#else
+#define TEXTURES_DIR	"assets/textures/"
 #endif
 
 #include "scenegraph.h"

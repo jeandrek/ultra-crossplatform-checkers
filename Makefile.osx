@@ -4,7 +4,8 @@ LDFLAGS=-framework Carbon -framework OpenGL -framework AGL
 CFLAGS=	-Wall -O2 -std=c99
 
 Checkers.app: $(PROGRAM)
-	mkdir -p $@/Contents/MacOS
+	mkdir -p $@/Contents/{MacOS,Resources}
+	cp -r assets/textures $@/Contents/Resources
 	cp $< $@/Contents/MacOS
 
 $(PROGRAM): $(OBJECTS)

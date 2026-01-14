@@ -11,6 +11,7 @@
 #elif defined(__APPLE__)
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
+#include <CoreFoundation/CoreFoundation.h>
 #else
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -45,8 +46,24 @@ texture_init(struct texture *texture, int width, int height, void *pixels)
 
 void
 texture_init_from_file(struct texture *texture, int width, int height,
-		       char *path)
+		       char *name)
 {
+#ifdef __APPLE__
+	CFBundleRef bundle;
+	CFURLRef url;
+	char path[128];
+
+	bundle = CFBundleGetMainBundle();
+	url = CFBundleCopyResourceURL(bundle,
+				      CFStringCreateWithCString(NULL, name, 0),
+				      NULL, CFSTR("textures"));
+	if (url == NULL)
+		exit(1);
+	CFURLGetFileSystemRepresentation(url, 1, path, 128);
+#else
+	char *path = name;
+#endif
+
 	size_t size = 4*width*height;
 	char *buf = malloc(size);
 	FILE *f = fopen(path, "rb");
