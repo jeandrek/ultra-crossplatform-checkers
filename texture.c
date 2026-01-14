@@ -60,6 +60,7 @@ texture_init_from_file(struct texture *texture, int width, int height,
 	if (url == NULL)
 		exit(1);
 	CFURLGetFileSystemRepresentation(url, 1, path, 128);
+	CFRelease(url);
 #else
 	char *path = name;
 #endif
