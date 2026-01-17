@@ -5,6 +5,10 @@
 #include "sprite.h"
 #include "texture.h"
 
+#define FONT_WIDTH	8
+#define FONT_HEIGHT	16
+#define FONT_ROW_LENGTH	16
+
 static struct texture texture_font;
 static struct sprite *ascii_sprites[128] = {NULL};
 
@@ -15,10 +19,11 @@ text_init(void)
 			       "assets/textures/font");
 
 	for (int i = '!'; i <= '}'; i++) {
-		int row = (i - '!') / 16;
-		int col = (i - '!') % 16;
+		int row = (i - '!') / FONT_ROW_LENGTH;
+		int col = (i - '!') % FONT_ROW_LENGTH;
 		struct sprite *s = malloc(sizeof (struct sprite));
-		sprite_init(s, &texture_font, 8*col, 16*row, 8, 16);
+		sprite_init(s, &texture_font, FONT_WIDTH*col, FONT_HEIGHT*row,
+			    FONT_WIDTH, FONT_HEIGHT);
 		ascii_sprites[i] = s;
 	}
 }
@@ -42,16 +47,16 @@ void
 draw_text(struct scenegraph *scenegraph, char *str, float x, float y,
 	  int alignment)
 {
-	char c;
 	float pixel_size = 2.0/scenegraph->height;
+	int c;
 
 	switch (alignment) {
 	case TEXT_TOPLEFT:
-		x += scale * 4.0 * pixel_size;
-		y -= scale * 8.0 * pixel_size;
+		x += scale * FONT_WIDTH / 2.0 * pixel_size;
+		y -= scale * FONT_HEIGHT / 2.0 * pixel_size;
 		break;
 	case TEXT_CENTRE:
-		x -= scale * 4.0 * pixel_size * (strlen(str) - 1);
+		x -= scale * FONT_WIDTH / 2.0 * pixel_size * (strlen(str) - 1);
 		break;
 	}
 
@@ -64,6 +69,6 @@ draw_text(struct scenegraph *scenegraph, char *str, float x, float y,
 			s->y = y;
 			sprite_draw(scenegraph, s);
 		}
-		x += scale * 8.0 * pixel_size;
+		x += scale * FONT_WIDTH * pixel_size;
 	}
 }

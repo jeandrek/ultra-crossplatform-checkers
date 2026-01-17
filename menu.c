@@ -3,7 +3,6 @@
 #include "checkers.h"
 #include "game.h"
 #include "menu.h"
-#include "sprite.h"
 #include "scenegraph.h"
 #include "texture.h"
 #include "input.h"

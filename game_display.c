@@ -1,5 +1,4 @@
 #include <string.h>
-#include <stdlib.h>
 #include <math.h>
 
 #include "game.h"
@@ -10,7 +9,6 @@
 #include "texture.h"
 #include "models.h"
 #include "sprite.h"
-#include "text.h"
 
 #define COLOR_PLAYER_0		0xff0000ff
 #define COLOR_PLAYER_0_SEL	0xff8080ff
