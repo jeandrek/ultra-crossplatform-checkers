@@ -59,12 +59,12 @@ sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 
 	sprite_verts[0] = sprite->tex_left;
 	sprite_verts[1] = sprite->tex_top;
-	sprite_verts[2] = 240 + 240 * sprite->x - sprite->width / 2.0;
+	sprite_verts[2] = 240 + 136 * sprite->x - sprite->width / 2.0;
 	sprite_verts[3] = 136 - 136 * sprite->y - sprite->height / 2.0;
 
 	sprite_verts[5] = sprite->tex_left + sprite->width;
 	sprite_verts[6] = sprite->tex_top + sprite->height;
-	sprite_verts[7] = 240 + 240 * sprite->x + sprite->width / 2.0;
+	sprite_verts[7] = 240 + 136 * sprite->x + sprite->width / 2.0;
 	sprite_verts[8] = 136 - 136 * sprite->y + sprite->height / 2.0;
 
 	sceGuDisable(GU_DEPTH_TEST);
@@ -118,6 +118,7 @@ sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);

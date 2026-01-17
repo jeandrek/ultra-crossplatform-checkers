@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdlib.h>
 #include <math.h>
 
 #include "game.h"
@@ -9,6 +10,7 @@
 #include "texture.h"
 #include "models.h"
 #include "sprite.h"
+#include "text.h"
 
 #define COLOR_PLAYER_0		0xff0000ff
 #define COLOR_PLAYER_0_SEL	0xff8080ff
@@ -126,11 +128,22 @@ render_win(struct scenegraph *scenegraph)
 	}
 }
 
+static void
+render_text(struct scenegraph *scenegraph)
+{
+	text_scale(1);
+	text_color(0xffffffff);
+	draw_text(scenegraph, "Hello there... :)",
+		  -4.0/3.0, 1,
+		  TEXT_TOPLEFT);
+}
+
 static void (*render_functions[])(struct scenegraph *) = {
 	render_board,
 	render_highlight,
 	render_pieces,
-	render_win
+	render_win,
+	render_text
 };
 
 void
@@ -148,7 +161,7 @@ void
 game_display_init(void)
 {
 	memset(&game.sg, 0, sizeof (game.sg));
-	game.sg.num_render = 4;
+	game.sg.num_render = sizeof (render_functions)/sizeof (render_functions[1]);
 	game.sg.render = render_functions;
 	game.sg.cam3d_enabled = 1;
 	game.sg.fov = 70.0;

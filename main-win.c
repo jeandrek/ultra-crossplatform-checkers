@@ -47,8 +47,8 @@ init_window(HWND hWnd)
 			(void *)wglGetProcAddress("wglSwapIntervalEXT");
 		wglSwapIntervalEXT(1);
 	}
-	checkers_init();
 	sg_init(800, 600);
+	checkers_init();
 	ReleaseDC(hWnd, hdc);
 }
 

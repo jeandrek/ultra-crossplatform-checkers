@@ -7,6 +7,7 @@
 #include "scenegraph.h"
 #include "texture.h"
 #include "input.h"
+#include "text.h"
 
 static struct texture texture_menu_ss;
 
@@ -15,9 +16,16 @@ static struct sprite button2;
 
 int selected_button = 0;
 
+static uint32_t
+button_color(int n)
+{
+	return n == selected_button ? 0xffffffff : 0xffaaaaaa;
+}
+
 static void
 menu_render_buttons(struct scenegraph *scenegraph)
 {
+#if 0
 	if (selected_button == 0) {
 		button1.base_color = 0xffffffff;
 		button2.base_color = 0xffaaaaaa;
@@ -27,6 +35,13 @@ menu_render_buttons(struct scenegraph *scenegraph)
 	}
 	sprite_draw(scenegraph, &button1);
 	sprite_draw(scenegraph, &button2);
+#endif
+	text_scale(1);
+	text_color(button_color(0));
+	char text[] = {'N','e','w',' ','G','a','m','e',0};
+	draw_text(scenegraph, text, 0, 0.2, TEXT_CENTRE);
+	text_color(button_color(1));
+	draw_text(scenegraph, "Return", 0, -0.2, TEXT_CENTRE);
 }
 
 static void (*menu_render_functions[])(struct scenegraph *) = {

@@ -1,12 +1,14 @@
 #include "checkers.h"
 #include "game.h"
 #include "menu.h"
+#include "text.h"
 
 static struct state *current_state = NULL;
 
 void
 checkers_init(void)
 {
+	text_init();
 	game.load();
 	game.init();
 	menu.load();
