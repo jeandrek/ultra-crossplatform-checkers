@@ -128,22 +128,11 @@ render_win(struct scenegraph *scenegraph)
 	}
 }
 
-static void
-render_text(struct scenegraph *scenegraph)
-{
-	text_scale(1);
-	text_color(0xffffffff);
-	draw_text(scenegraph, "Hello there... :)",
-		  -4.0/3.0, 1,
-		  TEXT_TOPLEFT);
-}
-
 static void (*render_functions[])(struct scenegraph *) = {
 	render_board,
 	render_highlight,
 	render_pieces,
-	render_win,
-	render_text
+	render_win
 };
 
 void
