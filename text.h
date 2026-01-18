@@ -9,7 +9,7 @@ enum {
 void text_init(void);
 void text_scale(float new_scale);
 void text_color(uint32_t new_color);
-void draw_text(struct scenegraph *scenegraph, char *s, float x, float y,
+void text_draw(struct scenegraph *scenegraph, char *s, float x, float y,
 	       int alignment);
 
 #endif /* _TEXT_H_ */

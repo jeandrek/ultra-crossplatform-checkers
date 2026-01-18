@@ -32,7 +32,7 @@ menu_render_items(struct scenegraph *scenegraph)
 	text_scale(1);
 	for (int i = 0; i < NUM_MENU_ITEMS; i++) {
 		text_color(item_color(i));
-		draw_text(scenegraph, menu_items[i], 0, item_y, TEXT_CENTRE);
+		text_draw(scenegraph, menu_items[i], 0, item_y, TEXT_CENTRE);
 		item_y -= item_gap;
 	}
 }
