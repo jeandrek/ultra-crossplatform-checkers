@@ -1,6 +1,6 @@
 #include "checkers.h"
 #include "game.h"
-#include "menu.h"
+#include "main_menu.h"
 #include "text.h"
 
 static struct state *current_state = NULL;
@@ -11,8 +11,8 @@ checkers_init(void)
 	text_init();
 	game.load();
 	game.init();
-	menu.load();
-	menu.init();
+	main_menu.load();
+	main_menu.init();
 	current_state = &game;
 }
 

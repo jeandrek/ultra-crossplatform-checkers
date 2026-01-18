@@ -3,6 +3,6 @@
 
 #include "checkers.h"
 
-extern struct state menu;
+extern struct state main_menu;
 
 #endif /* !_MENU_H_ */
