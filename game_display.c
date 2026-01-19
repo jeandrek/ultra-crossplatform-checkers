@@ -9,6 +9,7 @@
 #include "texture.h"
 #include "models.h"
 #include "sprite.h"
+#include "text.h"
 
 #define COLOR_PLAYER_0		0xff0000ff
 #define COLOR_PLAYER_0_SEL	0xff8080ff
@@ -17,8 +18,8 @@
 
 #define HALF_ALPHA(col)		(((col) & 0xffffff) | (0x80 << 24))
 
-static struct texture texture_board, texture_win_red, texture_win_black;
-static struct sprite overlay_sprite, win_sprite;
+static struct texture texture_board;
+static struct sprite overlay_sprite;
 
 static void
 render_board(struct scenegraph *scenegraph)
@@ -122,7 +123,9 @@ render_win(struct scenegraph *scenegraph)
 {
 	if (cur_mode == GAME_OVER) {
 		sprite_draw(scenegraph, &overlay_sprite);
-		sprite_draw(scenegraph, &win_sprite);
+		text_draw(scenegraph,
+			  winner() == 0 ? "Red wins" : "Black wins",
+			  0, 0, TEXT_CENTRE);
 	}
 }
 
@@ -138,10 +141,6 @@ game_display_load(void)
 {
 	texture_init_from_file(&texture_board, 128, 128,
 			       "assets/textures/board");
-	texture_init_from_file(&texture_win_red, 128, 64,
-			       "assets/textures/win-red");
-	texture_init_from_file(&texture_win_black, 128, 64,
-			       "assets/textures/win-black");
 }
 
 void
@@ -169,9 +168,6 @@ game_display_game_over(void)
 	sprite_init(&overlay_sprite, NULL, 0, 0,
 		    game.sg.width, game.sg.height);
 	overlay_sprite.base_color = 0x70000000;
-	sprite_init(&win_sprite,
-		    winner() == 0 ? &texture_win_red : &texture_win_black,
-		    0, 0, 128, 64);
 }
 
 static int anim_ticks = 0;
