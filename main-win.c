@@ -20,7 +20,6 @@ init_window(HWND hWnd)
 	PIXELFORMATDESCRIPTOR ppfd;
 	const char *extensions;
 	int format;
-	RECT rect;
 	HDC hdc;
 
 	memset(&ppfd, 0, sizeof (ppfd));
@@ -40,7 +39,7 @@ init_window(HWND hWnd)
 	hglrc = wglCreateContext(hdc);
 	wglMakeCurrent(hdc, hglrc);
 
-	extensions = glGetString(GL_EXTENSIONS);
+	extensions = (char *)glGetString(GL_EXTENSIONS);
 	if (strstr(extensions, "WGL_EXT_swap_control") != NULL) {
 		vsync = 1;
 		wglSwapIntervalEXT =
@@ -67,8 +66,6 @@ WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
-
-int state[NUM_BUTTONS] = {0};
 
 int WINAPI
 WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,

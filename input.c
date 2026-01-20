@@ -10,6 +10,7 @@
 
 #include "checkers.h"
 #include "input.h"
+#include "config.h"
 
 static const int can_repeat[NUM_BUTTONS] = {
 	[INPUT_UP] = 1,
@@ -31,7 +32,7 @@ handle_button(int button)
 	}
 }
 
-#if !defined(__psp__) && !defined(_WIN32)
+#ifdef USE_X11
 extern int button_state[NUM_BUTTONS];
 #endif
 
@@ -54,7 +55,7 @@ input_handle(void)
 #elif defined(_WIN32)
 		int val = input_mapping[i];
 		if (state[val] >> 7) handle_button(i);
-#else
+#elif defined(USE_X11)
 		if (button_state[i]) handle_button(i);
 #endif
 		else repeat_delay[i] = 0;
