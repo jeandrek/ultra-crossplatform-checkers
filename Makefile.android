@@ -1,0 +1,16 @@
+PROGRAM=	checkers.apk
+KEYSTORE=	../jeandre.jks
+ANDROID_SDK=	/mnt/c/Users/jeand/AppData/Local/Android/Sdk
+ANDROID_NDK_TOOLCHAIN=	/opt/android-sdk/ndk/r27d/toolchains/llvm/prebuilt/linux-x86_64
+ANDROID_JAR=	$(ANDROID_SDK)/platforms/android-19/android.jar
+OBJECTS=	checkers.o game.o game_display.o game_interaction.o game_checkers.o main_menu.o sprite.o scenegraph-gl.o texture.o input.o text.o
+CFLAGS=		--target=aarch64-linux-android21 -Wall
+LDFLAGS=	--target=aarch64-linux-android21 -shared
+CC=		$(ANDROID_NDK_TOOLCHAIN)/bin/clang
+
+$(PROGRAM): AndroidManifest.xml libcheckers.so
+	aapt p -I $(ANDROID_JAR) -M AndroidManifest.xml -F $@
+	apksigner sign -ks $(KEYSTORE) $@
+
+libcheckers.so: $(OBJECTS)
+	$(CC) $(LDFLAGS) -o $(OBJECTS)
