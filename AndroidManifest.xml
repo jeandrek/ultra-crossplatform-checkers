@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	  package="jeandre.checkers">
-  <application android:label="Checkers"
-	       android:hasCode="false">
-    <activity android:name="android.app.NativeActivity">
-    </activity>
-  </application>
-</manifest>

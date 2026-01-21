@@ -4,4 +4,10 @@
 *.o
 *.elf
 *.exe
-checkers
+*.apk
+*.dex
+*.class
+*.idsig
+*.so
+R.java
+/checkers

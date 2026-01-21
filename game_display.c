@@ -140,7 +140,7 @@ void
 game_display_load(void)
 {
 	texture_init_from_file(&texture_board, 128, 128,
-			       "assets/textures/board");
+			       TEXTURES_DIR "board");
 }
 
 void

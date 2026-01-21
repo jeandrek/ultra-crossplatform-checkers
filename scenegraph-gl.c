@@ -4,11 +4,16 @@
 #include <math.h>
 #include <stdint.h>
 
+#include "config.h"
+#ifdef USE_GL_ES
+#include <GLES/gl.h>
+#define glFrustum glFrustumf
+#else
+#include <GL/gl.h>
+#endif
+
 #include "scenegraph.h"
 #include "texture.h"
-
-#include <GL/gl.h>
-#include <GL/glu.h>
 
 static int width, height;
 
@@ -50,11 +55,15 @@ sg_render(struct scenegraph *scenegraph)
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	if (scenegraph->cam3d_enabled) {
+		float tan_fov_2 = tanf(scenegraph->fov/2.0 * M_PI/180.0);
+		float aspect = (float)width/(float)height;
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		gluPerspective(scenegraph->fov,
-			       (float)width/(float)height,
-			       scenegraph->near_plane, scenegraph->far_plane);
+		glFrustum(-0.1 * tan_fov_2 * aspect,
+			  0.1 * tan_fov_2 * aspect,
+			  -0.1 * tan_fov_2, 0.1 * tan_fov_2,
+			  scenegraph->near_plane,
+			  scenegraph->far_plane);
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 	}

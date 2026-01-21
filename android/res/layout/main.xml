@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:id="@+id/main">
+    <Button
+            android:text="←"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/leftButton"
+            android:layout_alignParentBottom="true" android:layout_marginBottom="25dp"/>
+    <Button
+            android:text="↓"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/downButton" android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@id/leftButton"/>
+    <Button
+            android:text="↑"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/upButton" android:layout_above="@id/downButton"
+            android:layout_toRightOf="@id/leftButton"/>
+    <Button
+            android:text="→"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/rightButton"
+            android:layout_toRightOf="@id/downButton" android:layout_alignParentBottom="true"
+            android:layout_marginBottom="25dp"/>
+    <Button
+            android:text="Pause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/pauseButton"/>
+    <Button
+            android:text="X"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/acceptButton"
+            android:layout_toRightOf="@id/rightButton"
+            android:layout_alignParentBottom="true"/>
+    <Button
+            android:text="Y"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/backButton"
+            android:layout_toRightOf="@id/acceptButton"
+            android:layout_alignParentBottom="true"/>
+</RelativeLayout>
