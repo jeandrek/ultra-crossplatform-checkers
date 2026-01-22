@@ -149,6 +149,8 @@ render_win(struct scenegraph *scenegraph)
 {
 	if (cur_mode == GAME_OVER) {
 		sprite_draw(scenegraph, &overlay_sprite);
+		text_scale(1);
+		text_color(0xffffffff);
 		text_draw(scenegraph,
 			  winner() == 0 ? "Red wins" : "Black wins",
 			  0, 0, TEXT_CENTRE);
