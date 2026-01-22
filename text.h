@@ -24,22 +24,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _TEXTURE_H_
-#define _TEXTURE_H_
+#ifndef _TEXT_H_
+#define _TEXT_H_
 
-struct texture {
-	int	width;
-	int	height;
-#ifdef __psp__
-	void	*buffer;
-#else
-	unsigned	gl_tex;
-#endif
+enum {
+	TEXT_TOPLEFT,
+	TEXT_CENTRE
 };
 
-void	texture_init(struct texture *texture, int width, int height,
-		     void *pixels);
-void	texture_init_from_file(struct texture *texture, int width, int height,
-			       char *path);
+void text_init(void);
+void text_scale(float new_scale);
+void text_color(uint32_t new_color);
+void text_draw(struct scenegraph *scenegraph, char *s, float x, float y,
+	       int alignment);
 
-#endif /* !_TEXTURE_H_ */
+#endif /* _TEXT_H_ */

@@ -24,22 +24,35 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _TEXTURE_H_
-#define _TEXTURE_H_
+package jeandre.checkers;
 
-struct texture {
-	int	width;
-	int	height;
-#ifdef __psp__
-	void	*buffer;
-#else
-	unsigned	gl_tex;
-#endif
-};
+import java.io.*;
+import android.app.Activity;
 
-void	texture_init(struct texture *texture, int width, int height,
-		     void *pixels);
-void	texture_init_from_file(struct texture *texture, int width, int height,
-			       char *path);
+class Checkers {
+	private Activity activity;
 
-#endif /* !_TEXTURE_H_ */
+	public native void init(int width, int height);
+	public native void update();
+	public native void inputEvent(int button);
+
+	public Checkers(Activity activity) {
+		this.activity = activity;
+	}
+
+	private byte[] textureDataFromAsset(String fileName)
+		throws IOException {
+		InputStream stream = activity.getAssets().open(fileName);
+		stream.mark(Integer.MAX_VALUE);
+		int length = (int)stream.skip(1 << 20);
+		stream.reset();
+		byte[] pixels = new byte[length];
+		stream.read(pixels, 0, length);
+		stream.close();
+		return pixels;
+	}
+
+	static {
+		System.loadLibrary("checkers");
+	}
+}

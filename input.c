@@ -1,3 +1,29 @@
+/*
+ * Copyright (c) 2026 Jeandre Kruger
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 #if defined(__psp__)
 #include <pspctrl.h>
 #include "input_mapping-psp.h"
@@ -14,6 +40,7 @@
 
 #include "checkers.h"
 #include "input.h"
+#include "config.h"
 
 static const int can_repeat[NUM_BUTTONS] = {
 	[INPUT_UP] = 1,
@@ -35,7 +62,7 @@ handle_button(int button)
 	}
 }
 
-#if !defined(__psp__) && !defined(_WIN32)
+#ifdef USE_X11
 extern int button_state[NUM_BUTTONS];
 #endif
 
@@ -65,8 +92,10 @@ input_handle(void)
 #elif defined(_WIN32)
 		int val = input_mapping[i];
 		if (state[val] >> 7) handle_button(i);
-#else
+#elif defined(USE_X11)
 		if (button_state[i]) handle_button(i);
+#else
+		if (0) handle_button(i);
 #endif
 		else repeat_delay[i] = 0;
 	}

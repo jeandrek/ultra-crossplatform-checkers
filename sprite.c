@@ -1,21 +1,47 @@
+/*
+ * Copyright (c) 2026 Jeandre Kruger
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+#include "config.h"
+#if defined(__psp__)
+#include <pspgu.h>
+#include <pspgum.h>
+#elif defined(USE_GL_ES)
+#include <GLES/gl.h>
+#define glOrtho glOrthof
+#elif defined(__APPLE__)
+#include <OpenGL/gl.h>
+#else
+#include <GL/gl.h>
+#endif
+
 #include "sprite.h"
 #include "scenegraph.h"
 #include "texture.h"
 
-#if defined(__psp__)
-#include <pspgu.h>
-#include <pspgum.h>
-
-#else
-
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
-
+#ifndef __psp__
 static float sprite_verts[] = {
 	-1, -1,
 	1, -1,
@@ -23,8 +49,7 @@ static float sprite_verts[] = {
 	-1, 1
 };
 
-static int sprite_indices[] = {0, 1, 2, 0, 2, 3};
-
+static uint16_t sprite_indices[] = {0, 1, 2, 0, 2, 3};
 #endif
 
 void
@@ -65,12 +90,12 @@ sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 
 	sprite_verts[0] = sprite->tex_left;
 	sprite_verts[1] = sprite->tex_top;
-	sprite_verts[2] = 240 + 240 * sprite->x - sprite->width / 2.0;
+	sprite_verts[2] = 240 + 136 * sprite->x - sprite->width / 2.0;
 	sprite_verts[3] = 136 - 136 * sprite->y - sprite->height / 2.0;
 
 	sprite_verts[5] = sprite->tex_left + sprite->width;
 	sprite_verts[6] = sprite->tex_top + sprite->height;
-	sprite_verts[7] = 240 + 240 * sprite->x + sprite->width / 2.0;
+	sprite_verts[7] = 240 + 136 * sprite->x + sprite->width / 2.0;
 	sprite_verts[8] = 136 - 136 * sprite->y + sprite->height / 2.0;
 
 	sceGuDisable(GU_DEPTH_TEST);
@@ -119,11 +144,12 @@ sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 
 	glVertexPointer(2, GL_FLOAT, 0, sprite_verts);
 	glTexCoordPointer(2, GL_FLOAT, 0, sprite->tex_coord);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, sprite_indices);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, sprite_indices);
 
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);

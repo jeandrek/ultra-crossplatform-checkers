@@ -1,0 +1,60 @@
+ANDROID_SDK=	/opt/android-sdk
+ANDROID_VERSION=21
+TOOLCHAIN=	$(ANDROID_SDK)/ndk/r27d/toolchains/llvm/prebuilt/linux-x86_64
+ANDROID_JAR=	$(ANDROID_SDK)/platforms/android-$(ANDROID_VERSION)/android.jar
+
+D8=		$(ANDROID_SDK)/build-tools/36.1.0/d8
+ZIPALIGN=	$(ANDROID_SDK)/build-tools/36.1.0/zipalign
+APKSIGNER=	apksigner
+AAPT=		aapt
+JAVAC=		javac
+JAR=		jar
+CC=		$(TOOLCHAIN)/bin/clang
+
+TARGET=		aarch64-linux-android$(ANDROID_VERSION)
+
+PROGRAM=	checkers.apk
+KEYSTORE=	../jeandre.jks
+OBJECTS=	checkers.o game.o game_display.o game_interaction.o game_checkers.o main-android.o main_menu.o sprite.o scenegraph-gl.o texture.o input.o text.o
+LIBS=		-lEGL -lGLESv1_CM -lm
+CFLAGS=		--target=$(TARGET) -Wall -fPIC
+LDFLAGS=	--target=$(TARGET) -shared $(LIBS) -Wl,--no-undefined
+
+CLASSES=	android/jeandre/checkers/MainActivity.class \
+		android/jeandre/checkers/Checkers.class \
+		android/jeandre/checkers/R.class
+
+$(PROGRAM): android/AndroidManifest.xml libcheckers.so classes.dex
+	$(AAPT) p -I $(ANDROID_JAR) -M android/AndroidManifest.xml \
+		-F $@ -S android/res -A assets
+	mkdir -p lib/arm64-v8a
+	cp libcheckers.so lib/arm64-v8a
+	$(JAR) -u -f $@ lib
+	rm -rf lib
+	$(JAR) -u -f $@ classes.dex
+	mv checkers.apk checkers_.apk
+	$(ZIPALIGN) 4 checkers_.apk checkers.apk
+	rm checkers_.apk
+	$(APKSIGNER) sign -ks $(KEYSTORE) $@
+
+libcheckers.so: $(OBJECTS)
+	$(CC) $(LDFLAGS) -o $@ $(OBJECTS)
+
+classes.dex: $(CLASSES)
+	$(D8) --lib $(ANDROID_JAR) android/jeandre/checkers/*.class
+
+.SUFFIXES: .java .class
+
+.java.class:
+	$(JAVAC) -sourcepath android -cp $(ANDROID_JAR) $<
+
+android/jeandre/checkers/MainActivity.java: android/jeandre/checkers/R.java
+
+android/jeandre/checkers/R.java: android/res/layout/main.xml
+	$(AAPT) p -I $(ANDROID_JAR) -M android/AndroidManifest.xml \
+		-J android/jeandre/checkers -S android/res
+
+clean:
+	rm -f $(PROGRAM) $(PROGRAM).idsig libcheckers.so classes.dex \
+		android/jeandre/checkers/*.class \
+		android/jeandre/checkers/R.java $(OBJECTS)

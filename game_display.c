@@ -1,3 +1,29 @@
+/*
+ * Copyright (c) 2026 Jeandre Kruger
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 #include <string.h>
 #include <math.h>
 
@@ -9,6 +35,7 @@
 #include "texture.h"
 #include "models.h"
 #include "sprite.h"
+#include "text.h"
 
 #define COLOR_PLAYER_0		0xff0000ff
 #define COLOR_PLAYER_0_SEL	0xff8080ff
@@ -17,8 +44,8 @@
 
 #define HALF_ALPHA(col)		(((col) & 0xffffff) | (0x80 << 24))
 
-static struct texture texture_board, texture_win_red, texture_win_black;
-static struct sprite overlay_sprite, win_sprite;
+static struct texture texture_board;
+static struct sprite overlay_sprite;
 
 static void
 render_board(struct scenegraph *scenegraph)
@@ -122,7 +149,11 @@ render_win(struct scenegraph *scenegraph)
 {
 	if (cur_mode == GAME_OVER) {
 		sprite_draw(scenegraph, &overlay_sprite);
-		sprite_draw(scenegraph, &win_sprite);
+		text_scale(1);
+		text_color(0xffffffff);
+		text_draw(scenegraph,
+			  winner() == 0 ? "Red wins" : "Black wins",
+			  0, 0, TEXT_CENTRE);
 	}
 }
 
@@ -138,17 +169,13 @@ game_display_load(void)
 {
 	texture_init_from_file(&texture_board, 128, 128,
 			       TEXTURES_DIR "board");
-	texture_init_from_file(&texture_win_red, 128, 64,
-			       TEXTURES_DIR "win-red");
-	texture_init_from_file(&texture_win_black, 128, 64,
-			       TEXTURES_DIR "win-black");
 }
 
 void
 game_display_init(void)
 {
 	memset(&game.sg, 0, sizeof (game.sg));
-	game.sg.num_render = 4;
+	game.sg.num_render = sizeof (render_functions)/sizeof (render_functions[1]);
 	game.sg.render = render_functions;
 	game.sg.cam3d_enabled = 1;
 	game.sg.fov = 70.0;
@@ -169,9 +196,6 @@ game_display_game_over(void)
 	sprite_init(&overlay_sprite, NULL, 0, 0,
 		    game.sg.width, game.sg.height);
 	overlay_sprite.base_color = 0x70000000;
-	sprite_init(&win_sprite,
-		    winner() == 0 ? &texture_win_red : &texture_win_black,
-		    0, 0, 128, 64);
 }
 
 static int anim_ticks = 0;

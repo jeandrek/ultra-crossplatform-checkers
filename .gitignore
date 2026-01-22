@@ -4,10 +4,16 @@
 *.o
 *.elf
 *.exe
-checkers
 AGL
 OpenGL
 GL
 *.a
 *.bin
 *.pef
+*.apk
+*.dex
+*.class
+*.idsig
+*.so
+R.java
+/checkers

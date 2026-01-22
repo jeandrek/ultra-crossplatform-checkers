@@ -1,6 +1,6 @@
 CC=powerpc-apple-macos-gcc
 PROGRAM=checkers
-OBJECTS=checkers.o game.o game_display.o game_interaction.o game_checkers.o menu.o sprite.o scenegraph-gl.o main-mac.o texture.o input.o
+OBJECTS=checkers.o game.o game_display.o game_interaction.o game_checkers.o main_menu.o sprite.o scenegraph-gl.o main-mac.o texture.o input.o text.o
 LDFLAGS=-carbon -L. -lm -lOpenGLLibrary -lOpenGLUtility
 CFLAGS=	-Wall -W -Og -g -I. -IGL -IAGL
 RETRO68=$(HOME)/Retro68-build/toolchain

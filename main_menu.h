@@ -24,22 +24,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _TEXTURE_H_
-#define _TEXTURE_H_
+#ifndef _MAIN_MENU_H_
+#define _MAIN_MENU_H_
 
-struct texture {
-	int	width;
-	int	height;
-#ifdef __psp__
-	void	*buffer;
-#else
-	unsigned	gl_tex;
-#endif
-};
+#include "checkers.h"
 
-void	texture_init(struct texture *texture, int width, int height,
-		     void *pixels);
-void	texture_init_from_file(struct texture *texture, int width, int height,
-			       char *path);
+extern struct state main_menu;
 
-#endif /* !_TEXTURE_H_ */
+#endif /* !_MAIN_MENU_H_ */
