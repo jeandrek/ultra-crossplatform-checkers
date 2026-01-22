@@ -45,8 +45,7 @@ Java_jeandre_checkers_Checkers_inputEvent(JNIEnv *env, jobject obj, jint button)
 {
 	mtx_lock(&checkers_mutex);
 	/* Alternatively, this could enqueue events and input_handle processes
-	   them.  This is fine for now but it probably needs to be done that
-	   way with networking/computer opponent. */
+	   them; but this is fine for now. */
 	checkers_input_event(button);
 	mtx_unlock(&checkers_mutex);
 }
