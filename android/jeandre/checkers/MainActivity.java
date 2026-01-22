@@ -55,7 +55,6 @@ public class MainActivity extends Activity {
 	}
 
 	private View.OnClickListener onClickFor(int button) {
-		MainActivity activity = this;
 		return new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
