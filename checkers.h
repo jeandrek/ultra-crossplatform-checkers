@@ -27,8 +27,8 @@ void checkers_switch_state(struct state *new_state);
 
 /* JNIEnv for GLSurfaceView's rendering thread */
 extern JNIEnv *checkers_jnienv;
-/* jeandre.checkers.Checkers class */
-extern jclass checkers_java;
+/* jeandre.checkers.Checkers instance */
+extern jobject checkers_java;
 #endif
 
 #endif /* !_CHECKERS_H_ */

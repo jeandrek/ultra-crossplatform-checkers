@@ -52,19 +52,18 @@ static void
 texture_data_from_asset(char *path, char *buf)
 {
 	JNIEnv *env = checkers_jnienv;
-	jmethodID mid =
-		(*env)->GetStaticMethodID(env, checkers_java,
-					  "textureDataFromAsset",
-					  "(Ljava/lang/String;)[B");
+	jclass cls = (*env)->FindClass(env, "jeandre/checkers/Checkers");
+	jmethodID mid = (*env)->GetMethodID(env, cls, "textureDataFromAsset",
+					    "(Ljava/lang/String;)[B");
 	jstring path_obj = (*env)->NewStringUTF(env, path);
-	jbyteArray data =
-		(*env)->CallStaticObjectMethod(env, checkers_java,
-					       mid, path_obj);
+	jbyteArray data = (*env)->CallObjectMethod(env, checkers_java,
+						   mid, path_obj);
 
 	size_t len = (*env)->GetArrayLength(env, data);
 	int8_t *temp = (*env)->GetByteArrayElements(env, data, NULL);
 	memcpy(buf, temp, len);
 	(*env)->ReleaseByteArrayElements(env, data, temp, 0);
+	(*env)->DeleteLocalRef(env, data);
 }
 #endif
 

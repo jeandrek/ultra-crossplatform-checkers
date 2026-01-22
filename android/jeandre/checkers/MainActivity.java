@@ -19,13 +19,14 @@ public class MainActivity extends Activity {
 		R.id.backButton
 	};
 
+	private Checkers checkers;
 	private GLSurfaceView view;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Checkers.setActivity(this);
+		checkers = new Checkers(this);
 
 		setContentView(R.layout.main);
 
@@ -33,7 +34,7 @@ public class MainActivity extends Activity {
 		view.setRenderer(new GLSurfaceView.Renderer() {
 			@Override
 			public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-				Checkers.init(view.getWidth(),
+				checkers.init(view.getWidth(),
 					      view.getHeight());
 			}
 
@@ -44,7 +45,7 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onDrawFrame(GL10 gl) {
-				Checkers.update();
+				checkers.update();
 			}
 		});
 		view.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
@@ -58,7 +59,7 @@ public class MainActivity extends Activity {
 		return new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Checkers.inputEvent(button);
+				checkers.inputEvent(button);
 			}
 		};
 	}

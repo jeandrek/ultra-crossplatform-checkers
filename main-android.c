@@ -13,8 +13,8 @@
 
 /* JNIEnv for GLSurfaceView's rendering thread */
 JNIEnv *checkers_jnienv;
-/* jeandre.checkers.Checkers class */
-jclass checkers_java;
+/* jeandre.checkers.Checkers instance */
+jobject checkers_java;
 
 static mtx_t checkers_mutex;	/* Big lock */
 

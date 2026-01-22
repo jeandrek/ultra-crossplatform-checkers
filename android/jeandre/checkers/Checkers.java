@@ -4,22 +4,23 @@ import java.io.*;
 import android.app.Activity;
 
 class Checkers {
-	private static Activity activity;
+	private Activity activity;
 
-	public static native void init(int width, int height);
-	public static native void update();
-	public static native void inputEvent(int button);
+	public native void init(int width, int height);
+	public native void update();
+	public native void inputEvent(int button);
 
-	public static void setActivity(Activity newActivity) {
-		activity = newActivity;
+	public Checkers(Activity activity) {
+		this.activity = activity;
 	}
 
-	private static byte[] textureDataFromAsset(String fileName) throws IOException {
+	private byte[] textureDataFromAsset(String fileName)
+		throws IOException {
 		InputStream stream = activity.getAssets().open(fileName);
 		stream.mark(Integer.MAX_VALUE);
 		int length = (int)stream.skip(1 << 20);
-		byte[] pixels = new byte[length];
 		stream.reset();
+		byte[] pixels = new byte[length];
 		stream.read(pixels, 0, length);
 		stream.close();
 		return pixels;
