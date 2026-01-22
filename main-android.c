@@ -1,6 +1,6 @@
 /*
  * We could rather use NativeActivity/native_app_glue, but the (currently
- * rather poor) Android UI uses several ButtonViews for input, rather than
+ * rather poor) Android UI uses several Buttons for input, rather than
  * supporting proper touch input.
  */
 
