@@ -6,43 +6,43 @@
 		android:id="@+id/main">
   <Button
       android:id="@+id/downButton" android:text="↓"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
+      android:layout_width="40dp"
+      android:layout_height="40dp"
       android:layout_alignParentLeft="true"
       android:layout_alignParentBottom="true"
-      android:layout_marginLeft="25dp" />
+      android:layout_marginLeft="20dp" />
   <Button
       android:id="@+id/leftButton" android:text="←"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
+      android:layout_width="40dp"
+      android:layout_height="40dp"
       android:layout_above="@id/downButton" />
   <Button
       android:id="@+id/rightButton" android:text="→"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
+      android:layout_width="40dp"
+      android:layout_height="40dp"
       android:layout_above="@id/downButton"
       android:layout_toRightOf="@id/leftButton" />
   <Button
       android:id="@+id/upButton" android:text="↑"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
+      android:layout_width="40dp"
+      android:layout_height="40dp"
       android:layout_above="@id/leftButton"
       android:layout_alignParentLeft="true"
-      android:layout_marginLeft="25dp" />
+      android:layout_marginLeft="20dp" />
   <Button
-      android:id="@+id/pauseButton" android:text="Pause"
+      android:id="@+id/pauseButton" android:text="Menu"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content" />
   <Button
       android:id="@+id/acceptButton" android:text="X"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
+      android:layout_width="40dp"
+      android:layout_height="40dp"
       android:layout_toRightOf="@id/rightButton"
       android:layout_alignParentBottom="true" />
   <Button
       android:id="@+id/backButton" android:text="Y"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
+      android:layout_width="40dp"
+      android:layout_height="40dp"
       android:layout_toRightOf="@id/acceptButton"
       android:layout_alignParentBottom="true" />
 </RelativeLayout>
