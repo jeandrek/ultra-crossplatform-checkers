@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
+
+#include "checkers.h"
 #include "scenegraph.h"
 #include "text.h"
 #include "sprite.h"
@@ -21,7 +23,7 @@ void
 text_init(void)
 {
 	texture_init_from_file(&texture_font, 128, 128,
-			       "assets/textures/font");
+			       TEXTURES_DIR "font");
 
 	for (int i = '!'; i <= '}'; i++) {
 		int row = (i - '!') / FONT_ROW_LENGTH;

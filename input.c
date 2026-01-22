@@ -57,6 +57,8 @@ input_handle(void)
 		if (state[val] >> 7) handle_button(i);
 #elif defined(USE_X11)
 		if (button_state[i]) handle_button(i);
+#else
+		if (0) handle_button(i);
 #endif
 		else repeat_delay[i] = 0;
 	}

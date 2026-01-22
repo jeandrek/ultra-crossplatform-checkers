@@ -1,15 +1,19 @@
+#include "config.h"
+#if defined(__psp__)
+#include <pspgu.h>
+#include <pspgum.h>
+#elif defined(USE_GL_ES)
+#include <GLES/gl.h>
+#define glOrtho glOrthof
+#else
+#include <GL/gl.h>
+#endif
+
 #include "sprite.h"
 #include "scenegraph.h"
 #include "texture.h"
 
-#ifdef __psp__
-#include <pspgu.h>
-#include <pspgum.h>
-
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-
+#ifndef __psp__
 static float sprite_verts[] = {
 	-1, -1,
 	1, -1,
@@ -17,8 +21,7 @@ static float sprite_verts[] = {
 	-1, 1
 };
 
-static int sprite_indices[] = {0, 1, 2, 0, 2, 3};
-
+static uint16_t sprite_indices[] = {0, 1, 2, 0, 2, 3};
 #endif
 
 void
@@ -113,7 +116,7 @@ sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 
 	glVertexPointer(2, GL_FLOAT, 0, sprite_verts);
 	glTexCoordPointer(2, GL_FLOAT, 0, sprite->tex_coord);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, sprite_indices);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, sprite_indices);
 
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
