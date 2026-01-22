@@ -53,12 +53,22 @@ extern board_t board;
 
 void board_init(void); /* Rename? */
 
+/*
+ * Returns piece or -1.
+ */
 int piece_occupying_square_belonging_to_player(int i, int player);
+
 void board_available_moves(struct move moves[64][MAX_MOVES], int *num_moves,
 			   int player, int moved_piece_idx);
 
+/*
+ * Performs move and returns whether the player's turn has ended yet.
+ */
 int perform_move(struct move *move, int player);
 
+/*
+ * Returns winner or -1.
+ */
 int winner(void);
 
 #endif /* !_GAME_CHECKERS_H_ */

@@ -46,6 +46,9 @@ is_square_empty(int i)
 		 || ((board[1][KING] >> i) & 1));
 }
 
+/*
+ * Returns piece or -1.
+ */
 int
 piece_occupying_square_belonging_to_player(int i, int player)
 {
@@ -189,6 +192,9 @@ board_available_moves(struct move moves[64][MAX_MOVES], int *num_moves,
 		num_moves[i] = piece_moves(moves[i], player, i, 0);
 }
 
+/*
+ * Performs move and returns whether the player's turn has ended yet.
+ */
 int
 perform_move(struct move *move, int player)
 {
@@ -206,6 +212,9 @@ perform_move(struct move *move, int player)
 		return 1;
 }
 
+/*
+ * Returns winner or -1.
+ */
 int
 winner(void)
 {
