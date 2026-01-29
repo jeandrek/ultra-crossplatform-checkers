@@ -69,7 +69,10 @@ main()
 
 	win_attribs.event_mask = (SubstructureNotifyMask
 				  | KeyPressMask
-				  | KeyReleaseMask);
+				  | KeyReleaseMask
+				  | PointerMotionMask
+				  | ButtonPressMask
+				  | ButtonReleaseMask);
 
 	win = XCreateWindow(dpy, DefaultRootWindow(dpy), 30, 30,
 			    800, 600, 0,
@@ -126,6 +129,13 @@ main()
 		case KeyRelease:
 			if (keycode_buttons[evt.xkey.keycode] >= 0)
 				button_state[keycode_buttons[evt.xkey.keycode]] = 0;
+			break;
+		case MotionNotify:
+			mouse_x = evt.xmotion.x;
+			mouse_y = evt.xmotion.y;
+			break;
+		case ButtonRelease:
+			checkers_mouse_up(evt.xbutton.x, evt.xbutton.y);
 			break;
 		case ClientMessage:
 			goto quit;

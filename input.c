@@ -38,6 +38,8 @@
 #include "input.h"
 #include "config.h"
 
+int mouse_x, mouse_y;
+
 static const int can_repeat[NUM_BUTTONS] = {
 	[INPUT_UP] = 1,
 	[INPUT_DOWN] = 1,
@@ -51,7 +53,7 @@ static void
 handle_button(int button)
 {
 	if (repeat_delay[button] == 0) {
-		checkers_input_event(button);
+		checkers_button_event(button);
 		repeat_delay[button] = can_repeat[button] ? REPEAT_DELAY : -1;
 	} else if (repeat_delay[button] > 0) {
 		repeat_delay[button]--;

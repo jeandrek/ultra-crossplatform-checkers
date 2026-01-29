@@ -94,7 +94,7 @@ move_piece(void)
 }
 
 void
-game_input_event(int button)
+game_button_event(int button)
 {
 	if (button == INPUT_PAUSE) {
 		main_menu.init();

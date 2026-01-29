@@ -39,14 +39,16 @@ struct state {
 	void (*load)(void);
 	void (*init)(void);
 	void (*update)(void);
-	void (*input_event)(int);
+	void (*button_event)(int);
+	void (*mouse_up_event)(float, float);
 	struct scenegraph sg;
 };
 
 void checkers_init(void);
 void checkers_update(void);
-void checkers_input_event(int button);
+void checkers_button_event(int button);
 void checkers_switch_state(struct state *new_state);
+void checkers_mouse_up(float x, float y);
 
 #ifdef __ANDROID__
 #include <jni.h>

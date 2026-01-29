@@ -56,7 +56,13 @@ checkers_update(void)
 }
 
 void
-checkers_input_event(int button)
+checkers_button_event(int button)
 {
-	current_state->input_event(button);
+	current_state->button_event(button);
+}
+
+void
+checkers_mouse_up(float x, float y)
+{
+	current_state->mouse_up_event(x, y);
 }

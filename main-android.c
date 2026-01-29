@@ -72,6 +72,6 @@ Java_jeandre_checkers_Checkers_inputEvent(JNIEnv *env, jobject obj, jint button)
 	mtx_lock(&checkers_mutex);
 	/* Alternatively, this could enqueue events and input_handle processes
 	   them; but this is fine for now. */
-	checkers_input_event(button);
+	checkers_button_event(button);
 	mtx_unlock(&checkers_mutex);
 }

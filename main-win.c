@@ -87,6 +87,13 @@ WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		wglDeleteContext(hglrc);
 		PostQuitMessage(0);
 		return 0;
+	case WM_LBUTTONUP:
+		checkers_mouse_up(LOWORD(lParam), HIWORD(lParam));
+		return 0;
+	case WM_MOUSEMOVE:
+		mouse_x = LOWORD(lParam);
+		mouse_y = HIWORD(lParam);
+		return 0;
 	}
 
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);

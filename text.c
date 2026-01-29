@@ -114,3 +114,26 @@ text_draw(struct scenegraph *scenegraph, char *str, float x, float y,
 		x += scale * FONT_WIDTH * pixel_size;
 	}
 }
+
+void
+text_screen_bounds(struct scenegraph *scenegraph, size_t len, float x, float y,
+	       int alignment, struct rect *rect)
+{
+	int screen_x = scenegraph->width/2 + scenegraph->height/2 * x;
+	int screen_y = scenegraph->height/2 - scenegraph->height/2 * y;
+
+	switch (alignment) {
+	case TEXT_CENTRE:
+		rect->left = screen_x - scale * FONT_WIDTH/2 * len;
+		rect->top = screen_y - scale * FONT_HEIGHT/2;
+		rect->right = screen_x + scale * FONT_WIDTH/2 * len;
+		rect->bottom = screen_y + scale * FONT_HEIGHT/2;
+		break;
+	case TEXT_TOPLEFT:
+		rect->left = screen_x;
+		rect->top = screen_y;
+		rect->right = screen_x + scale * FONT_WIDTH * len;
+		rect->bottom = screen_y + scale * FONT_HEIGHT;
+		break;
+	}
+}

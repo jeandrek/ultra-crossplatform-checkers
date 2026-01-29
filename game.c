@@ -65,9 +65,15 @@ game_anim_rotate_finished(void)
 	cur_mode = SELECT_PIECE;
 }
 
+static void
+game_mouse_up_event(float x, float y)
+{
+}
+
 struct state game = {
 	.load = game_display_load,
 	.init = game_init,
 	.update = game_update,
-	.input_event = game_input_event
+	.button_event = game_button_event,
+	.mouse_up_event = game_mouse_up_event
 };

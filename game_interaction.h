@@ -37,6 +37,6 @@ extern int sel_move_idx;
 extern int player_turn;
 
 void game_interaction_init(void);
-void game_input_event(int button);
+void game_button_event(int button);
 
 #endif

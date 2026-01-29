@@ -50,6 +50,8 @@ static char *main_menu_items[] = {
 	"Return"
 };
 
+static struct rect buttons[NUM_MENU_ITEMS];
+
 static void
 main_menu_render_items(struct scenegraph *scenegraph)
 {
@@ -81,15 +83,55 @@ main_menu_init(void)
 	main_menu.sg.num_render = num_main_menu_render_functions;
 	main_menu.sg.render = main_menu_render_functions;
 	sg_init_scenegraph(&main_menu.sg);
+
+	float item_gap = 1.5 / (NUM_MENU_ITEMS + 1);
+	float item_y = .75 - item_gap;
+
+	for (int i = 0; i < NUM_MENU_ITEMS; i++) {
+		text_screen_bounds(&main_menu.sg, strlen(main_menu_items[i]),
+				   0, item_y, TEXT_CENTRE, &buttons[i]);
+		buttons[i].left -= 8;
+		buttons[i].top -= 8;
+		buttons[i].right += 8;
+		buttons[i].bottom += 8;
+		item_y -= item_gap;
+	}
+}
+
+static int
+point_in_rect(int x, int y, struct rect *bounds)
+{
+	return (x >= bounds->left && x <= bounds->right
+		&& y >= bounds->top && y <= bounds->bottom);
 }
 
 static void
 main_menu_update(void)
 {
+	for (int i = 0; i < NUM_MENU_ITEMS; i++) {
+		struct rect *bounds = &buttons[i];
+		if (point_in_rect(mouse_x, mouse_y, bounds))
+			selected_item = i;
+	}
+
 }
 
 static void
-main_menu_input_event(int button)
+click(int idx)
+{
+	switch (idx) {
+	case 0:
+		game.init();
+		checkers_switch_state(&game);
+		break;
+	case 1:
+		checkers_switch_state(&game);
+		break;
+	}
+}
+
+static void
+main_menu_button_event(int button)
 {
 	switch (button) {
 	case INPUT_UP:
@@ -100,16 +142,18 @@ main_menu_input_event(int button)
 		selected_item = (selected_item + 1) % NUM_MENU_ITEMS;
 		break;
 	case INPUT_ACCEPT:
-		switch (selected_item) {
-		case 0:
-			game.init();
-			checkers_switch_state(&game);
-			break;
-		case 1:
-			checkers_switch_state(&game);
-			break;
-		}
+		click(selected_item);
 		break;
+	}
+}
+
+static void
+main_menu_mouse_up_event(float x, float y)
+{
+	for (int i = 0; i < NUM_MENU_ITEMS; i++) {
+		struct rect *bounds = &buttons[i];
+		if (point_in_rect(x, y, bounds))
+			click(i);
 	}
 }
 
@@ -117,5 +161,6 @@ struct state main_menu = {
 	.load = main_menu_load,
 	.init = main_menu_init,
 	.update = main_menu_update,
-	.input_event = main_menu_input_event
+	.button_event = main_menu_button_event,
+	.mouse_up_event = main_menu_mouse_up_event
 };

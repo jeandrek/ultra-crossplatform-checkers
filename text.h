@@ -32,10 +32,16 @@ enum {
 	TEXT_CENTRE
 };
 
+struct rect {
+	int left, top, right, bottom;
+};
+
 void text_init(void);
 void text_scale(float new_scale);
 void text_color(uint32_t new_color);
 void text_draw(struct scenegraph *scenegraph, char *s, float x, float y,
 	       int alignment);
+void text_screen_bounds(struct scenegraph *scenegraph, size_t len, float x, float y,
+			int alignment, struct rect *rect);
 
 #endif /* _TEXT_H_ */
