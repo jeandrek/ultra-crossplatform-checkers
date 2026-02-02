@@ -28,14 +28,11 @@
 
 #include "checkers.h"
 #include "game.h"
+#include "game_checkers.h"
 #include "scenegraph.h"
-#include "texture.h"
-#include "input.h"
 #include "text.h"
 #include "gui.h"
 #include "menu.h"
-
-int game_dirty = 1;
 
 static int num_elems;
 static struct element *elems;

@@ -48,6 +48,7 @@ struct move {
 };
 
 extern board_t board;
+extern int game_dirty;
 
 #define MAX_MOVES	4
 

@@ -27,6 +27,7 @@
 #include "game_checkers.h"
 
 board_t board;
+int game_dirty;
 
 void
 board_init(void)
@@ -35,6 +36,7 @@ board_init(void)
 	board[1][MAN] = 0xaa55aa0000000000;
 	board[0][KING] = 0;
 	board[1][KING] = 0;
+	game_dirty = 0;
 }
 
 static int
@@ -199,6 +201,8 @@ int
 perform_move(struct move *move, int player)
 {
 	struct move further_captures[MAX_MOVES];
+
+	if (!game_dirty) game_dirty = 1;
 
 	board[0][MAN] = move->resulting_board[0][MAN];
 	board[0][KING] = move->resulting_board[0][KING];
