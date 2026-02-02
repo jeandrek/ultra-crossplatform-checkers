@@ -49,4 +49,4 @@ void sprite_init(struct sprite *sprite, struct texture *texture,
 		 int tex_left, int tex_top, int width, int height);
 void sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite);
 
-#endif /* _SPRITE_H_ */
+#endif /* !_SPRITE_H_ */

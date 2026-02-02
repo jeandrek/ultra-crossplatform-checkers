@@ -24,11 +24,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _MAIN_MENU_H_
-#define _MAIN_MENU_H_
+#ifndef _MENU_H_
+#define _MENU_H_
 
 #include "checkers.h"
 
 extern struct state menu;
 
-#endif /* !_MAIN_MENU_H_ */
+#endif /* !_MENU_H_ */

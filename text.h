@@ -40,4 +40,4 @@ void text_draw(struct scenegraph *scenegraph, char *s, float x, float y,
 void text_screen_bounds(struct scenegraph *scenegraph, size_t len, float x, float y,
 			int alignment, struct rect *rect);
 
-#endif /* _TEXT_H_ */
+#endif /* !_TEXT_H_ */

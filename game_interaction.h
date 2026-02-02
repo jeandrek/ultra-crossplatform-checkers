@@ -39,4 +39,4 @@ extern int player_turn;
 void game_interaction_init(void);
 void game_button_event(int button);
 
-#endif
+#endif /* !_GAME_INTERACTION_H_ */
