@@ -28,18 +28,17 @@
 
 #include "checkers.h"
 #include "game.h"
-#include "main_menu.h"
 #include "scenegraph.h"
 #include "texture.h"
 #include "input.h"
 #include "text.h"
-
-static int selected_item = 0;
+#include "gui.h"
+#include "main_menu.h"
 
 static uint32_t
 item_color(int n)
 {
-	return n == selected_item ? 0xffffffff : 0xffaaaaaa;
+	return n == gui_focus_row ? 0xffffffff : 0xffaaaaaa;
 }
 
 #define NUM_MENU_ITEMS 2
@@ -76,6 +75,22 @@ main_menu_load(void)
 {
 }
 
+int row_lengths[] = {1, 1};
+
+static void
+click(int row, int col)
+{
+	switch (row) {
+	case 0:
+		game.init();
+		checkers_switch_state(&game);
+		break;
+	case 1:
+		checkers_switch_state(&game);
+		break;
+	}
+}
+
 static void
 main_menu_init(void)
 {
@@ -96,6 +111,9 @@ main_menu_init(void)
 		buttons[i].bottom += 8;
 		item_y -= item_gap;
 	}
+
+	gui_set_row_lengths(2, row_lengths);
+	gui_set_action_proc(click);
 }
 
 static int
@@ -111,40 +129,15 @@ main_menu_update(void)
 	for (int i = 0; i < NUM_MENU_ITEMS; i++) {
 		struct rect *bounds = &buttons[i];
 		if (point_in_rect(mouse_x, mouse_y, bounds))
-			selected_item = i;
+			; //selected_item = i;
 	}
 
-}
-
-static void
-click(int idx)
-{
-	switch (idx) {
-	case 0:
-		game.init();
-		checkers_switch_state(&game);
-		break;
-	case 1:
-		checkers_switch_state(&game);
-		break;
-	}
 }
 
 static void
 main_menu_button_event(int button)
 {
-	switch (button) {
-	case INPUT_UP:
-		selected_item = (selected_item == 0 ?
-				 NUM_MENU_ITEMS - 1 : selected_item - 1);
-		break;
-	case INPUT_DOWN:
-		selected_item = (selected_item + 1) % NUM_MENU_ITEMS;
-		break;
-	case INPUT_ACCEPT:
-		click(selected_item);
-		break;
-	}
+	gui_button_event(button);
 }
 
 static void
@@ -153,7 +146,7 @@ main_menu_mouse_up_event(float x, float y)
 	for (int i = 0; i < NUM_MENU_ITEMS; i++) {
 		struct rect *bounds = &buttons[i];
 		if (point_in_rect(x, y, bounds))
-			click(i);
+			click(i, 0);
 	}
 }
 
