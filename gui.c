@@ -147,10 +147,13 @@ gui_mouse_up_event(float x, float y)
 	for (int i = 0; i < num_rows; i++) {
 		for (int j = 0; j < rows[i].len; j++) {
 			struct rect *bounds = &rows[i].elems[j]->bounds;
-			if (point_in_rect(mouse_x, mouse_y, bounds))
+			if (point_in_rect(x, y, bounds)) {
 				action(i, j);
+				goto quit;
+			}
 		}
 	}
+quit:
 }
 
 void
