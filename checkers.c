@@ -37,7 +37,6 @@ checkers_init(void)
 	text_init();
 	game.load();
 	game.init();
-	main_menu.load();
 	main_menu.init();
 	current_state = &game;
 }

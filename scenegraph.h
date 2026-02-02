@@ -43,6 +43,10 @@ struct scenegraph {
 	int	width, height;	/* XXX */
 };
 
+struct rect {
+	int left, top, right, bottom;
+};
+
 #define SG_OBJ_NOLIGHTDEPTH	(1<<0)
 #define SG_OBJ_TEXTURED		(1<<1)
 

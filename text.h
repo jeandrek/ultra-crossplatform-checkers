@@ -32,10 +32,6 @@ enum {
 	TEXT_CENTRE
 };
 
-struct rect {
-	int left, top, right, bottom;
-};
-
 void text_init(void);
 void text_scale(float new_scale);
 void text_color(uint32_t new_color);

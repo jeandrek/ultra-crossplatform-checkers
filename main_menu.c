@@ -35,47 +35,27 @@
 #include "gui.h"
 #include "main_menu.h"
 
-static uint32_t
-item_color(int n)
-{
-	return n == gui_focus_row ? 0xffffffff : 0xffaaaaaa;
-}
+int row_lengths[] = {1, 1};
 
-#define NUM_MENU_ITEMS 2
-static char *main_menu_items[] = {
-	"New game",
-	/* "Host game", */
-	/* "Join game", */
-	"Return"
+struct element elems[] = {
+	{.x = 0, .y = 0.1, .data = "New game"},
+	{.x = 0, .y = -0.1, .data = "Return"}
 };
-
-static struct rect buttons[NUM_MENU_ITEMS];
 
 static void
 main_menu_render_items(struct scenegraph *scenegraph)
 {
-	float item_gap = 1.5 / (NUM_MENU_ITEMS + 1);
-	float item_y = .75 - item_gap;
 	text_scale(1);
-	for (int i = 0; i < NUM_MENU_ITEMS; i++) {
-		text_color(item_color(i));
-		text_draw(scenegraph, main_menu_items[i], 0, item_y, TEXT_CENTRE);
-		item_y -= item_gap;
+	for (int i = 0; i < sizeof (elems)/sizeof (elems[0]); i++) {
+		text_color(button_color(i, 0));
+		text_draw(scenegraph, elems[i].data, elems[i].x, elems[i].y,
+			  TEXT_CENTRE);
 	}
 }
 
 static void (*main_menu_render_functions[])(struct scenegraph *) = {
 	main_menu_render_items
 };
-
-static size_t num_main_menu_render_functions = 1;
-
-static void
-main_menu_load(void)
-{
-}
-
-int row_lengths[] = {1, 1};
 
 static void
 click(int row, int col)
@@ -95,65 +75,23 @@ static void
 main_menu_init(void)
 {
 	memset(&main_menu.sg, 0, sizeof (main_menu.sg));
-	main_menu.sg.num_render = num_main_menu_render_functions;
+	main_menu.sg.num_render = sizeof (main_menu_render_functions)/sizeof (main_menu_render_functions[0]);
 	main_menu.sg.render = main_menu_render_functions;
 	sg_init_scenegraph(&main_menu.sg);
 
-	float item_gap = 1.5 / (NUM_MENU_ITEMS + 1);
-	float item_y = .75 - item_gap;
-
-	for (int i = 0; i < NUM_MENU_ITEMS; i++) {
-		text_screen_bounds(&main_menu.sg, strlen(main_menu_items[i]),
-				   0, item_y, TEXT_CENTRE, &buttons[i]);
-		buttons[i].left -= 8;
-		buttons[i].top -= 8;
-		buttons[i].right += 8;
-		buttons[i].bottom += 8;
-		item_y -= item_gap;
-	}
+	for (int i = 0; i < sizeof (elems)/sizeof (elems[0]); i++)
+		button_bounds(&main_menu.sg, strlen(elems[i].data),
+			      elems[i].x, elems[i].y, &elems[i].bounds);
 
 	gui_set_row_lengths(2, row_lengths);
+	gui_set_element(0, 0, &elems[0]);
+	gui_set_element(1, 0, &elems[1]);
 	gui_set_action_proc(click);
 }
 
-static int
-point_in_rect(int x, int y, struct rect *bounds)
-{
-	return (x >= bounds->left && x <= bounds->right
-		&& y >= bounds->top && y <= bounds->bottom);
-}
-
-static void
-main_menu_update(void)
-{
-	for (int i = 0; i < NUM_MENU_ITEMS; i++) {
-		struct rect *bounds = &buttons[i];
-		if (point_in_rect(mouse_x, mouse_y, bounds))
-			; //selected_item = i;
-	}
-
-}
-
-static void
-main_menu_button_event(int button)
-{
-	gui_button_event(button);
-}
-
-static void
-main_menu_mouse_up_event(float x, float y)
-{
-	for (int i = 0; i < NUM_MENU_ITEMS; i++) {
-		struct rect *bounds = &buttons[i];
-		if (point_in_rect(x, y, bounds))
-			click(i, 0);
-	}
-}
-
 struct state main_menu = {
-	.load = main_menu_load,
 	.init = main_menu_init,
-	.update = main_menu_update,
-	.button_event = main_menu_button_event,
-	.mouse_up_event = main_menu_mouse_up_event
+	.update = gui_update,
+	.button_event = gui_button_event,
+	.mouse_up_event = gui_mouse_up_event
 };
