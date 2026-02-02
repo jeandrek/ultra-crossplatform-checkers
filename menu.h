@@ -29,6 +29,6 @@
 
 #include "checkers.h"
 
-extern struct state main_menu;
+extern struct state menu;
 
 #endif /* !_MAIN_MENU_H_ */

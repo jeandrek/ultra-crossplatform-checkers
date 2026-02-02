@@ -26,7 +26,7 @@
 
 #include "checkers.h"
 #include "game.h"
-#include "main_menu.h"
+#include "menu.h"
 #include "text.h"
 
 static struct state *current_state = NULL;
@@ -37,7 +37,7 @@ checkers_init(void)
 	text_init();
 	game.load();
 	game.init();
-	main_menu.init();
+	menu.init();
 	current_state = &game;
 }
 

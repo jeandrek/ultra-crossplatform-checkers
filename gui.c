@@ -25,6 +25,7 @@
  */
 
 #include <string.h>
+#include <stdarg.h>
 #include <stdlib.h>
 
 #include "scenegraph.h"
@@ -72,14 +73,28 @@ point_in_rect(int x, int y, struct rect *bounds)
 }
 
 void
+gui_set_rows(int num, ...)
+{
+	va_list ap;
+
+	gui_free_rows();
+	num_rows = num;
+	rows = malloc(num * sizeof (struct row));
+
+	va_start(ap, num);
+	for (int i = 0; i < num; i++) {
+		rows[i].len = va_arg(ap, int);
+		rows[i].elems = malloc(rows[i].len * sizeof (struct element *));
+		for (int j = 0; j < rows[i].len; j++)
+			gui_set_element(i, j, va_arg(ap, struct element *));
+	}
+	va_end(ap);
+}
+
+void
 gui_set_row_lengths(int num, int *lengths)
 {
-	if (rows != NULL) {
-		for (int i = 0; i < num_rows; i++)
-			free(rows[i].elems);
-		free(rows);
-	}
-
+	gui_free_rows();
 	num_rows = num;
 	rows = malloc(num * sizeof (struct row));
 	for (int i = 0; i < num; i++) {
@@ -89,8 +104,20 @@ gui_set_row_lengths(int num, int *lengths)
 }
 
 void
+gui_free_rows(void)
+{
+	if (rows != NULL) {
+		for (int i = 0; i < num_rows; i++)
+			free(rows[i].elems);
+		free(rows);
+	}
+}
+
+void
 gui_set_element(int i, int j, struct element *elem)
 {
+	elem->row = i;
+	elem->col = j;
 	rows[i].elems[j] = elem;
 }
 
@@ -142,9 +169,11 @@ gui_button_event(int button)
 	case INPUT_UP:
 		gui_focus_row =
 			(gui_focus_row == 0 ? num_rows - 1 : gui_focus_row - 1);
+		gui_focus_col = 0;
 		break;
 	case INPUT_DOWN:
 		gui_focus_row = (gui_focus_row + 1) % num_rows;
+		gui_focus_col = 0;
 		break;
 	case INPUT_ACCEPT:
 		action(gui_focus_row, gui_focus_col);

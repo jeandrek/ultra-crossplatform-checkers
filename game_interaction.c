@@ -28,7 +28,7 @@
 #include "game.h"
 #include "game_interaction.h"
 #include "game_checkers.h"
-#include "main_menu.h"
+#include "menu.h"
 #include "input.h"
 
 struct move board_moves[64][MAX_MOVES];
@@ -97,8 +97,8 @@ void
 game_button_event(int button)
 {
 	if (button == INPUT_PAUSE) {
-		main_menu.init();
-		checkers_switch_state(&main_menu);
+		menu.init();
+		checkers_switch_state(&menu);
 		return;
 	}
 
