@@ -24,6 +24,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdio.h>
 #include <string.h>
 
 #include "checkers.h"
@@ -32,31 +33,131 @@
 #include "scenegraph.h"
 #include "text.h"
 #include "gui.h"
+#include "text_input.h"
 #include "menu.h"
 
 static int num_elems;
 static struct element *elems;
 static char *message = NULL;
 
+static void main_menu(void);
+static void network_menu(void);
+static void host_menu(void);
+static void join_menu(void);
+static void message_dlg(char *text, void (*back_action)(void));
+static void confirm_dlg(void (*yes_action)(void));
 static void menu_set_bounds(void);
 
-static void main_menu(void);
-static void confirm_dlg(void);
+#define game_net_host(x) 1
+#define game_net_join(x) 0
+
+static void
+new_game(void)
+{
+	game.init();
+	checkers_switch_state(&game);
+}
+
+
+#if defined(_WIN32)
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#elif defined(__unix__)
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#endif
+static char *
+get_ip_addr_str(void)
+{
+#ifdef __psp__
+	return "";
+#else
+	struct in_addr addr = {0};
+#if defined(_WIN32)
+	struct addrinfo *info;
+	struct addrinfo hints = {0};
+
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+	getaddrinfo("", NULL, &hints, &info);
+	if (info != NULL) {
+		struct sockaddr_in *sa = (struct sockaddr_in *)info->ai_addr;
+		addr = sa->sin_addr;
+	}
+	freeaddrinfo(info);
+#elif defined(__unix__)
+	struct ifaddrs *ifaddr;
+
+	getifaddrs(&ifaddr);
+	for (struct ifaddrs *cur = ifaddr; cur != NULL; cur = cur->ifa_next) {
+		if (cur->ifa_addr->sa_family == AF_INET) {
+			if (!(cur->ifa_flags & IFF_LOOPBACK)) {
+				struct sockaddr_in *sa =
+					(struct sockaddr_in *)cur->ifa_addr;
+				addr = sa->sin_addr;
+				break;
+			}
+		}
+	}
+	freeifaddrs(ifaddr);
+#endif
+	return inet_ntoa(addr);
+#endif
+}
+
+static void
+host_game(int player)
+{
+	static char wait_screen_msg[128];
+
+	if (game_net_host(player)) {
+		snprintf(wait_screen_msg, 128,
+			 "Waiting for connection~  IP address: %s",
+			 get_ip_addr_str());
+		message_dlg(wait_screen_msg, host_menu);
+	} else {
+		message_dlg("Error hosting", host_menu);
+	}
+}
+
+static void
+join_game(char *addr)
+{
+	static char error_msg[128];
+
+	if (game_net_join(addr)) {
+		game.init();
+		checkers_switch_state(&game);
+	} else {
+		snprintf(error_msg, 128, "Error connecting to %s", addr);
+		message_dlg(error_msg, join_menu);
+	}
+}
+
+static void
+join_address_entry(void)
+{
+	text_input("IP address/Host", join_game, join_menu);
+}
 
 static void
 main_menu_action(int row, int col)
 {
 	switch (row) {
 	case 0:
-		if (game_dirty) {
-			confirm_dlg();
-		} else {
-			game.init();
-			checkers_switch_state(&game);
-		}
+		if (game_dirty) confirm_dlg(new_game);
+		else new_game();
 		break;
 
 	case 1:
+		if (game_dirty) confirm_dlg(network_menu);
+		else network_menu();
+		break;
+
+	case 2:
 		checkers_switch_state(&game);
 		break;
 	}
@@ -66,44 +167,138 @@ static void
 main_menu(void)
 {
 	static struct element main_menu_elems[] = {
-		{.x = 0, .y = 0.1, .data = "New game"},
-		{.x = 0, .y = -0.1, .data = "Return"}
+		{.x = 0, .y = 0.2, .data = "New game~"},
+		{.x = 0, .y = 0, .data = "Network game~"},
+		{.x = 0, .y = -0.2, .data = "Return"}
 	};
-	num_elems = 2;
+	num_elems = 3;
 	elems = main_menu_elems;
 	message = NULL;
 	menu_set_bounds();
-	gui_set_rows(2, 1, &elems[0], 1, &elems[1]);
+	gui_set_rows(3, 1, &elems[0], 1, &elems[1], 1, &elems[2]);
 	gui_set_action_proc(main_menu_action);
 }
+
+static void (*message_dlg_back_action)(void);
+
+static void message_dlg_action(int row, int col) {message_dlg_back_action();}
+
+static void
+message_dlg(char *text, void (*back_action)(void))
+{
+	static struct element message_dlg_elems[] = {
+		{.x = 0, .y = -0.1, .data = "Back"}
+	};
+	num_elems = 1;
+	elems = message_dlg_elems;
+	message = text;
+	message_dlg_back_action = back_action;
+	menu_set_bounds();
+	gui_set_rows(1, 1, &elems[0]);
+	gui_set_action_proc(message_dlg_action);
+}
+
+static void (*confirm_dlg_yes_action)(void);
 
 static void
 confirm_dlg_action(int row, int col)
 {
 	switch (col) {
-	case 0:
-		game.init();
-		checkers_switch_state(&game);
-		break;
-	case 1:
-		main_menu();
-		break;
+	case 0: confirm_dlg_yes_action(); break;
+	case 1: main_menu(); break;
 	}
 }
 
 static void
-confirm_dlg(void)
+confirm_dlg(void (*yes_action)(void))
 {
-	static struct element table_elems[] = {
-		{.x = -0.2, .y = -0.1, .data = "OK"},
-		{.x = 0.2, .y = -0.1, .data = "Cancel"}
+	static struct element confirm_dlg_elems[] = {
+		{.x = -0.2, .y = -0.1, .data = "Yes"},
+		{.x = 0.2, .y = -0.1, .data = "No"}
 	};
 	num_elems = 2;
-	elems = table_elems;
+	elems = confirm_dlg_elems;
 	message = "Starting a game will quit current game.  Continue?";
+	confirm_dlg_yes_action = yes_action;
 	menu_set_bounds();
 	gui_set_rows(1, 2, &elems[0], &elems[1]);
 	gui_set_action_proc(confirm_dlg_action);
+}
+
+static void
+network_menu_action(int row, int col)
+{
+	switch (row) {
+	case 0: host_menu(); break;
+	case 1: join_menu(); break;
+	case 2: main_menu(); break;
+	}
+}
+
+static void
+network_menu(void)
+{
+	static struct element network_menu_elems[] = {
+		{.x = 0, .y = 0.2, .data = "Host game~"},
+		{.x = 0, .y = 0, .data = "Join game~"},
+		{.x = 0, .y = -0.2, .data = "Back"}
+	};
+	num_elems = 3;
+	elems = network_menu_elems;
+	message = NULL;
+	menu_set_bounds();
+	gui_set_rows(3, 1, &elems[0], 1, &elems[1], 1, &elems[2]);
+	gui_set_action_proc(network_menu_action);
+}
+
+static void
+host_menu_action(int row, int col)
+{
+	switch (row) {
+	case 0: host_game(0); break;
+	case 1: host_game(1); break;
+	case 2: network_menu(); break;
+	}
+}
+
+static void
+host_menu(void)
+{
+	static struct element host_menu_elems[] = {
+		{.x = 0, .y = 0.2, .data = "Play as red"},
+		{.x = 0, .y = 0, .data = "Play as black"},
+		{.x = 0, .y = -0.2, .data = "Back"}
+	};
+	num_elems = 3;
+	elems = host_menu_elems;
+	message = NULL;
+	menu_set_bounds();
+	gui_set_rows(3, 1, &elems[0], 1, &elems[1], 1, &elems[2]);
+	gui_set_action_proc(host_menu_action);
+}
+
+static void
+join_menu_action(int row, int col)
+{
+	switch (row) {
+	case 0: join_address_entry(); break;
+	case 1: network_menu(); break;
+	}
+}
+
+static void
+join_menu(void)
+{
+	static struct element join_menu_elems[] = {
+		{.x = 0, .y = 0.1, .data = "Enter address~"},
+		{.x = 0, .y = -0.1, .data = "Back"}
+	};
+	num_elems = 2;
+	elems = join_menu_elems;
+	message = NULL;
+	menu_set_bounds();
+	gui_set_rows(2, 1, &elems[0], 1, &elems[1]);
+	gui_set_action_proc(join_menu_action);
 }
 
 static void

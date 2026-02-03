@@ -75,7 +75,7 @@ main()
 				  | ButtonReleaseMask);
 
 	win = XCreateWindow(dpy, DefaultRootWindow(dpy), 30, 30,
-			    800, 600, 0,
+			    480, 360, 0,
 			    CopyFromParent, InputOutput, CopyFromParent,
 			    CWEventMask, &win_attribs);
 
@@ -98,7 +98,7 @@ main()
 
 	glXSwapIntervalEXT(dpy, glxWin, 1);
 
-	sg_init(800, 600);
+	sg_init(480, 360);
 
 	checkers_init();
 

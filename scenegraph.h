@@ -64,4 +64,8 @@ void	sg_init_scenegraph(struct scenegraph *scenegraph);
 void	sg_render(struct scenegraph *scenegraph);
 void	sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj);
 
+#ifdef __psp__
+extern uint32_t display_list[262144];
+#endif
+
 #endif /* !_SCENEGRAPH_H_ */

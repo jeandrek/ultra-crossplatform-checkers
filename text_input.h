@@ -24,40 +24,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _CHECKERS_H_
-#define _CHECKERS_H_
+#ifndef _TEXT_INPUT_H_
+#define _TEXT_INPUT_H_
 
-#ifdef __ANDROID__
-#define TEXTURES_DIR	"textures/"
-#else
-#define TEXTURES_DIR	"assets/textures/"
-#endif
+void text_input(char *label, void (*accept)(char *),
+		void (*cancel)(void));
 
-#include "scenegraph.h"
-
-struct state {
-	void (*load)(void);
-	void (*init)(void);
-	void (*update)(void);
-	void (*button_event)(int);
-	void (*mouse_up_event)(float, float);
-	struct scenegraph sg;
-};
-
-void checkers_init(void);
-void checkers_update(void);
-void checkers_button_event(int button);
-struct state *checkers_get_state(void);
-void checkers_switch_state(struct state *new_state);
-void checkers_mouse_up(float x, float y);
-
-#ifdef __ANDROID__
-#include <jni.h>
-
-/* JNIEnv for GLSurfaceView's rendering thread */
-extern JNIEnv *checkers_jnienv;
-/* jeandre.checkers.Checkers instance */
-extern jobject checkers_java;
-#endif
-
-#endif /* !_CHECKERS_H_ */
+#endif /* !_TEXT_INPUT_H_ */

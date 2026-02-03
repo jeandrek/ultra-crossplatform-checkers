@@ -149,6 +149,8 @@ sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 
+	if (sprite->texture != NULL)
+		glDisable(GL_TEXTURE_2D);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);

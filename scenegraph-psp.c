@@ -43,7 +43,7 @@
 #include "scenegraph.h"
 #include "texture.h"
 
-static unsigned int __attribute__((aligned(16))) list[262144];
+uint32_t __attribute__((aligned(16))) display_list[262144];
 
 static int width, height;
 
@@ -55,7 +55,7 @@ sg_init(int w, int h)
 	width = w;
 	height = h;
 	sceGuInit();
-	sceGuStart(GU_DIRECT, list);
+	sceGuStart(GU_DIRECT, display_list);
 	draw_buffer = guGetStaticVramBuffer(512, 272, GU_PSM_8888);
 	disp_buffer = guGetStaticVramBuffer(512, 272, GU_PSM_8888);
 	depth_buffer = guGetStaticVramBuffer(512, 272, GU_PSM_4444);
@@ -110,7 +110,7 @@ sg_render(struct scenegraph *scenegraph)
 	ScePspFVector3 translate = {
 		-scenegraph->cam_x, -scenegraph->cam_y, -scenegraph->cam_z
 	};
-	sceGuStart(GU_DIRECT, list);
+	sceGuStart(GU_DIRECT, display_list);
 	sceGuClearColor(GU_COLOR(0.0, 0.0, 0.0, 1.0));
 	sceGuClearDepth(0);
 	sceGuClear(GU_COLOR_BUFFER_BIT|GU_DEPTH_BUFFER_BIT);

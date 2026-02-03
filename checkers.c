@@ -41,6 +41,12 @@ checkers_init(void)
 	current_state = &game;
 }
 
+struct state *
+checkers_get_state(void)
+{
+	return current_state;
+}
+
 void
 checkers_switch_state(struct state *new_state)
 {

@@ -51,7 +51,7 @@ text_init(void)
 	texture_init_from_file(&texture_font, 128, 128,
 			       TEXTURES_DIR "font");
 
-	for (int i = '!'; i <= '}'; i++) {
+	for (int i = '!'; i <= '~'; i++) {
 		int row = (i - '!') / FONT_ROW_LENGTH;
 		int col = (i - '!') % FONT_ROW_LENGTH;
 		struct glyph *g = malloc(sizeof (struct glyph));

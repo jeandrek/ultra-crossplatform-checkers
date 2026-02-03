@@ -108,6 +108,9 @@ WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 	DWORD ticks;
 	HWND hWnd;
 	MSG msg;
+	WSADATA wsadata;
+
+	WSAStartup(0x0202, &wsadata);
 
 	memset(&cls, 0, sizeof (cls));
 	cls.lpszClassName = "CheckersWindow";
