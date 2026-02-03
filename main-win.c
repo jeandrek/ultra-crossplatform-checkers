@@ -143,7 +143,8 @@ WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 			if (LOWORD(msg.message) == WM_QUIT)
 				break;
-			TranslateMessage(&msg);
+			if (text_input_receiving())
+				TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
 		if (vsync || timeGetTime() - ticks >= 15) {
