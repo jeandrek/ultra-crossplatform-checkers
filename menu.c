@@ -30,6 +30,7 @@
 #include "checkers.h"
 #include "game.h"
 #include "game_checkers.h"
+#include "game_net.h"
 #include "scenegraph.h"
 #include "text.h"
 #include "gui.h"
@@ -48,64 +49,11 @@ static void message_dlg(char *text, void (*back_action)(void));
 static void confirm_dlg(void (*yes_action)(void));
 static void menu_set_bounds(void);
 
-#define game_net_host(x) 1
-#define game_net_join(x) 0
-
 static void
 new_game(void)
 {
 	game.init();
 	checkers_switch_state(&game);
-}
-
-
-#if defined(_WIN32)
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#elif defined(__unix__)
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <net/if.h>
-#include <ifaddrs.h>
-#endif
-static char *
-get_ip_addr_str(void)
-{
-#ifdef __psp__
-	return "";
-#else
-	struct in_addr addr = {0};
-#if defined(_WIN32)
-	struct addrinfo *info;
-	struct addrinfo hints = {0};
-
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	getaddrinfo("", NULL, &hints, &info);
-	if (info != NULL) {
-		struct sockaddr_in *sa = (struct sockaddr_in *)info->ai_addr;
-		addr = sa->sin_addr;
-	}
-	freeaddrinfo(info);
-#elif defined(__unix__)
-	struct ifaddrs *ifaddr;
-
-	getifaddrs(&ifaddr);
-	for (struct ifaddrs *cur = ifaddr; cur != NULL; cur = cur->ifa_next) {
-		if (cur->ifa_addr->sa_family == AF_INET) {
-			if (!(cur->ifa_flags & IFF_LOOPBACK)) {
-				struct sockaddr_in *sa =
-					(struct sockaddr_in *)cur->ifa_addr;
-				addr = sa->sin_addr;
-				break;
-			}
-		}
-	}
-	freeifaddrs(ifaddr);
-#endif
-	return inet_ntoa(addr);
-#endif
 }
 
 static void
@@ -116,7 +64,7 @@ host_game(int player)
 	if (game_net_host(player)) {
 		snprintf(wait_screen_msg, 128,
 			 "Waiting for connection~  IP address: %s",
-			 get_ip_addr_str());
+			 ip_addr_str());
 		message_dlg(wait_screen_msg, host_menu);
 	} else {
 		message_dlg("Error hosting", host_menu);
@@ -265,8 +213,8 @@ static void
 host_menu(void)
 {
 	static struct element host_menu_elems[] = {
-		{.x = 0, .y = 0.2, .data = "Play as red"},
-		{.x = 0, .y = 0, .data = "Play as black"},
+		{.x = 0, .y = 0.2, .data = "Play as red~"},
+		{.x = 0, .y = 0, .data = "Play as black~"},
 		{.x = 0, .y = -0.2, .data = "Back"}
 	};
 	num_elems = 3;

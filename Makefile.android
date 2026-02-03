@@ -15,7 +15,7 @@ TARGET=		aarch64-linux-android$(ANDROID_VERSION)
 
 PROGRAM=	checkers.apk
 KEYSTORE=	../jeandre.jks
-OBJECTS=	checkers.o game.o game_display.o game_interaction.o game_checkers.o main-android.o menu.o sprite.o scenegraph-gl.o texture.o input.o text.o gui.o
+OBJECTS=	checkers.o game.o game_display.o game_interaction.o game_checkers.o main-android.o menu.o sprite.o scenegraph-gl.o texture.o input.o text.o gui.o text_input.o game_net.o
 LIBS=		-lEGL -lGLESv1_CM -lm
 CFLAGS=		--target=$(TARGET) -Wall -fPIC
 LDFLAGS=	--target=$(TARGET) -shared $(LIBS) -Wl,--no-undefined

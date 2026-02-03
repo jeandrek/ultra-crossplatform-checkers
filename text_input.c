@@ -86,7 +86,7 @@ text_input_update(void)
 static void
 text_input_render(struct scenegraph *scenegraph)
 {
-	cursor.x = 8.0 * (text_len + 1) / scenegraph->height;
+	cursor.x = (float)FONT_WIDTH * (text_len + 1) / scenegraph->height;
 	cursor.y = -10.0 / scenegraph->height;
 	sprite_draw(scenegraph, &cursor);
 
@@ -122,9 +122,9 @@ text_field_bounds(struct scenegraph *scenegraph, struct rect *bounds)
 {
 	int mid_y = scenegraph->height/2;
 	bounds->left = 0;
-	bounds->top = mid_y - 16;
+	bounds->top = mid_y - FONT_HEIGHT/2 - 8;
 	bounds->right = scenegraph->width;
-	bounds->bottom = mid_y + 16;
+	bounds->bottom = mid_y + FONT_HEIGHT/2 + 8;
 }
 
 void
@@ -165,26 +165,41 @@ text_input(char *label, void (*accept)(char *), void (*cancel)(void))
 
 #ifdef __psp__
 static void
+c16s_to_cs(char *dst, uint16_t *src, size_t n)
+{
+	size_t i;
+	for (i = 0; src[i] != 0 && i < n - 1; i++) dst[i] = src[i];
+	dst[i] = 0;
+}
+
+static void
+cs_to_c16s(uint16_t *dst, char *src, size_t n)
+{
+	size_t i;
+	for (i = 0; src[i] != 0 && i < n - 1; i++) dst[i] = src[i];
+	dst[i] = 0;
+}
+
+static void
 text_input_psp(char *label, void (*accept)(char *),
 	       void (*cancel)(void))
 {
 	SceUtilityOskParams params;
 	SceUtilityOskData data;
+	uint16_t out_text[64] = {0};
+	uint16_t in_text[] = {0};
 	uint16_t desc[64];
-	uint16_t outtext[64] = {0};
-	uint16_t intext[] = {0};
-	size_t i;
-	for (i = 0; label[i] != 0; i++)
-		desc[i] = label[i];
-	desc[i] = 0;
+
 	memset(&data, 0, sizeof (data));
 	data.language =  PSP_UTILITY_OSK_LANGUAGE_DEFAULT;
 	data.lines = 1;
-	data.desc = (uint16_t *)desc;
-	data.intext = intext;
-	data.outtext = outtext;
+	cs_to_c16s(desc, label, 64);
+	data.desc = desc;
+	data.intext = in_text;
+	data.outtext = out_text;
 	data.outtextlength = 64;
 	data.outtextlimit = 64;
+
 	memset(&params, 0, sizeof (params));
 	params.base.size = sizeof (params);
 	params.base.language = PSP_SYSTEMPARAM_LANGUAGE_ENGLISH; /* XXX */
@@ -214,9 +229,7 @@ text_input_psp(char *label, void (*accept)(char *),
 			sceUtilityOskShutdownStart();
 			break;
 		case PSP_UTILITY_DIALOG_FINISHED:
-			for (i = 0; outtext[i] != 0; i++)
-				text_buffer[i] = outtext[i];
-			text_buffer[i] = 0;
+			c16s_to_cs(text_buffer, out_text, 64);
 			accept(text_buffer);
 			return;
 		case PSP_UTILITY_DIALOG_NONE:

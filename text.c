@@ -33,8 +33,6 @@
 #include "sprite.h"
 #include "texture.h"
 
-#define FONT_WIDTH	8
-#define FONT_HEIGHT	16
 #define FONT_ROW_LENGTH	16
 
 struct glyph {
