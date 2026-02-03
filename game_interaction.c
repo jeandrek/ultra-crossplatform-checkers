@@ -64,7 +64,7 @@ move_sel_square(int num)
 void
 game_interaction_init(void)
 {
-	if (game_net_connected())
+	if (game_type == NETWORK)
 		player_turn = game_net_player;
 	else
 		player_turn = 0;
@@ -93,7 +93,7 @@ move_piece(void)
 	int location = sel_piece_moves[sel_move_idx].location;
 	int finished = perform_move(&sel_piece_moves[sel_move_idx],
 				    player_turn);
-	if (game_net_connected())
+	if (game_type == NETWORK)
 		game_net_send_move(&sel_piece_moves[sel_move_idx]);
 	sel_move_idx = 0;
 	if (finished) {
@@ -102,7 +102,7 @@ move_piece(void)
 			return;
 		}
 
-		if (game_net_connected()) {
+		if (game_type == NETWORK) {
 			cur_mode = WAIT_TURN;
 		} else {
 			player_turn = !player_turn;

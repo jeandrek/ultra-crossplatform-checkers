@@ -30,6 +30,7 @@
 #include "game_interaction.h"
 #include "game_net.h"
 
+enum type game_type;
 enum mode cur_mode;
 
 static void
@@ -38,8 +39,12 @@ game_init(void)
 	board_init();
 	game_display_init();
 	game_interaction_init();
-	if (game_net_connected())
+	if (game_net_connected()) {
 		game_dirty = 1;
+		game_type = NETWORK;
+	} else {
+		game_type = LOCAL_2PLAYER;
+	}
 }
 
 static void
@@ -66,6 +71,8 @@ game_over(void)
 {
 	cur_mode = GAME_OVER;
 	game_display_game_over();
+	if (game_type == NETWORK)
+		game_net_disconnect();
 }
 
 void
