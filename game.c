@@ -38,13 +38,13 @@ game_init(void)
 {
 	board_init();
 	game_display_init();
-	game_interaction_init();
 	if (game_net_connected()) {
 		game_dirty = 1;
 		game_type = NETWORK;
 	} else {
 		game_type = LOCAL_2PLAYER;
 	}
+	game_interaction_init();
 }
 
 static void
