@@ -33,6 +33,7 @@
 #include "checkers.h"
 #include "scenegraph.h"
 #include "input.h"
+#include "text_input.h"
 
 static PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 
@@ -94,6 +95,9 @@ WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		mouse_x = LOWORD(lParam);
 		mouse_y = HIWORD(lParam);
 		return 0;
+	case WM_CHAR:
+		text_input_add_char(wParam);
+		return 0;
 	}
 
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -139,6 +143,7 @@ WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 			if (LOWORD(msg.message) == WM_QUIT)
 				break;
+			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
 		if (vsync || timeGetTime() - ticks >= 15) {

@@ -29,5 +29,6 @@
 
 void text_input(char *label, void (*accept)(char *),
 		void (*cancel)(void));
+void text_input_add_char(char c);
 
 #endif /* !_TEXT_INPUT_H_ */

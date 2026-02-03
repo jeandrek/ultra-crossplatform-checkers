@@ -34,6 +34,7 @@
 #include "scenegraph.h"
 #include "input.h"
 #include "input_mapping-x11.h"
+#include "text_input.h"
 
 int
 respond_to_event(Display *dpy, XEvent *evt, XPointer arg)
@@ -123,8 +124,15 @@ main()
 			continue;
 		switch (evt.type) {
 		case KeyPress:
-			if (keycode_buttons[evt.xkey.keycode] >= 0)
-				button_state[keycode_buttons[evt.xkey.keycode]] = 1;
+			{
+				KeySym ks = XkbKeycodeToKeysym(dpy,
+							       evt.xkey.keycode,
+							       0, 0);
+				if (keycode_buttons[evt.xkey.keycode] >= 0)
+					button_state[keycode_buttons[evt.xkey.keycode]] = 1;
+				if (ks < 256)
+					text_input_add_char(ks);
+			}
 			break;
 		case KeyRelease:
 			if (keycode_buttons[evt.xkey.keycode] >= 0)

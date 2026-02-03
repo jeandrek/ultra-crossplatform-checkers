@@ -24,6 +24,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <ctype.h>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -143,6 +144,7 @@ text_input(char *label, void (*accept)(char *), void (*cancel)(void))
 	sg_init_scenegraph(&text_input_screen.sg);
 
 	text_len = 0;
+	text_buffer[0] = 0;
 	snprintf(text_input_label, 64, "%s:", label);
 	text_input_accept = accept;
 	text_input_cancel = cancel;
@@ -161,6 +163,20 @@ text_input(char *label, void (*accept)(char *), void (*cancel)(void))
 	old_state = checkers_get_state();
 	checkers_switch_state(&text_input_screen);
 #endif
+}
+
+void
+text_input_add_char(char c)
+{
+	if (!(checkers_get_state() == &text_input_screen
+	      && gui_focus_row == 0))
+		return;
+
+	if (c == '\b' && text_len > 0)
+		text_len -= 1;
+	else if (isprint(c) && text_len < 63)
+		text_buffer[text_len++] = c;
+	text_buffer[text_len] = 0;
 }
 
 #ifdef __psp__
