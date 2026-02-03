@@ -28,13 +28,17 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #define close closesocket
-#elif defined(__unix__)
+#else
 #include <sys/types.h>
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+
+#if defined(__unix__) || defined(__APPLE__)
 #include <net/if.h>
 #include <ifaddrs.h>
+#endif
+
 #include <stdio.h>
 #include <unistd.h>
 #endif
@@ -77,7 +81,7 @@ ip_addr_str(void)
 		addr = sa->sin_addr;
 	}
 	freeaddrinfo(info);
-#elif defined(__unix__)
+#elif defined(__unix__) || defined(__APPLE__)
 	struct ifaddrs *ifaddr;
 
 	getifaddrs(&ifaddr);
