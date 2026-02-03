@@ -28,6 +28,7 @@
 #include "game.h"
 #include "game_display.h"
 #include "game_interaction.h"
+#include "game_net.h"
 
 enum mode cur_mode;
 
@@ -70,10 +71,18 @@ game_mouse_up_event(float x, float y)
 {
 }
 
+static void
+game_destroy(void)
+{
+	if (game_net_connected()) game_net_disconnect();
+	game_dirty = 0;
+}
+
 struct state game = {
 	.load = game_display_load,
 	.init = game_init,
 	.update = game_update,
+	.destroy = game_destroy,
 	.button_event = game_button_event,
 	.mouse_up_event = game_mouse_up_event
 };

@@ -194,3 +194,11 @@ game_net_send_move(struct move *move)
 			move_be.resulting_board[i][j] = htonll(move->resulting_board[i][j]);
 	send(conn_sock, (char *)&move_be, sizeof (move_be), 0);
 }
+
+void
+game_net_disconnect(void)
+{
+	close(conn_sock);
+	if (server_sock != -1)
+		close(server_sock);
+}

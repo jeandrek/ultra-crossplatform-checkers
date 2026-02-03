@@ -38,6 +38,7 @@
 struct state {
 	void (*load)(void);
 	void (*init)(void);
+	void (*destroy)(void);
 	void (*update)(void);
 	void (*button_event)(int);
 	void (*mouse_up_event)(float, float);

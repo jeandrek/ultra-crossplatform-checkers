@@ -52,6 +52,7 @@ static void menu_set_bounds(void);
 static void
 new_game(void)
 {
+	game.destroy();
 	game.init();
 	checkers_switch_state(&game);
 }
@@ -79,6 +80,7 @@ host_game(int player)
 {
 	static char wait_screen_msg[128];
 
+	game.destroy();
 	if (game_net_host(player)) {
 		snprintf(wait_screen_msg, 128,
 			 "Waiting for connection~  IP address: %s",
@@ -95,6 +97,7 @@ join_game(char *addr)
 {
 	static char error_msg[128];
 
+	game.destroy();
 	if (game_net_join(addr)) {
 		game.init();
 		checkers_switch_state(&game);
