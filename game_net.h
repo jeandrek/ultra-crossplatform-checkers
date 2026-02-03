@@ -27,11 +27,22 @@
 #ifndef _GAME_NET_H_
 #define _GAME_NET_H_
 
-char *ip_addr_str(void);
+char	*ip_addr_str(void);
 
-#define game_net_host(x) 1
-#define game_net_join(x) 0
-#define game_net_poll_connections() 0
-#define game_net_stop_hosting()
+#include "game_checkers.h"
+
+int	game_net_connected(void);
+
+int	game_net_host(int player);
+int	game_net_poll_connections(void);
+void	game_net_stop_hosting(void);
+
+int	game_net_join(char *addr);
+
+int	game_net_poll_move(void);
+void	game_net_recv_move(struct move *move);
+void	game_net_send_move(struct move *move);
+
+extern int game_net_player;
 
 #endif /* !_GAME_NET_H_ */
