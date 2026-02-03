@@ -38,6 +38,8 @@ game_init(void)
 	board_init();
 	game_interaction_init();
 	game_display_init();
+	if (game_net_connected())
+		game_dirty = 1;
 }
 
 static void

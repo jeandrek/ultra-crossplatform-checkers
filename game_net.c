@@ -41,14 +41,21 @@
 
 #include "game_net.h"
 
-#if !defined(_WIN32) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#include <byteswap.h>
+#ifndef _WIN32
+#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 /* LE */
-#define ntohll bswap_64
-#define htonll bswap_64
+static inline uint64_t
+byte_swap_64(uint64_t x)
+{
+	return (uint64_t)ntohl(x & 0xffffffff) << 32 | ntohl(x >> 32);
+}
+
+#define ntohll(x) byte_swap_64(x)
+#define htonll(x) byte_swap_64(x)
 #else
 #define ntohll(x) x
 #define htonll(x) x
+#endif
 #endif
 
 char *
