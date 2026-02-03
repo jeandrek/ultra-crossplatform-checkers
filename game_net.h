@@ -31,5 +31,7 @@ char *ip_addr_str(void);
 
 #define game_net_host(x) 1
 #define game_net_join(x) 0
+#define game_net_poll_connections() 0
+#define game_net_stop_hosting()
 
 #endif /* !_GAME_NET_H_ */

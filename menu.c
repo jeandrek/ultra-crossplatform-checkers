@@ -57,6 +57,24 @@ new_game(void)
 }
 
 static void
+quit_hosting(void)
+{
+	menu.update = gui_update;
+	game_net_stop_hosting();
+	host_menu();
+}
+
+static void
+wait_screen_update(void)
+{
+	gui_update();
+	if (game_net_poll_connections()) {
+		game.init();
+		checkers_switch_state(&game);
+	}
+}
+
+static void
 host_game(int player)
 {
 	static char wait_screen_msg[128];
@@ -65,7 +83,8 @@ host_game(int player)
 		snprintf(wait_screen_msg, 128,
 			 "Waiting for connection~  IP address: %s",
 			 ip_addr_str());
-		message_dlg(wait_screen_msg, host_menu);
+		menu.update = wait_screen_update;
+		message_dlg(wait_screen_msg, quit_hosting);
 	} else {
 		message_dlg("Error hosting", host_menu);
 	}
