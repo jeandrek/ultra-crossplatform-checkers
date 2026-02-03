@@ -36,8 +36,8 @@ static void
 game_init(void)
 {
 	board_init();
-	game_interaction_init();
 	game_display_init();
+	game_interaction_init();
 	if (game_net_connected())
 		game_dirty = 1;
 }
@@ -45,8 +45,20 @@ game_init(void)
 static void
 game_update(void)
 {
-	if (cur_mode == ANIM_ROTATE_BOARD)
+	if (cur_mode == ANIM_ROTATE_BOARD) {
 		game_anim();
+	} else if (cur_mode == WAIT_TURN && game_net_poll_move()) {
+		struct move move;
+		int finished;
+		game_net_recv_move(&move);
+		finished = perform_move(&move, !game_net_player);
+		if (finished) {
+			if (winner() != -1)
+				game_over();
+			else
+				game_interaction_turn();
+		}
+	}
 }
 
 void

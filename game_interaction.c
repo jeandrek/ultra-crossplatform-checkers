@@ -28,6 +28,8 @@
 #include "game.h"
 #include "game_interaction.h"
 #include "game_checkers.h"
+#include "game_display.h"
+#include "game_net.h"
 #include "menu.h"
 #include "input.h"
 
@@ -62,10 +64,27 @@ move_sel_square(int num)
 void
 game_interaction_init(void)
 {
-	player_turn = 0;
+	if (game_net_connected())
+		player_turn = game_net_player;
+	else
+		player_turn = 0;
+
+	game_display_set_viewpoint(player_turn);
+	if (player_turn == 0) {
+		cur_mode = SELECT_PIECE;
+		board_available_moves(board_moves, board_num_moves, player_turn, -1);
+		set_sel_square(0);
+	} else {
+		cur_mode = WAIT_TURN;
+	}
+}
+
+void
+game_interaction_turn(void)
+{
 	cur_mode = SELECT_PIECE;
 	board_available_moves(board_moves, board_num_moves, player_turn, -1);
-	set_sel_square(0);
+	set_sel_square(player_turn == 0 ? 0 : 63);
 }
 
 static void
@@ -74,6 +93,8 @@ move_piece(void)
 	int location = sel_piece_moves[sel_move_idx].location;
 	int finished = perform_move(&sel_piece_moves[sel_move_idx],
 				    player_turn);
+	if (game_net_connected())
+		game_net_send_move(&sel_piece_moves[sel_move_idx]);
 	sel_move_idx = 0;
 	if (finished) {
 		if (winner() != -1) {
@@ -81,11 +102,15 @@ move_piece(void)
 			return;
 		}
 
-		player_turn = !player_turn;
-		board_available_moves(board_moves, board_num_moves,
-				      player_turn, -1);
-		game_start_anim_rotate();
-		set_sel_square(player_turn == 0 ? 0 : 63);
+		if (game_net_connected()) {
+			cur_mode = WAIT_TURN;
+		} else {
+			player_turn = !player_turn;
+			board_available_moves(board_moves, board_num_moves,
+					      player_turn, -1);
+			game_start_anim_rotate();
+			set_sel_square(player_turn == 0 ? 0 : 63);
+		}
 	} else {
 		board_available_moves(board_moves, board_num_moves,
 				      player_turn, location);

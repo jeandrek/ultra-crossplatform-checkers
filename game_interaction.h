@@ -37,6 +37,7 @@ extern int sel_move_idx;
 extern int player_turn;
 
 void game_interaction_init(void);
+void game_interaction_turn(void);
 void game_button_event(int button);
 
 #endif /* !_GAME_INTERACTION_H_ */

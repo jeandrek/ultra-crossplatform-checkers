@@ -66,6 +66,8 @@ static void
 render_highlight(struct scenegraph *scenegraph)
 {
 	struct sg_object obj;
+	if (cur_mode == WAIT_TURN)
+		return;
 	obj.color = 0x8080ffff;
 	obj.flags = SG_OBJ_NOLIGHTDEPTH;
 	obj.vertices = highlight_verts;
@@ -130,6 +132,8 @@ render_pieces(struct scenegraph *scenegraph)
 		}
 	}
 
+	if (cur_mode == WAIT_TURN) return;
+
 	for (int i = 0; i < sel_piece_moves_len; i++) {
 		int color;
 		if (player_turn == 0)
@@ -186,7 +190,6 @@ game_display_init(void)
 	game.sg.light0_y = 2;
 	game.sg.light0_z = 0;
 	game.sg.light0_color = 0xffffffff;
-	game_display_set_viewpoint(0);
 	sg_init_scenegraph(&game.sg);
 }
 

@@ -37,7 +37,14 @@ enum mode {
 	GAME_OVER
 };
 
+enum type {
+	LOCAL_2PLAYER,
+	NETWORK,
+	COMPUTER
+};
+
 extern struct state game;
+extern enum type game_type;
 extern enum mode cur_mode;
 
 void game_over(void);
