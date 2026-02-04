@@ -76,6 +76,7 @@ game_interaction_init(void)
 		set_sel_square(0);
 	} else {
 		cur_mode = WAIT_TURN;
+		sel_piece_moves_len = 0;
 	}
 }
 
@@ -104,6 +105,7 @@ move_piece(void)
 
 		if (game_type == NETWORK) {
 			cur_mode = WAIT_TURN;
+			sel_piece_moves_len = 0;
 		} else {
 			player_turn = !player_turn;
 			board_available_moves(board_moves, board_num_moves,

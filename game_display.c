@@ -66,7 +66,7 @@ static void
 render_highlight(struct scenegraph *scenegraph)
 {
 	struct sg_object obj;
-	if (cur_mode == WAIT_TURN)
+	if (!(cur_mode == SELECT_PIECE || cur_mode == SELECT_MOVE))
 		return;
 	obj.color = 0x8080ffff;
 	obj.flags = SG_OBJ_NOLIGHTDEPTH;
@@ -131,8 +131,6 @@ render_pieces(struct scenegraph *scenegraph)
 			}
 		}
 	}
-
-	if (cur_mode == WAIT_TURN) return;
 
 	for (int i = 0; i < sel_piece_moves_len; i++) {
 		int color;
