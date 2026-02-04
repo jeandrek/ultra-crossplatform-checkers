@@ -103,7 +103,9 @@ ip_addr_str(void)
 
 static int server_sock = -1;
 static int conn_sock = -1;
-int game_net_player = -1;
+char game_net_player = -1;
+
+static void	game_net_connect_to_client(void);
 
 int
 game_net_connected(void)
@@ -130,6 +132,10 @@ game_net_host(int player)
 	return 1;
 }
 
+/*
+ * Alternatively could use another thread and blocking operations.
+ */
+
 int
 game_net_poll_connections(void)
 {
@@ -144,8 +150,16 @@ game_net_poll_connections(void)
 	result = select(server_sock + 1, &fds, NULL, NULL, &timeout);
 	if (!result)
 		return 0;
-	conn_sock = accept(server_sock, NULL, NULL);
+	game_net_connect_to_client();
 	return 1;
+}
+
+static void
+game_net_connect_to_client(void)
+{
+	conn_sock = accept(server_sock, NULL, NULL);
+
+	send(conn_sock, &game_net_player, 1, 0);
 }
 
 void
@@ -158,6 +172,7 @@ int
 game_net_join(char *addr)
 {
 	struct sockaddr_in sa;
+	char opponent;
 
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons(7440);
@@ -165,7 +180,8 @@ game_net_join(char *addr)
 	conn_sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (connect(conn_sock, (struct sockaddr *)&sa, sizeof (sa)) < 0)
 		return 0;
-	game_net_player = 1;	/* XXX */
+	recv(conn_sock, &opponent, 1, 0);
+	game_net_player = !opponent;
 	return 1;
 }
 

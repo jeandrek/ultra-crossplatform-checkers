@@ -44,6 +44,6 @@ void	game_net_recv_move(struct move *move);
 void	game_net_send_move(struct move *move);
 void	game_net_disconnect(void);
 
-extern int game_net_player;
+extern char game_net_player;
 
 #endif /* !_GAME_NET_H_ */
