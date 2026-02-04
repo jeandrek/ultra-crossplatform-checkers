@@ -30,8 +30,6 @@
 void text_input(char *label, void (*accept)(char *),
 		void (*cancel)(void));
 
-int text_input_receiving(void); /* Exposed so Win event loop knows whether
-				   to translate keyboard messages. */
 void text_input_add_char(char c);
 
 #endif /* !_TEXT_INPUT_H_ */

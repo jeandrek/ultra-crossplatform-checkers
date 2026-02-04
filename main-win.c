@@ -143,9 +143,9 @@ WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 			if (LOWORD(msg.message) == WM_QUIT)
 				break;
-			if (text_input_receiving())
-				TranslateMessage(&msg);
+			TranslateMessage(&msg);
 			DispatchMessage(&msg);
+			continue;
 		}
 		if (vsync || timeGetTime() - ticks >= 15) {
 			HDC hdc = GetDC(hWnd);
@@ -158,5 +158,7 @@ WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 			Sleep(2);
 		}
 	}
+	WSACleanup();
+
 	return 0;
 }

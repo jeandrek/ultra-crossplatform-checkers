@@ -168,7 +168,8 @@ text_input(char *label, void (*accept)(char *), void (*cancel)(void))
 void
 text_input_add_char(char c)
 {
-	if (!text_input_receiving())
+	if (!(checkers_get_state() == &text_input_screen
+	      && gui_focus_row == 0))
 		return;
 
 	if (c == '\b' && text_len > 0)
@@ -176,13 +177,6 @@ text_input_add_char(char c)
 	else if (isprint(c) && text_len < 63)
 		text_buffer[text_len++] = c;
 	text_buffer[text_len] = 0;
-}
-
-int
-text_input_receiving(void)
-{
-	return (checkers_get_state() == &text_input_screen
-		&& gui_focus_row == 0);
 }
 
 #ifdef __psp__
