@@ -228,6 +228,9 @@ void
 game_net_disconnect(void)
 {
 	close(conn_sock);
-	if (server_sock != -1)
+	conn_sock = -1;
+	if (server_sock != -1) {
 		close(server_sock);
+		server_sock = -1;
+	}
 }
