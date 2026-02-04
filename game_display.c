@@ -149,15 +149,20 @@ render_pieces(struct scenegraph *scenegraph)
 }
 
 static void
-render_win(struct scenegraph *scenegraph)
+render_game_over(struct scenegraph *scenegraph)
 {
-	if (cur_mode == GAME_OVER) {
+	char *text = NULL;
+
+	if (cur_mode == GAME_OVER)
+		text = winner() == 0 ? "Red wins" : "Black wins";
+	if (cur_mode == LOST_CONNECTION)
+		text = "Lost connection";
+
+	if (text != NULL) {
 		sprite_draw(scenegraph, &overlay_sprite);
 		text_scale(1);
 		text_color(0xffffffff);
-		text_draw(scenegraph,
-			  winner() == 0 ? "Red wins" : "Black wins",
-			  0, 0, TEXT_CENTRE);
+		text_draw(scenegraph, text, 0, 0, TEXT_CENTRE);
 	}
 }
 
@@ -165,7 +170,7 @@ static void (*render_functions[])(struct scenegraph *) = {
 	render_board,
 	render_highlight,
 	render_pieces,
-	render_win
+	render_game_over
 };
 
 void

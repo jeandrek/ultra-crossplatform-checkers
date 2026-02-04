@@ -55,7 +55,14 @@ game_update(void)
 	} else if (cur_mode == WAIT_TURN && game_net_poll_move()) {
 		struct move move;
 		int finished;
-		game_net_recv_move(&move);
+
+		if (!game_net_recv_move(&move)) {
+			cur_mode = LOST_CONNECTION;
+			game_display_game_over();
+			game_net_disconnect();
+			return;
+		}
+
 		finished = perform_move(&move, !game_net_player);
 		if (finished) {
 			if (winner() != -1)

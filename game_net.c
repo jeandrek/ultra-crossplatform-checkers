@@ -198,17 +198,26 @@ game_net_poll_move(void)
 	return select(conn_sock + 1, &fds, NULL, NULL, &timeout);
 }
 
-void
+int
 game_net_recv_move(struct move *move)
 {
 	struct move move_be;
-	recv(conn_sock, (char *)&move_be, sizeof (move_be), 0);
+	ssize_t val;
+
+	val = recv(conn_sock, (char *)&move_be, sizeof (move_be), 0);
+	if (val == 0)
+		return 0;
+#ifdef _WIN32
+	if (val == -1 && WSAGetLastError() == WSAECONNRESET)
+		return 0;
+#endif
 	move->location = ntohl(move_be.location);
 	move->capture = ntohl(move_be.capture);
 	move->promotion = ntohl(move_be.promotion);
 	for (int i = 0; i < 2; i++)
 		for (int j = 0; j < 2; j++)
 			move->resulting_board[i][j] = ntohll(move_be.resulting_board[i][j]);
+	return 1;
 }
 
 void

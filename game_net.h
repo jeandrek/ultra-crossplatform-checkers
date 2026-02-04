@@ -40,7 +40,7 @@ void	game_net_stop_hosting(void);
 int	game_net_join(char *addr);
 
 int	game_net_poll_move(void);
-void	game_net_recv_move(struct move *move);
+int	game_net_recv_move(struct move *move);
 void	game_net_send_move(struct move *move);
 void	game_net_disconnect(void);
 

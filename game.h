@@ -34,7 +34,8 @@ enum mode {
 	SELECT_MOVE,
 	ANIM_ROTATE_BOARD,
 	WAIT_TURN,
-	GAME_OVER
+	GAME_OVER,
+	LOST_CONNECTION
 };
 
 enum type {
