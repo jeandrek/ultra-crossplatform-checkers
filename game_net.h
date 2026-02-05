@@ -27,9 +27,9 @@
 #ifndef _GAME_NET_H_
 #define _GAME_NET_H_
 
-char	*ip_addr_str(void);
-
 #include "game_checkers.h"
+
+char	*ip_addr_str(void);
 
 int	game_net_connected(void);
 
@@ -45,5 +45,13 @@ void	game_net_send_move(struct move *move);
 void	game_net_disconnect(void);
 
 extern char game_net_player;
+
+#define PROTOCOL_MAJOR	0
+#define PROTOCOL_MINOR	1
+struct __attribute__ ((packed)) checkers_header {
+	uint8_t	magic[2];
+	uint8_t	major;
+	uint8_t	minor;
+};
 
 #endif /* !_GAME_NET_H_ */

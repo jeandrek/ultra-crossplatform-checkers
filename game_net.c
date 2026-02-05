@@ -62,6 +62,14 @@ byte_swap_64(uint64_t x)
 #endif
 #endif
 
+static int	game_net_connect_to_client(void);
+static void	game_net_send_header(void);
+static int	game_net_check_header(void);
+
+static int server_sock = -1;
+static int conn_sock = -1;
+char game_net_player = -1;
+
 char *
 ip_addr_str(void)
 {
@@ -101,12 +109,6 @@ ip_addr_str(void)
 #endif
 }
 
-static int server_sock = -1;
-static int conn_sock = -1;
-char game_net_player = -1;
-
-static void	game_net_connect_to_client(void);
-
 int
 game_net_connected(void)
 {
@@ -117,12 +119,15 @@ int
 game_net_host(int player)
 {
 	struct sockaddr_in sa;
+	int reuse;
 	int sock;
 
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons(7440);
 	sa.sin_addr.s_addr = htonl(INADDR_ANY);
 	sock = socket(AF_INET, SOCK_STREAM, 0);
+	reuse = 1;
+	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof (reuse));
 
 	if (bind(sock, (struct sockaddr *)&sa, sizeof (sa)) < 0)
 		return 0;
@@ -150,16 +155,25 @@ game_net_poll_connections(void)
 	result = select(server_sock + 1, &fds, NULL, NULL, &timeout);
 	if (!result)
 		return 0;
-	game_net_connect_to_client();
+	if (!game_net_connect_to_client())
+		return 0;
 	return 1;
 }
 
-static void
+static int
 game_net_connect_to_client(void)
 {
 	conn_sock = accept(server_sock, NULL, NULL);
-
+	game_net_send_header();
+	if (!game_net_check_header())
+		goto bad_conn;
 	send(conn_sock, &game_net_player, 1, 0);
+	return 1;
+
+bad_conn:
+	close(conn_sock);
+	conn_sock = -1;
+	return 0;
 }
 
 void
@@ -180,8 +194,46 @@ game_net_join(char *addr)
 	conn_sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (connect(conn_sock, (struct sockaddr *)&sa, sizeof (sa)) < 0)
 		return 0;
-	recv(conn_sock, &opponent, 1, 0);
+
+	game_net_send_header();
+	if (!game_net_check_header())
+		goto bad_conn;
+	if (recv(conn_sock, &opponent, 1, 0) < 1)
+		goto bad_conn;
 	game_net_player = !opponent;
+
+	return 1;
+
+bad_conn:
+	close(conn_sock);
+	conn_sock = -1;
+	return 0;
+}
+
+static void
+game_net_send_header(void)
+{
+	struct checkers_header header;
+
+	header.magic[0] = 0xff;
+	header.magic[1] = 'C';
+	header.major = PROTOCOL_MAJOR;
+	header.minor = PROTOCOL_MINOR;
+	send(conn_sock, (char *)&header, sizeof (header), 0);
+}
+
+static int
+game_net_check_header(void)
+{
+	struct checkers_header header;
+
+	if (recv(conn_sock, (char *)&header, sizeof (header), 0)
+	    < sizeof (header))
+		return 0;
+	if (header.magic[0] != 0xff || header.magic[1] != 'C'
+	    || header.major != PROTOCOL_MAJOR
+	    || header.minor != PROTOCOL_MINOR)
+		return 0;
 	return 1;
 }
 
@@ -189,9 +241,6 @@ int
 game_net_poll_move(void)
 {
 	struct timeval timeout = {0, 0};
-
-	if (conn_sock == -1)
-		return 0;
 	fd_set fds;
 	FD_ZERO(&fds);
 	FD_SET(conn_sock, &fds);
@@ -205,12 +254,8 @@ game_net_recv_move(struct move *move)
 	ssize_t val;
 
 	val = recv(conn_sock, (char *)&move_be, sizeof (move_be), 0);
-	if (val == 0)
+	if (val == 0 || val == -1)
 		return 0;
-#ifdef _WIN32
-	if (val == -1 && WSAGetLastError() == WSAECONNRESET)
-		return 0;
-#endif
 	move->location = ntohl(move_be.location);
 	move->capture = ntohl(move_be.capture);
 	move->promotion = ntohl(move_be.promotion);
