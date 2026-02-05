@@ -130,7 +130,7 @@ main()
 							       0, 0);
 				if (keycode_buttons[evt.xkey.keycode] >= 0)
 					button_state[keycode_buttons[evt.xkey.keycode]] = 1;
-				if (ks < 256)
+				if (ks < 256 || ks == XK_BackSpace)
 					text_input_add_char(ks);
 			}
 			break;
