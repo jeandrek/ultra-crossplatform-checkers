@@ -40,6 +40,4 @@
 
 void input_handle(void);
 
-extern int mouse_x, mouse_y;
-
 #endif /* !_INPUT_H_ */

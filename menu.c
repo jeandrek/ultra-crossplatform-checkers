@@ -318,5 +318,6 @@ struct state menu = {
 	.init = menu_init,
 	.update = gui_update,
 	.button_event = gui_button_event,
-	.mouse_up_event = gui_mouse_up_event
+	.mouse_up_event = gui_mouse_up_event,
+	.mouse_move_event = gui_mouse_move_event
 };

@@ -95,7 +95,7 @@ game_anim_rotate_finished(void)
 }
 
 static void
-game_mouse_up_event(float x, float y)
+game_mouse_up_event(int x, int y)
 {
 }
 

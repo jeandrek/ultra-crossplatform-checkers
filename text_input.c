@@ -51,7 +51,8 @@ static void text_input_psp(char *label, void (*accept)(char *),
 struct state text_input_screen = {
 	.update = text_input_update,
 	.button_event = gui_button_event,
-	.mouse_up_event = gui_mouse_up_event
+	.mouse_up_event = gui_mouse_up_event,
+	.mouse_move_event = gui_mouse_move_event
 };
 
 static char text_input_label[64];

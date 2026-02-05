@@ -127,7 +127,8 @@ game_net_host(int player)
 	sa.sin_addr.s_addr = htonl(INADDR_ANY);
 	sock = socket(AF_INET, SOCK_STREAM, 0);
 	reuse = 1;
-	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof (reuse));
+	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
+		   (char *)&reuse, sizeof (reuse));
 
 	if (bind(sock, (struct sockaddr *)&sa, sizeof (sa)) < 0)
 		return 0;

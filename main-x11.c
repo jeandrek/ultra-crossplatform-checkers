@@ -76,7 +76,7 @@ main()
 				  | ButtonReleaseMask);
 
 	win = XCreateWindow(dpy, DefaultRootWindow(dpy), 30, 30,
-			    480, 360, 0,
+			    800, 600, 0,
 			    CopyFromParent, InputOutput, CopyFromParent,
 			    CWEventMask, &win_attribs);
 
@@ -99,7 +99,7 @@ main()
 
 	glXSwapIntervalEXT(dpy, glxWin, 1);
 
-	sg_init(480, 360);
+	sg_init(800, 600);
 
 	checkers_init();
 
@@ -139,8 +139,7 @@ main()
 				button_state[keycode_buttons[evt.xkey.keycode]] = 0;
 			break;
 		case MotionNotify:
-			mouse_x = evt.xmotion.x;
-			mouse_y = evt.xmotion.y;
+			checkers_mouse_move(evt.xbutton.x, evt.xbutton.y);
 			break;
 		case ButtonRelease:
 			checkers_mouse_up(evt.xbutton.x, evt.xbutton.y);

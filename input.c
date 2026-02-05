@@ -38,8 +38,6 @@
 #include "input.h"
 #include "config.h"
 
-int mouse_x, mouse_y;
-
 static const int can_repeat[NUM_BUTTONS] = {
 	[INPUT_UP] = 1,
 	[INPUT_DOWN] = 1,

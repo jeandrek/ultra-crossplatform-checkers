@@ -44,7 +44,8 @@ void gui_free_rows(void);
 void gui_set_element(int i, int j, struct element *elem);
 void gui_set_action_proc(void (*proc)(int, int));
 void gui_update(void);
-void gui_mouse_up_event(float x, float y);
+void gui_mouse_up_event(int x, int y);
+void gui_mouse_move_event(int x, int y);
 void gui_button_event(int button);
 
 extern int gui_focus_row;

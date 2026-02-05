@@ -132,25 +132,32 @@ gui_set_action_proc(void (*proc)(int, int))
 void
 gui_update(void)
 {
-	for (int i = 0; i < num_rows; i++) {
-		for (int j = 0; j < rows[i].len; j++) {
-			struct rect *bounds = &rows[i].elems[j]->bounds;
-			if (point_in_rect(mouse_x, mouse_y, bounds)) {
-				gui_focus_row = i;
-				gui_focus_col = j;
-			}
-		}
-	}
 }
 
 void
-gui_mouse_up_event(float x, float y)
+gui_mouse_up_event(int x, int y)
 {
 	for (int i = 0; i < num_rows; i++) {
 		for (int j = 0; j < rows[i].len; j++) {
 			struct rect *bounds = &rows[i].elems[j]->bounds;
 			if (point_in_rect(x, y, bounds)) {
 				action(i, j);
+				goto quit;
+			}
+		}
+	}
+quit:
+}
+
+void
+gui_mouse_move_event(int x, int y)
+{
+	for (int i = 0; i < num_rows; i++) {
+		for (int j = 0; j < rows[i].len; j++) {
+			struct rect *bounds = &rows[i].elems[j]->bounds;
+			if (point_in_rect(x, y, bounds)) {
+				gui_focus_row = i;
+				gui_focus_col = j;
 				goto quit;
 			}
 		}

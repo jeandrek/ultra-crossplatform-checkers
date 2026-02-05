@@ -92,8 +92,7 @@ WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		checkers_mouse_up(LOWORD(lParam), HIWORD(lParam));
 		return 0;
 	case WM_MOUSEMOVE:
-		mouse_x = LOWORD(lParam);
-		mouse_y = HIWORD(lParam);
+		checkers_mouse_move(LOWORD(lParam), HIWORD(lParam));
 		return 0;
 	case WM_CHAR:
 		text_input_add_char(wParam);

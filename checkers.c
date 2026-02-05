@@ -67,7 +67,14 @@ checkers_button_event(int button)
 }
 
 void
-checkers_mouse_up(float x, float y)
+checkers_mouse_up(int x, int y)
 {
 	current_state->mouse_up_event(x, y);
+}
+
+void
+checkers_mouse_move(int x, int y)
+{
+	if (current_state->mouse_move_event != NULL)
+		current_state->mouse_move_event(x, y);
 }
