@@ -1,5 +1,5 @@
 ANDROID_SDK=	/opt/android-sdk
-ANDROID_VERSION=21
+ANDROID_VERSION=24
 TOOLCHAIN=	$(ANDROID_SDK)/ndk/r27d/toolchains/llvm/prebuilt/linux-x86_64
 ANDROID_JAR=	$(ANDROID_SDK)/platforms/android-$(ANDROID_VERSION)/android.jar
 
