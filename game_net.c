@@ -37,6 +37,7 @@
 #if defined(__unix__) || defined(__APPLE__)
 #include <net/if.h>
 #include <ifaddrs.h>
+#include <netdb.h>
 #endif
 
 #include <stdio.h>
@@ -66,9 +67,9 @@ static int	game_net_connect_to_client(void);
 static void	game_net_send_header(void);
 static int	game_net_check_header(void);
 
-static int server_sock = -1;
-static int conn_sock = -1;
-char game_net_player = -1;
+static int	server_sock = -1;
+static int	conn_sock = -1;
+char		game_net_player = -1;
 
 char *
 ip_addr_str(void)
@@ -186,12 +187,18 @@ game_net_stop_hosting(void)
 int
 game_net_join(char *addr)
 {
+	struct addrinfo *info;
+	struct addrinfo hints = {0};
 	struct sockaddr_in sa;
 	char opponent;
 
-	sa.sin_family = AF_INET;
-	sa.sin_port = htons(7440);
-	sa.sin_addr.s_addr = inet_addr(addr);
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+	if (getaddrinfo(addr, "7440", &hints, &info))
+		return 0;
+	sa = *(struct sockaddr_in *)info->ai_addr;
+	freeaddrinfo(info);
+
 	conn_sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (connect(conn_sock, (struct sockaddr *)&sa, sizeof (sa)) < 0)
 		return 0;
