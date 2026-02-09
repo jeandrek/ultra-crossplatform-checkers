@@ -108,19 +108,6 @@ gui_add_row(int len, ...)
 	va_end(ap);
 }
 
-/* void */
-/* gui_set_row_lengths(int num, int *lengths) */
-/* { */
-/* 	gui_free_rows(); */
-/* 	gui_focus_row = gui_focus_col = 0; */
-/* 	num_rows = num; */
-/* 	rows = malloc(num * sizeof (struct row)); */
-/* 	for (int i = 0; i < num; i++) { */
-/* 		rows[i].len = lengths[i]; */
-/* 		rows[i].elems = malloc(lengths[i] * sizeof (struct element *)); */
-/* 	} */
-/* } */
-
 void
 gui_free_rows(void)
 {

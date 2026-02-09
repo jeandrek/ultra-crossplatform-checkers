@@ -24,20 +24,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "checkers.h"
 #include "game.h"
 #include "game_checkers.h"
-#include "game_net.h"
 #include "scenegraph.h"
 #include "text.h"
 #include "gui.h"
-#include "text_input.h"
-#include "menu.h"
 #include "net_menu.h"
+#include "menu.h"
 
 struct element *elems;
 static int num_elems;
