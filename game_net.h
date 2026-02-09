@@ -29,6 +29,14 @@
 
 #include "game_checkers.h"
 
+struct disc_ent {
+	char		*name;
+	/* Private */
+	uint32_t	if_idx;
+	char		*domain;
+	char		*regtype;
+};
+
 char	*ip_addr_str(void);
 
 int	game_net_connected(void);
@@ -37,6 +45,11 @@ int	game_net_host(int player);
 int	game_net_poll_connections(void);
 void	game_net_stop_hosting(void);
 
+int	game_net_discover(void);
+void	game_net_discovery_update(void);
+void	game_net_stop_discovery(void);
+void	free_discovered_game(struct disc_ent *disc_ent);
+char	*discovered_game_addr();
 int	game_net_join(char *addr);
 
 int	game_net_poll_move(void);

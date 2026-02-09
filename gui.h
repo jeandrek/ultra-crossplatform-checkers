@@ -40,6 +40,7 @@ struct element {
 
 void gui_set_rows(int num, ...);
 void gui_set_row_lengths(int num, int *lengths);
+void gui_add_row(int len, ...);
 void gui_free_rows(void);
 void gui_set_element(int i, int j, struct element *elem);
 void gui_set_action_proc(void (*proc)(int, int));

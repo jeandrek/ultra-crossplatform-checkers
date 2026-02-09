@@ -1,6 +1,6 @@
 PROGRAM=checkers
-OBJECTS=checkers.o game.o game_display.o game_interaction.o game_checkers.o menu.o main-x11.o sprite.o scenegraph-gl.o texture.o input.o text.o gui.o text_input.o game_net.o
-LDFLAGS=-lX11 -lGL -lGLU -lm
+OBJECTS=checkers.o game.o game_display.o game_interaction.o game_checkers.o menu.o net_menu.o main-x11.o sprite.o scenegraph-gl.o texture.o input.o text.o gui.o text_input.o game_net.o
+LDFLAGS=-lX11 -lGL -lGLU -lm -ldns_sd
 CFLAGS=	-Wall -Og -g
 
 $(PROGRAM): $(OBJECTS)

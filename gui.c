@@ -93,17 +93,33 @@ gui_set_rows(int num, ...)
 }
 
 void
-gui_set_row_lengths(int num, int *lengths)
+gui_add_row(int len, ...)
 {
-	gui_free_rows();
-	gui_focus_row = gui_focus_col = 0;
-	num_rows = num;
-	rows = malloc(num * sizeof (struct row));
-	for (int i = 0; i < num; i++) {
-		rows[i].len = lengths[i];
-		rows[i].elems = malloc(lengths[i] * sizeof (struct element *));
-	}
+	va_list ap;
+	int i = num_rows;
+
+	num_rows++;
+	rows = realloc(rows, num_rows * sizeof (struct row));
+	rows[i].len = len;
+	rows[i].elems = malloc(len * sizeof (struct element *));
+	va_start(ap, len);
+	for (int j = 0; j < len; j++)
+		gui_set_element(i, j, va_arg(ap, struct element *));
+	va_end(ap);
 }
+
+/* void */
+/* gui_set_row_lengths(int num, int *lengths) */
+/* { */
+/* 	gui_free_rows(); */
+/* 	gui_focus_row = gui_focus_col = 0; */
+/* 	num_rows = num; */
+/* 	rows = malloc(num * sizeof (struct row)); */
+/* 	for (int i = 0; i < num; i++) { */
+/* 		rows[i].len = lengths[i]; */
+/* 		rows[i].elems = malloc(lengths[i] * sizeof (struct element *)); */
+/* 	} */
+/* } */
 
 void
 gui_free_rows(void)

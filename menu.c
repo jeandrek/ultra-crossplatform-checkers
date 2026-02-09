@@ -25,6 +25,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "checkers.h"
@@ -36,18 +37,13 @@
 #include "gui.h"
 #include "text_input.h"
 #include "menu.h"
+#include "net_menu.h"
 
+struct element *elems;
 static int num_elems;
-static struct element *elems;
 static char *message = NULL;
 
-static void main_menu(void);
-static void network_menu(void);
-static void host_menu(void);
-static void join_menu(void);
-static void message_dlg(char *text, void (*back_action)(void));
 static void confirm_dlg(void (*yes_action)(void));
-static void menu_set_bounds(void);
 
 static void
 new_game(void)
@@ -55,62 +51,6 @@ new_game(void)
 	game.destroy();
 	game.init();
 	checkers_switch_state(&game);
-}
-
-static void
-quit_hosting(void)
-{
-	menu.update = gui_update;
-	game_net_stop_hosting();
-	host_menu();
-}
-
-static void
-wait_screen_update(void)
-{
-	gui_update();
-	if (game_net_poll_connections()) {
-		game.init();
-		checkers_switch_state(&game);
-	}
-}
-
-static void
-host_game(int player)
-{
-	static char wait_screen_msg[128];
-
-	game.destroy();
-	if (game_net_host(player)) {
-		snprintf(wait_screen_msg, 128,
-			 "Waiting for connection~  IP address: %s",
-			 ip_addr_str());
-		menu.update = wait_screen_update;
-		message_dlg(wait_screen_msg, quit_hosting);
-	} else {
-		message_dlg("Error hosting", host_menu);
-	}
-}
-
-static void
-join_game(char *addr)
-{
-	static char error_msg[128];
-
-	game.destroy();
-	if (game_net_join(addr)) {
-		game.init();
-		checkers_switch_state(&game);
-	} else {
-		snprintf(error_msg, 128, "Error connecting to %s", addr);
-		message_dlg(error_msg, join_menu);
-	}
-}
-
-static void
-join_address_entry(void)
-{
-	text_input("IP address/Host", join_game, join_menu);
 }
 
 static void
@@ -123,8 +63,8 @@ main_menu_action(int row, int col)
 		break;
 
 	case 1:
-		if (game_dirty) confirm_dlg(network_menu);
-		else network_menu();
+		if (game_dirty) confirm_dlg(net_menu);
+		else net_menu();
 		break;
 
 	case 2:
@@ -133,7 +73,7 @@ main_menu_action(int row, int col)
 	}
 }
 
-static void
+void
 main_menu(void)
 {
 	static struct element main_menu_elems[] = {
@@ -141,10 +81,7 @@ main_menu(void)
 		{.x = 0, .y = 0, .data = "Network game~"},
 		{.x = 0, .y = -0.2, .data = "Return"}
 	};
-	num_elems = 3;
-	elems = main_menu_elems;
-	message = NULL;
-	menu_set_bounds();
+	menu_set_elements(3, main_menu_elems);
 	gui_set_rows(3, 1, &elems[0], 1, &elems[1], 1, &elems[2]);
 	gui_set_action_proc(main_menu_action);
 }
@@ -153,17 +90,15 @@ static void (*message_dlg_back_action)(void);
 
 static void message_dlg_action(int row, int col) {message_dlg_back_action();}
 
-static void
+void
 message_dlg(char *text, void (*back_action)(void))
 {
 	static struct element message_dlg_elems[] = {
 		{.x = 0, .y = -0.1, .data = "Back"}
 	};
-	num_elems = 1;
-	elems = message_dlg_elems;
-	message = text;
 	message_dlg_back_action = back_action;
-	menu_set_bounds();
+	menu_set_elements(1, message_dlg_elems);
+	message = text;
 	gui_set_rows(1, 1, &elems[0]);
 	gui_set_action_proc(message_dlg_action);
 }
@@ -186,100 +121,25 @@ confirm_dlg(void (*yes_action)(void))
 		{.x = -0.2, .y = -0.1, .data = "Yes"},
 		{.x = 0.2, .y = -0.1, .data = "No"}
 	};
-	num_elems = 2;
-	elems = confirm_dlg_elems;
-	message = "Starting a game will quit current game.  Continue?";
 	confirm_dlg_yes_action = yes_action;
-	menu_set_bounds();
+	menu_set_elements(2, confirm_dlg_elems);
+	message = "Starting a game will quit current game.  Continue?";
 	gui_set_rows(1, 2, &elems[0], &elems[1]);
 	gui_set_action_proc(confirm_dlg_action);
 }
 
-static void
-network_menu_action(int row, int col)
+void
+menu_set_elements(int num, struct element *new_elems)
 {
-	switch (row) {
-	case 0: host_menu(); break;
-	case 1: join_menu(); break;
-	case 2: main_menu(); break;
-	}
-}
-
-static void
-network_menu(void)
-{
-	static struct element network_menu_elems[] = {
-		{.x = 0, .y = 0.2, .data = "Host game~"},
-		{.x = 0, .y = 0, .data = "Join game~"},
-		{.x = 0, .y = -0.2, .data = "Back"}
-	};
-	num_elems = 3;
-	elems = network_menu_elems;
+	num_elems = num;
+	elems = new_elems;
 	message = NULL;
-	menu_set_bounds();
-	gui_set_rows(3, 1, &elems[0], 1, &elems[1], 1, &elems[2]);
-	gui_set_action_proc(network_menu_action);
-}
-
-static void
-host_menu_action(int row, int col)
-{
-	switch (row) {
-	case 0: host_game(0); break;
-	case 1: host_game(1); break;
-	case 2: network_menu(); break;
-	}
-}
-
-static void
-host_menu(void)
-{
-	static struct element host_menu_elems[] = {
-		{.x = 0, .y = 0.2, .data = "Play as red~"},
-		{.x = 0, .y = 0, .data = "Play as black~"},
-		{.x = 0, .y = -0.2, .data = "Back"}
-	};
-	num_elems = 3;
-	elems = host_menu_elems;
-	message = NULL;
-	menu_set_bounds();
-	gui_set_rows(3, 1, &elems[0], 1, &elems[1], 1, &elems[2]);
-	gui_set_action_proc(host_menu_action);
-}
-
-static void
-join_menu_action(int row, int col)
-{
-	switch (row) {
-	case 0: join_address_entry(); break;
-	case 1: network_menu(); break;
-	}
-}
-
-static void
-join_menu(void)
-{
-	static struct element join_menu_elems[] = {
-		{.x = 0, .y = 0.1, .data = "Enter address~"},
-		{.x = 0, .y = -0.1, .data = "Back"}
-	};
-	num_elems = 2;
-	elems = join_menu_elems;
-	message = NULL;
-	menu_set_bounds();
-	gui_set_rows(2, 1, &elems[0], 1, &elems[1]);
-	gui_set_action_proc(join_menu_action);
-}
-
-static void
-menu_set_bounds(void)
-{
 	for (int i = 0; i < num_elems; i++)
 		button_bounds(&menu.sg, strlen(elems[i].data),
 			      elems[i].x, elems[i].y, &elems[i].bounds);
 }
 
-static void
+void
 menu_render_items(struct scenegraph *scenegraph)
 {
 	text_scale(1);

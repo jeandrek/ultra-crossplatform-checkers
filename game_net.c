@@ -24,6 +24,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <string.h>
+#include <stdlib.h>
+
 #if defined(_WIN32)
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -44,6 +47,13 @@
 #include <unistd.h>
 #endif
 
+#include "config.h"
+
+#ifdef USE_BONJOUR
+#include <dns_sd.h>
+#endif
+
+#include "net_menu.h"
 #include "game_net.h"
 
 #ifndef _WIN32
@@ -69,6 +79,11 @@ static int	game_net_check_header(void);
 
 static int	server_sock = -1;
 static int	conn_sock = -1;
+#ifdef USE_BONJOUR
+static DNSServiceRef sd_register = NULL;
+static DNSServiceRef sd_browse = NULL;
+static DNSServiceRef sd_resolve = NULL;
+#endif
 char		game_net_player = -1;
 
 char *
@@ -136,6 +151,17 @@ game_net_host(int player)
 	listen(sock, 1);
 	server_sock = sock;
 	game_net_player = player;
+
+#ifdef USE_BONJOUR
+	DNSServiceErrorType err;
+
+	err = DNSServiceRegister(&sd_register, 0, 0, NULL, "_checkers._tcp",
+				 NULL, NULL, htons(7440), 0, NULL,
+				 NULL, NULL);
+	if (!err)
+		DNSServiceProcessResult(sd_register);
+#endif
+
 	return 1;
 }
 
@@ -182,6 +208,122 @@ void
 game_net_stop_hosting(void)
 {
 	close(server_sock);
+#ifdef USE_BONJOUR
+	if (sd_register != NULL)
+		DNSServiceRefDeallocate(sd_register);
+#endif
+}
+
+#ifdef USE_BONJOUR
+static void
+discovery_callback(DNSServiceRef sd_ref, DNSServiceFlags flags,
+		   uint32_t if_idx, DNSServiceErrorType error,
+		   const char *name, const char *regtype,
+		   const char *domain, void *context)
+{
+	if (!error) {
+		if (flags & kDNSServiceFlagsAdd) {
+			struct disc_ent *ent;
+			ent = malloc(sizeof (*ent));
+			ent->name = strdup(name);
+			ent->if_idx = if_idx;
+			ent->domain = strdup(domain);
+			ent->regtype = strdup(regtype);
+			add_discovered_game(ent);
+			if (!(flags & kDNSServiceFlagsMoreComing))
+				show_discovered_games();
+		} else {
+			remove_discovered_game(name);
+			show_discovered_games();
+		}
+	}
+}
+#endif
+
+int
+game_net_discover(void)
+{
+#ifdef USE_BONJOUR
+	DNSServiceErrorType err;
+	err = DNSServiceBrowse(&sd_browse, 0, 0, "_checkers._tcp", NULL,
+			       discovery_callback, NULL);
+	return !err;
+#else
+	return 0;
+#endif
+}
+
+void
+game_net_discovery_update(void)
+{
+#ifdef USE_BONJOUR
+	struct timeval timeout = {0, 0};
+	fd_set fds;
+	int sock;
+
+	if (sd_browse == NULL)
+		return;
+	sock = DNSServiceRefSockFD(sd_browse);
+	FD_ZERO(&fds);
+	FD_SET(sock, &fds);
+	if (select(sock + 1, &fds, NULL, NULL, &timeout))
+		DNSServiceProcessResult(sd_browse);
+#endif
+}
+
+void
+game_net_stop_discovery(void)
+{
+#ifdef USE_BONJOUR
+	if (sd_browse != NULL)
+		DNSServiceRefDeallocate(sd_browse);
+	sd_browse = NULL;
+#endif
+}
+
+void
+free_discovered_game(struct disc_ent *disc_ent)
+{
+	free(disc_ent->name);
+	free(disc_ent->domain);
+	free(disc_ent->regtype);
+	free(disc_ent);
+}
+
+#ifdef USE_BONJOUR
+static char *resolved_host;
+
+static void
+resolution_callback(DNSServiceRef sd_ref, DNSServiceFlags flags,
+		    uint32_t if_idx, DNSServiceErrorType error,
+		    const char *fullname, const char *hosttarget,
+		    uint16_t port, uint16_t txt_len,
+		    const unsigned char *txt_record,
+		    void *context)
+{
+	resolved_host = strdup(hosttarget);
+}
+#endif
+
+char *
+discovered_game_addr(struct disc_ent *disc_ent)
+{
+#ifdef USE_BONJOUR
+	DNSServiceErrorType err;
+
+	err = DNSServiceResolve(&sd_resolve, 0, disc_ent->if_idx,
+				disc_ent->name, disc_ent->regtype,
+				disc_ent->domain,
+				(DNSServiceResolveReply)resolution_callback,
+				NULL);
+	if (err)
+		return NULL;
+	DNSServiceProcessResult(sd_resolve);
+	DNSServiceRefDeallocate(sd_resolve);
+	return resolved_host;
+#else
+	return NULL;
+#endif
 }
 
 int
@@ -294,5 +436,10 @@ game_net_disconnect(void)
 	if (server_sock != -1) {
 		close(server_sock);
 		server_sock = -1;
+#ifdef USE_BONJOUR
+		if (sd_register != NULL)
+			DNSServiceRefDeallocate(sd_register);
+		sd_register = NULL;
+#endif
 	}
 }

@@ -28,7 +28,14 @@
 #define _MENU_H_
 
 #include "checkers.h"
+#include "gui.h"
 
+void menu_set_elements(int num, struct element *new_elems);
+void menu_render_items(struct scenegraph *scenegraph);
+void message_dlg(char *text, void (*back_action)(void));
+void main_menu(void);
+
+extern struct element *elems;
 extern struct state menu;
 
 #endif /* !_MENU_H_ */

@@ -9,4 +9,8 @@
 #define USE_GL_ES
 #endif
 
+#if !defined(__ANDROID__) && !defined(__psp__)
+#define USE_BONJOUR
+#endif
+
 #endif /* !_CONFIG_H_ */
