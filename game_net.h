@@ -49,7 +49,7 @@ int	game_net_discover(void);
 void	game_net_discovery_update(void);
 void	game_net_stop_discovery(void);
 void	free_discovered_game(struct disc_ent *disc_ent);
-char	*discovered_game_addr();
+char	*discovered_game_addr(struct disc_ent *disc_ent);
 int	game_net_join(char *addr);
 
 int	game_net_poll_move(void);

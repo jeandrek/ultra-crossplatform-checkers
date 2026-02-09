@@ -224,7 +224,7 @@ add_discovered_game(struct disc_ent *ent)
 void
 remove_discovered_game(const char *name)
 {
-	struct join_item *prev;
+	struct join_item *prev = NULL;
 	for (struct join_item *item = join_items; item; item = item->next) {
 		if (!strcmp(item->disc_ent->name, name)) {
 			if (item == join_items)
