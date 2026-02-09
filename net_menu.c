@@ -254,6 +254,7 @@ join_menu(void)
 		join_menu_elems[0].y = 0.1;
 		join_menu_elems[1].y = -0.1;
 	}
+	num_join_items = 0;
 	join_items = NULL;
 	menu.update = join_menu_update;
 	menu.sg.render[0] = join_menu_render_items;
