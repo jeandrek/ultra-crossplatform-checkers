@@ -36,11 +36,11 @@
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <netdb.h>
 
 #if defined(__unix__) || defined(__APPLE__)
 #include <net/if.h>
 #include <ifaddrs.h>
-#include <netdb.h>
 #endif
 
 #include <stdio.h>
@@ -329,17 +329,15 @@ discovered_game_addr(struct disc_ent *disc_ent)
 int
 game_net_join(char *addr)
 {
-	struct addrinfo *info;
-	struct addrinfo hints = {0};
 	struct sockaddr_in sa;
 	char opponent;
+	struct hostent *hostent = gethostbyname(addr);
 
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_STREAM;
-	if (getaddrinfo(addr, "7440", &hints, &info))
+	if (hostent == NULL)
 		return 0;
-	sa = *(struct sockaddr_in *)info->ai_addr;
-	freeaddrinfo(info);
+	sa.sin_family = AF_INET;
+	sa.sin_port = ntohs(7440);
+	sa.sin_addr = *(struct in_addr *)hostent->h_addr_list[0];
 
 	conn_sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (connect(conn_sock, (struct sockaddr *)&sa, sizeof (sa)) < 0)
