@@ -60,15 +60,18 @@
 
 #ifndef _WIN32
 #if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-/* LE */
+/* LE system */
 static inline uint64_t
-byte_swap_64(uint64_t x)
+byte_swap_u64(uint64_t x)
 {
-	return (uint64_t)ntohl(x & 0xffffffff) << 32 | ntohl(x >> 32);
+	return ((x & 0xff) << 56 | ((x >> 8) & 0xff) << 48 |
+		((x >> 16) & 0xff) << 40 | ((x >> 24) & 0xff) << 32 |
+		((x >> 32) & 0xff) << 24 | ((x >> 40) & 0xff) << 16 |
+		((x >> 48) & 0xff) << 8  | x >> 56);
 }
 
-#define ntohll(x) byte_swap_64(x)
-#define htonll(x) byte_swap_64(x)
+#define ntohll(x) byte_swap_u64(x)
+#define htonll(x) byte_swap_u64(x)
 #else
 #define ntohll(x) x
 #define htonll(x) x
