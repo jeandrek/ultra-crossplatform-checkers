@@ -35,6 +35,11 @@
 
 #define FONT_ROW_LENGTH	16
 
+/*
+ * Tilde really appears as an ellipsis, since we are currently limiting to
+ * ASCII.
+ */
+
 struct glyph {
 	int	tex_left, tex_top;
 	int	width;
