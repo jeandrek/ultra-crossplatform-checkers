@@ -150,6 +150,7 @@ gui_mouse_up_event(int x, int y)
 		}
 	}
 quit:
+	;
 }
 
 void
@@ -166,6 +167,7 @@ gui_mouse_move_event(int x, int y)
 		}
 	}
 quit:
+	;
 }
 
 void
