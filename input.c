@@ -36,7 +36,6 @@
 
 #include "checkers.h"
 #include "input.h"
-#include "config.h"
 
 static const int can_repeat[NUM_BUTTONS] = {
 	[INPUT_UP] = 1,

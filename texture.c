@@ -34,7 +34,6 @@
 #include <jni.h>
 #endif
 
-#include "config.h"
 #if defined(__psp__)
 #include <pspkernel.h>
 #include <pspgu.h>

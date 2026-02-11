@@ -49,8 +49,6 @@
 #include <unistd.h>
 #endif
 
-#include "config.h"
-
 #ifdef USE_BONJOUR
 #include <dns_sd.h>
 #endif
