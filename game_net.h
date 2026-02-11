@@ -50,7 +50,9 @@ void	game_net_discovery_update(void);
 void	game_net_stop_discovery(void);
 void	free_discovered_game(struct disc_ent *disc_ent);
 char	*discovered_game_addr(struct disc_ent *disc_ent);
-int	game_net_join(char *addr);
+void	game_net_join(const char *nodename);
+int	game_net_poll_connected(void);
+void	game_net_stop_connecting(void);
 
 int	game_net_poll_move(void);
 int	game_net_recv_move(struct move *move);

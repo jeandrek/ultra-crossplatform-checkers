@@ -43,6 +43,8 @@
 #include <ifaddrs.h>
 #endif
 
+#include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
 #endif
@@ -79,6 +81,8 @@ static int	game_net_check_header(void);
 
 static int	server_sock = -1;
 static int	conn_sock = -1;
+static int	conn_sock_state;
+enum {CANT_CONNECT, CONNECTING, WAITING_FOR_HEADER, WAITING_FOR_OPPONENT};
 #ifdef USE_BONJOUR
 static DNSServiceRef sd_register = NULL;
 static DNSServiceRef sd_browse = NULL;
@@ -326,36 +330,95 @@ discovered_game_addr(struct disc_ent *disc_ent)
 #endif
 }
 
-int
-game_net_join(char *addr)
+void
+game_net_join(const char *nodename)
 {
 	struct sockaddr_in sa;
-	char opponent;
-	struct hostent *hostent = gethostbyname(addr);
+	struct hostent *hostent = gethostbyname(nodename);
+	int result;
 
+	conn_sock_state = CANT_CONNECT;
 	if (hostent == NULL)
-		return 0;
+		return;
 	sa.sin_family = AF_INET;
 	sa.sin_port = ntohs(7440);
 	sa.sin_addr = *(struct in_addr *)hostent->h_addr_list[0];
 
 	conn_sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (connect(conn_sock, (struct sockaddr *)&sa, sizeof (sa)) < 0)
-		return 0;
+#ifdef _WIN32
+	unsigned long nonblocking = 1;
+	ioctlsocket(conn_sock, FIONBIO, &nonblocking);
+#else
+	fcntl(conn_sock, F_SETFL, O_NONBLOCK);
+#endif
+	result = connect(conn_sock, (struct sockaddr *)&sa, sizeof (sa));
+#ifdef _WIN32
+	if (result < 0 && WSAGetLastError() != WSAEWOULDBLOCK)
+#else
+	if (result < 0 && errno != EINPROGRESS && errno != EWOULDBLOCK)
+#endif
+		return;
+	conn_sock_state = CONNECTING;
+}
 
-	game_net_send_header();
-	if (!game_net_check_header())
-		goto bad_conn;
-	if (recv(conn_sock, &opponent, 1, 0) < 1)
-		goto bad_conn;
-	game_net_player = !opponent;
+int
+game_net_poll_connected(void)
+{
+	struct timeval timeout = {0, 0};
+	fd_set fds;
 
-	return 1;
-
+	FD_ZERO(&fds);
+	FD_SET(conn_sock, &fds);
+	if (conn_sock_state == CANT_CONNECT) {
+		return -1;
+	} if (conn_sock_state == CONNECTING) {
+		if (select(conn_sock + 1, NULL, &fds, NULL, &timeout) > 0) {
+#ifndef _WIN32
+			int err;
+			socklen_t len = sizeof (err);
+			getsockopt(conn_sock, SOL_SOCKET, SO_ERROR,
+				   (char *)&err, &len);
+			if (err)
+				goto bad_conn;
+#endif
+			conn_sock_state = WAITING_FOR_HEADER;
+			game_net_send_header();
+			return 0;
+		}
+#ifdef _WIN32
+		FD_ZERO(&fds);
+		FD_SET(conn_sock, &fds);
+		if (select(conn_sock + 1, NULL, NULL, &fds, &timeout) > 0)
+			goto bad_conn;
+#endif
+	} else if (conn_sock_state == WAITING_FOR_HEADER) {
+		if (select(conn_sock + 1, &fds, NULL, NULL, &timeout) > 0) {
+			if (!game_net_check_header())
+				goto bad_conn;
+			conn_sock_state = WAITING_FOR_OPPONENT;
+			return 0;
+		}
+	} else if (conn_sock_state == WAITING_FOR_OPPONENT) {
+		char opponent;
+		if (select(conn_sock + 1, &fds, NULL, NULL, &timeout) > 0) {
+			if (recv(conn_sock, &opponent, 1, 0) < 1)
+				goto bad_conn;
+			game_net_player = !opponent;
+			return 1;
+		}
+	}
+	return 0;
 bad_conn:
 	close(conn_sock);
 	conn_sock = -1;
-	return 0;
+	return -1;
+}
+
+void
+game_net_stop_connecting(void)
+{
+	close(conn_sock);
+	conn_sock = -1;
 }
 
 static void

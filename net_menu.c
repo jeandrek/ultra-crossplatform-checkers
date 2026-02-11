@@ -73,10 +73,11 @@ quit_hosting(void)
 }
 
 static void
-wait_screen_update(void)
+update_hosting_wait_screen(void)
 {
 	gui_update();
 	if (game_net_poll_connections()) {
+		menu.update = gui_update;
 		game.init();
 		checkers_switch_state(&game);
 	}
@@ -92,7 +93,7 @@ host_game(int player)
 		snprintf(wait_screen_msg, 128,
 			 "Waiting for connection~  IP address: %s",
 			 ip_addr_str());
-		menu.update = wait_screen_update;
+		menu.update = update_hosting_wait_screen;
 		message_dlg(wait_screen_msg, quit_hosting);
 	} else {
 		message_dlg("Error hosting", host_menu);
@@ -100,18 +101,47 @@ host_game(int player)
 }
 
 static void
-join_game(char *addr)
+cancel_connecting(void)
+{
+	menu.update = gui_update;
+	game_net_stop_connecting();
+	join_menu();
+}
+
+static char *join_game_addr;
+
+static void
+update_connecting_wait_screen(void)
 {
 	static char error_msg[128];
+	int result;
 
-	game.destroy();
-	if (game_net_join(addr)) {
+	gui_update();
+	if ((result = game_net_poll_connected()) > 0) {
+		free(join_game_addr);
+		menu.update = gui_update;
 		game.init();
 		checkers_switch_state(&game);
-	} else {
-		snprintf(error_msg, 128, "Error connecting to %s", addr);
+	} else if (result < 0) {
+		snprintf(error_msg, 128, "Error connecting to %s",
+			 join_game_addr);
+		free(join_game_addr);
+		menu.update = gui_update;
 		message_dlg(error_msg, join_menu);
 	}
+}
+
+static void
+join_game(char *addr)
+{
+	static char wait_screen_msg[128];
+
+	game.destroy();
+	game_net_join(addr);
+	menu.update = update_connecting_wait_screen;
+	snprintf(wait_screen_msg, 128, "Connecting to %s~", addr);
+	join_game_addr = strdup(addr);
+	message_dlg(wait_screen_msg, cancel_connecting);
 }
 
 static void
