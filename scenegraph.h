@@ -43,6 +43,10 @@ struct scenegraph {
 	int	width, height;	/* XXX */
 };
 
+struct rect {
+	int left, top, right, bottom;
+};
+
 #define SG_OBJ_NOLIGHTDEPTH	(1<<0)
 #define SG_OBJ_TEXTURED		(1<<1)
 
@@ -59,5 +63,9 @@ void	sg_init(int w, int h);
 void	sg_init_scenegraph(struct scenegraph *scenegraph);
 void	sg_render(struct scenegraph *scenegraph);
 void	sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj);
+
+#ifdef __psp__
+extern uint32_t display_list[262144];
+#endif
 
 #endif /* !_SCENEGRAPH_H_ */

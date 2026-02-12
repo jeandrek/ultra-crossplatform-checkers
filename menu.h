@@ -24,57 +24,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef _MENU_H_
+#define _MENU_H_
+
 #include "checkers.h"
-#include "game.h"
-#include "menu.h"
-#include "text.h"
+#include "gui.h"
 
-static struct state *current_state = NULL;
+void menu_set_elements(int num, struct element *new_elems);
+void menu_render_items(struct scenegraph *scenegraph);
+void message_dlg(char *text, void (*back_action)(void));
+void main_menu(void);
 
-void
-checkers_init(void)
-{
-	text_init();
-	game.load();
-	game.init();
-	menu.init();
-	current_state = &game;
-}
+extern struct element *elems;
+extern struct state menu;
 
-struct state *
-checkers_get_state(void)
-{
-	return current_state;
-}
-
-void
-checkers_switch_state(struct state *new_state)
-{
-	current_state = new_state;
-}
-
-void
-checkers_update(void)
-{
-	current_state->update();
-	sg_render(&current_state->sg);
-}
-
-void
-checkers_button_event(int button)
-{
-	current_state->button_event(button);
-}
-
-void
-checkers_mouse_up(int x, int y)
-{
-	current_state->mouse_up_event(x, y);
-}
-
-void
-checkers_mouse_move(int x, int y)
-{
-	if (current_state->mouse_move_event != NULL)
-		current_state->mouse_move_event(x, y);
-}
+#endif /* !_MENU_H_ */

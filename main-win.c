@@ -33,6 +33,7 @@
 #include "checkers.h"
 #include "scenegraph.h"
 #include "input.h"
+#include "text_input.h"
 
 static PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 
@@ -87,6 +88,15 @@ WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		wglDeleteContext(hglrc);
 		PostQuitMessage(0);
 		return 0;
+	case WM_LBUTTONUP:
+		checkers_mouse_up(LOWORD(lParam), HIWORD(lParam));
+		return 0;
+	case WM_MOUSEMOVE:
+		checkers_mouse_move(LOWORD(lParam), HIWORD(lParam));
+		return 0;
+	case WM_CHAR:
+		text_input_add_char(wParam);
+		return 0;
 	}
 
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -101,6 +111,9 @@ WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 	DWORD ticks;
 	HWND hWnd;
 	MSG msg;
+	WSADATA wsadata;
+
+	WSAStartup(0x0202, &wsadata);
 
 	memset(&cls, 0, sizeof (cls));
 	cls.lpszClassName = "CheckersWindow";
@@ -129,7 +142,9 @@ WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 			if (LOWORD(msg.message) == WM_QUIT)
 				break;
+			TranslateMessage(&msg);
 			DispatchMessage(&msg);
+			continue;
 		}
 		if (vsync || timeGetTime() - ticks >= 15) {
 			HDC hdc = GetDC(hWnd);
@@ -142,5 +157,7 @@ WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 			Sleep(2);
 		}
 	}
+	WSACleanup();
+
 	return 0;
 }

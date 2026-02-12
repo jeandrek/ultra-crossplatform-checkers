@@ -28,22 +28,49 @@
 #include "game.h"
 #include "game_display.h"
 #include "game_interaction.h"
+#include "game_net.h"
 
+enum type game_type;
 enum mode cur_mode;
 
 static void
 game_init(void)
 {
 	board_init();
-	game_interaction_init();
 	game_display_init();
+	if (game_net_connected()) {
+		game_dirty = 1;
+		game_type = NETWORK;
+	} else {
+		game_type = LOCAL_2PLAYER;
+	}
+	game_interaction_init();
 }
 
 static void
 game_update(void)
 {
-	if (cur_mode == ANIM_ROTATE_BOARD)
+	if (cur_mode == ANIM_ROTATE_BOARD) {
 		game_anim();
+	} else if (cur_mode == WAIT_TURN && game_net_poll_move()) {
+		struct move move;
+		int finished;
+
+		if (!game_net_recv_move(&move)) {
+			cur_mode = LOST_CONNECTION;
+			game_display_game_over();
+			game_net_disconnect();
+			return;
+		}
+
+		finished = perform_move(&move, !game_net_player);
+		if (finished) {
+			if (winner() != -1)
+				game_over();
+			else
+				game_interaction_turn();
+		}
+	}
 }
 
 void
@@ -51,6 +78,8 @@ game_over(void)
 {
 	cur_mode = GAME_OVER;
 	game_display_game_over();
+	if (game_type == NETWORK)
+		game_net_disconnect();
 }
 
 void
@@ -65,9 +94,23 @@ game_anim_rotate_finished(void)
 	cur_mode = SELECT_PIECE;
 }
 
+static void
+game_mouse_up_event(int x, int y)
+{
+}
+
+static void
+game_destroy(void)
+{
+	if (game_net_connected()) game_net_disconnect();
+	game_dirty = 0;
+}
+
 struct state game = {
 	.load = game_display_load,
 	.init = game_init,
 	.update = game_update,
-	.input_event = game_input_event
+	.destroy = game_destroy,
+	.button_event = game_button_event,
+	.mouse_up_event = game_mouse_up_event
 };

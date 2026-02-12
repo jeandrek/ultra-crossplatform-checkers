@@ -33,9 +33,12 @@
 #include "sprite.h"
 #include "texture.h"
 
-#define FONT_WIDTH	8
-#define FONT_HEIGHT	16
 #define FONT_ROW_LENGTH	16
+
+/*
+ * Tilde really appears as an ellipsis, since we are currently limiting to
+ * ASCII.
+ */
 
 struct glyph {
 	int	tex_left, tex_top;
@@ -51,7 +54,7 @@ text_init(void)
 	texture_init_from_file(&texture_font, 128, 128,
 			       TEXTURES_DIR "font");
 
-	for (int i = '!'; i <= '}'; i++) {
+	for (int i = '!'; i <= '~'; i++) {
 		int row = (i - '!') / FONT_ROW_LENGTH;
 		int col = (i - '!') % FONT_ROW_LENGTH;
 		struct glyph *g = malloc(sizeof (struct glyph));
@@ -112,5 +115,28 @@ text_draw(struct scenegraph *scenegraph, char *str, float x, float y,
 			draw_glyph(scenegraph, ascii_glyphs[c], x, y);
 		}
 		x += scale * FONT_WIDTH * pixel_size;
+	}
+}
+
+void
+text_screen_bounds(struct scenegraph *scenegraph, size_t len, float x, float y,
+	       int alignment, struct rect *rect)
+{
+	int screen_x = scenegraph->width/2 + scenegraph->height/2 * x;
+	int screen_y = scenegraph->height/2 - scenegraph->height/2 * y;
+
+	switch (alignment) {
+	case TEXT_CENTRE:
+		rect->left = screen_x - scale * FONT_WIDTH/2 * len;
+		rect->top = screen_y - scale * FONT_HEIGHT/2;
+		rect->right = screen_x + scale * FONT_WIDTH/2 * len;
+		rect->bottom = screen_y + scale * FONT_HEIGHT/2;
+		break;
+	case TEXT_TOPLEFT:
+		rect->left = screen_x;
+		rect->top = screen_y;
+		rect->right = screen_x + scale * FONT_WIDTH * len;
+		rect->bottom = screen_y + scale * FONT_HEIGHT;
+		break;
 	}
 }

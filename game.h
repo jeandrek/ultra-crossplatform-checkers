@@ -33,10 +33,19 @@ enum mode {
 	SELECT_PIECE,
 	SELECT_MOVE,
 	ANIM_ROTATE_BOARD,
-	GAME_OVER
+	WAIT_TURN,
+	GAME_OVER,
+	LOST_CONNECTION
+};
+
+enum type {
+	LOCAL_2PLAYER,
+	NETWORK,
+	COMPUTER
 };
 
 extern struct state game;
+extern enum type game_type;
 extern enum mode cur_mode;
 
 void game_over(void);

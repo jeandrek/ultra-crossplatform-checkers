@@ -24,57 +24,58 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "checkers.h"
-#include "game.h"
-#include "menu.h"
-#include "text.h"
+#ifndef _GAME_NET_H_
+#define _GAME_NET_H_
 
-static struct state *current_state = NULL;
+#include "game_checkers.h"
 
-void
-checkers_init(void)
-{
-	text_init();
-	game.load();
-	game.init();
-	menu.init();
-	current_state = &game;
-}
+struct disc_ent {
+	char		*name;
+	/* Private */
+	uint32_t	if_idx;
+	char		*domain;
+	char		*regtype;
+};
 
-struct state *
-checkers_get_state(void)
-{
-	return current_state;
-}
+char	*ip_addr_str(void);
 
-void
-checkers_switch_state(struct state *new_state)
-{
-	current_state = new_state;
-}
+int	game_net_connected(void);
 
-void
-checkers_update(void)
-{
-	current_state->update();
-	sg_render(&current_state->sg);
-}
+int	game_net_host(int player);
+int	game_net_poll_connections(void);
+void	game_net_stop_hosting(void);
 
-void
-checkers_button_event(int button)
-{
-	current_state->button_event(button);
-}
+int	game_net_discover(void);
+void	game_net_discovery_update(void);
+void	game_net_stop_discovery(void);
+void	free_discovered_game(struct disc_ent *disc_ent);
+char	*discovered_game_addr(struct disc_ent *disc_ent);
+void	game_net_join(const char *nodename);
+int	game_net_poll_connected(void);
+void	game_net_stop_connecting(void);
 
-void
-checkers_mouse_up(int x, int y)
-{
-	current_state->mouse_up_event(x, y);
-}
+int	game_net_poll_move(void);
+int	game_net_recv_move(struct move *move);
+void	game_net_send_move(struct move *move);
+void	game_net_disconnect(void);
 
-void
-checkers_mouse_move(int x, int y)
-{
-	if (current_state->mouse_move_event != NULL)
-		current_state->mouse_move_event(x, y);
-}
+extern char game_net_player;
+
+#define PROTOCOL_MAJOR	0
+#define PROTOCOL_MINOR	1
+struct __attribute__ ((packed)) checkers_header {
+	uint8_t	magic[2];
+	uint8_t	major;
+	uint8_t	minor;
+};
+
+#ifdef DISABLE_NETWORK
+#define game_net_connected() 0
+#define game_net_poll_move() 0
+#define game_net_recv_move(pmove) 0
+#define game_net_send_move(pmove)
+#define game_net_disconnect()
+#define game_net_player (-1)
+#endif
+
+#endif /* !_GAME_NET_H_ */

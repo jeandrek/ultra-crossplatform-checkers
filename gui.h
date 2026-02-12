@@ -24,57 +24,31 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "checkers.h"
-#include "game.h"
-#include "menu.h"
-#include "text.h"
+#ifndef _GUI_H_
+#define _GUI_H_
 
-static struct state *current_state = NULL;
+uint32_t button_color(int i, int j);
+void button_bounds(struct scenegraph *scenegraph, int len,
+		   float x, float y, struct rect *bounds);
 
-void
-checkers_init(void)
-{
-	text_init();
-	game.load();
-	game.init();
-	menu.init();
-	current_state = &game;
-}
+struct element {
+	float	x, y;
+	struct rect bounds;
+	int	row, col;
+	void	*data;
+};
 
-struct state *
-checkers_get_state(void)
-{
-	return current_state;
-}
+void gui_set_rows(int num, ...);
+void gui_add_row(int len, ...);
+void gui_free_rows(void);
+void gui_set_element(int i, int j, struct element *elem);
+void gui_set_action_proc(void (*proc)(int, int));
+void gui_update(void);
+void gui_mouse_up_event(int x, int y);
+void gui_mouse_move_event(int x, int y);
+void gui_button_event(int button);
 
-void
-checkers_switch_state(struct state *new_state)
-{
-	current_state = new_state;
-}
+extern int gui_focus_row;
+extern int gui_focus_col;
 
-void
-checkers_update(void)
-{
-	current_state->update();
-	sg_render(&current_state->sg);
-}
-
-void
-checkers_button_event(int button)
-{
-	current_state->button_event(button);
-}
-
-void
-checkers_mouse_up(int x, int y)
-{
-	current_state->mouse_up_event(x, y);
-}
-
-void
-checkers_mouse_move(int x, int y)
-{
-	if (current_state->mouse_move_event != NULL)
-		current_state->mouse_move_event(x, y);
-}
+#endif /* !_GUI_H_ */

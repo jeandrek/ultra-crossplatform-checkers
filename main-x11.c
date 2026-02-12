@@ -34,6 +34,7 @@
 #include "scenegraph.h"
 #include "input.h"
 #include "input_mapping-x11.h"
+#include "text_input.h"
 
 int
 respond_to_event(Display *dpy, XEvent *evt, XPointer arg)
@@ -42,6 +43,27 @@ respond_to_event(Display *dpy, XEvent *evt, XPointer arg)
 }
 
 int button_state[NUM_BUTTONS] = {0};
+static int8_t keycode_buttons[256];
+
+static void
+key_press_event(XKeyEvent *evt)
+{
+	char text[5];
+
+	XLookupString(evt, text, sizeof (text), NULL, NULL);
+	for (int i = 0; text[i] != 0; i++)
+		text_input_add_char(text[i]);
+
+	if (keycode_buttons[evt->keycode] >= 0)
+		button_state[keycode_buttons[evt->keycode]] = 1;
+}
+
+static void
+key_release_event(XKeyEvent *evt)
+{
+	if (keycode_buttons[evt->keycode] >= 0)
+		button_state[keycode_buttons[evt->keycode]] = 0;
+}
 
 int
 main()
@@ -53,7 +75,6 @@ main()
 		None
 	};
 	XSetWindowAttributes win_attribs;
-	int8_t keycode_buttons[256];
 	char *name = "Checkers";
 	XTextProperty prop;
 	Atom protocols[1];
@@ -69,7 +90,10 @@ main()
 
 	win_attribs.event_mask = (SubstructureNotifyMask
 				  | KeyPressMask
-				  | KeyReleaseMask);
+				  | KeyReleaseMask
+				  | PointerMotionMask
+				  | ButtonPressMask
+				  | ButtonReleaseMask);
 
 	win = XCreateWindow(dpy, DefaultRootWindow(dpy), 30, 30,
 			    800, 600, 0,
@@ -120,12 +144,16 @@ main()
 			continue;
 		switch (evt.type) {
 		case KeyPress:
-			if (keycode_buttons[evt.xkey.keycode] >= 0)
-				button_state[keycode_buttons[evt.xkey.keycode]] = 1;
+			key_press_event(&evt.xkey);
 			break;
 		case KeyRelease:
-			if (keycode_buttons[evt.xkey.keycode] >= 0)
-				button_state[keycode_buttons[evt.xkey.keycode]] = 0;
+			key_release_event(&evt.xkey);
+			break;
+		case MotionNotify:
+			checkers_mouse_move(evt.xbutton.x, evt.xbutton.y);
+			break;
+		case ButtonRelease:
+			checkers_mouse_up(evt.xbutton.x, evt.xbutton.y);
 			break;
 		case ClientMessage:
 			goto quit;

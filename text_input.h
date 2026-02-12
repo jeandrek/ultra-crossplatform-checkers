@@ -24,11 +24,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _MAIN_MENU_H_
-#define _MAIN_MENU_H_
+#ifndef _TEXT_INPUT_H_
+#define _TEXT_INPUT_H_
 
-#include "checkers.h"
+void text_input(char *label, void (*accept)(char *),
+		void (*cancel)(void));
 
-extern struct state main_menu;
+void text_input_add_char(char c);
 
-#endif /* !_MAIN_MENU_H_ */
+#endif /* !_TEXT_INPUT_H_ */

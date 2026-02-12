@@ -24,57 +24,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "checkers.h"
-#include "game.h"
-#include "menu.h"
-#include "text.h"
+#ifndef _NET_MENU_H_
+#define _NET_MENU_H_
 
-static struct state *current_state = NULL;
+#include "game_net.h"
 
-void
-checkers_init(void)
-{
-	text_init();
-	game.load();
-	game.init();
-	menu.init();
-	current_state = &game;
-}
+void net_menu(void);
+void show_discovered_games(void);
+void add_discovered_game(struct disc_ent *game);
+void remove_discovered_game(const char *name);
 
-struct state *
-checkers_get_state(void)
-{
-	return current_state;
-}
-
-void
-checkers_switch_state(struct state *new_state)
-{
-	current_state = new_state;
-}
-
-void
-checkers_update(void)
-{
-	current_state->update();
-	sg_render(&current_state->sg);
-}
-
-void
-checkers_button_event(int button)
-{
-	current_state->button_event(button);
-}
-
-void
-checkers_mouse_up(int x, int y)
-{
-	current_state->mouse_up_event(x, y);
-}
-
-void
-checkers_mouse_move(int x, int y)
-{
-	if (current_state->mouse_move_event != NULL)
-		current_state->mouse_move_event(x, y);
-}
+#endif /* !_NET_MENU_H_ */

@@ -66,6 +66,8 @@ static void
 render_highlight(struct scenegraph *scenegraph)
 {
 	struct sg_object obj;
+	if (!(cur_mode == SELECT_PIECE || cur_mode == SELECT_MOVE))
+		return;
 	obj.color = 0x8080ffff;
 	obj.flags = SG_OBJ_NOLIGHTDEPTH;
 	obj.vertices = highlight_verts;
@@ -145,15 +147,20 @@ render_pieces(struct scenegraph *scenegraph)
 }
 
 static void
-render_win(struct scenegraph *scenegraph)
+render_game_over(struct scenegraph *scenegraph)
 {
-	if (cur_mode == GAME_OVER) {
+	char *text = NULL;
+
+	if (cur_mode == GAME_OVER)
+		text = winner() == 0 ? "Red wins" : "Black wins";
+	if (cur_mode == LOST_CONNECTION)
+		text = "Lost connection";
+
+	if (text != NULL) {
 		sprite_draw(scenegraph, &overlay_sprite);
 		text_scale(1);
 		text_color(0xffffffff);
-		text_draw(scenegraph,
-			  winner() == 0 ? "Red wins" : "Black wins",
-			  0, 0, TEXT_CENTRE);
+		text_draw(scenegraph, text, 0, 0, TEXT_CENTRE);
 	}
 }
 
@@ -161,7 +168,7 @@ static void (*render_functions[])(struct scenegraph *) = {
 	render_board,
 	render_highlight,
 	render_pieces,
-	render_win
+	render_game_over
 };
 
 void
@@ -186,7 +193,6 @@ game_display_init(void)
 	game.sg.light0_y = 2;
 	game.sg.light0_z = 0;
 	game.sg.light0_color = 0xffffffff;
-	game_display_set_viewpoint(0);
 	sg_init_scenegraph(&game.sg);
 }
 

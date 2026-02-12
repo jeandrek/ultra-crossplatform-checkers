@@ -40,7 +40,7 @@ typedef uint64_t board_t[2][2];
  * capture; hence a turn may consist of several moves.
  */
 
-struct move {
+struct __attribute__ ((packed)) move {
 	int	location;
 	int	capture;
 	int	promotion;
@@ -48,6 +48,7 @@ struct move {
 };
 
 extern board_t board;
+extern int game_dirty;
 
 #define MAX_MOVES	4
 
