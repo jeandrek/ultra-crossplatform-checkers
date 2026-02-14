@@ -1,3 +1,8 @@
+#ifndef _EXTRA_CARBON_DEFS_H_
+#define _EXTRA_CARBON_DEFS_H_
+
+#include <Carbon.h>
+
 #define kWindowStandardFloatingAttributes ((1<<0)|(1<<3))
 #define kWindowStandardHandlerAttribute (1<<25)
 #define kDocumentWindowClass 6
@@ -28,3 +33,8 @@ OSStatus InstallEventHandler(void *, void *, uint32_t, EventTypeSpec *, void *, 
 void *NewEventHandlerUPP(void *);
 void *GetWindowEventTarget(WindowRef);
 OSErr SetMenuItemCommandID(MenuRef, int16_t, uint32_t);
+
+typedef void *OTClientContextPtr;
+typedef void *EndpointRef;
+
+#endif /* !_EXTRA_CARBON_DEFS_H_ */

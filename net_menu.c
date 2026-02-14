@@ -117,14 +117,14 @@ update_connecting_wait_screen(void)
 	int result;
 
 	gui_update();
-	if ((result = game_net_poll_connected()) > 0) {
+	if ((result = game_net_poll_connected()) == 0) {
 		free(join_game_addr);
 		menu.update = gui_update;
 		game.init();
 		checkers_switch_state(&game);
-	} else if (result < 0) {
-		snprintf(error_msg, 128, "Error connecting to %s",
-			 join_game_addr);
+	} else {
+		snprintf(error_msg, 128, "Error connecting to %s: code %d",
+			 join_game_addr, result);
 		free(join_game_addr);
 		menu.update = gui_update;
 		message_dlg(error_msg, join_menu);

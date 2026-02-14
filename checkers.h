@@ -67,4 +67,10 @@ extern JNIEnv *checkers_jnienv;
 extern jobject checkers_java;
 #endif
 
+#ifdef macintosh
+#include "extra_carbon_defs.h"
+
+OTClientContextPtr ot;
+#endif
+
 #endif /* !_CHECKERS_H_ */

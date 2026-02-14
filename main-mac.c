@@ -49,6 +49,11 @@ main(void)
 	Rect bounds = {100, 100, 100+HEIGHT, 100+WIDTH};
 	long gestalt_val;
 
+#ifdef macintosh
+	if (InitOpenTransportInContext(1, &ot) != 0)
+		return 1;
+#endif
+
 	err = CreateNewWindow(kDocumentWindowClass,
 			      (kWindowStandardFloatingAttributes |
 			       kWindowStandardHandlerAttribute),
@@ -84,6 +89,10 @@ main(void)
 	RunApplicationEventLoop();
 
 	aglDestroyContext(context);
+
+#ifdef macintosh
+	CloseOpenTransportInContext(ot);
+#endif
 
 	return err;
 }

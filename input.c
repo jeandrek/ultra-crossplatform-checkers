@@ -50,9 +50,12 @@ static const int can_repeat[NUM_BUTTONS] = {
 
 static int repeat_delay[NUM_BUTTONS] = {0};
 
+#include "text_input.h"
 static void
 handle_button(int button)
 {
+	//for (int i = 0; i < 64; i++) text_input_add_char('\b');
+
 	if (repeat_delay[button] == 0) {
 		checkers_button_event(button);
 		repeat_delay[button] = can_repeat[button] ? REPEAT_DELAY : -1;
@@ -63,6 +66,31 @@ handle_button(int button)
 
 #ifdef USE_X11
 extern int button_state[NUM_BUTTONS];
+#endif
+
+#ifdef macintosh
+uint8_t old_keymap[16];
+#include <stdio.h>
+#include <string.h>
+
+uint8_t key2ascii[128] = {
+	[0] = 'a',
+	[1] = 's',
+	[2] = 'd',
+	[3] = 'f',
+	[18] = '1',
+	[19] = '2',
+	[20] = '3',
+	[21] = '4',
+	[23] = '5',
+	[22] = '6',
+	[26] = '7',
+	[28] = '8',
+	[25] = '9',
+	[29] = '0',
+	[41] = ':',
+	[47] = '.'
+};
 #endif
 
 void
@@ -98,4 +126,14 @@ input_handle(void)
 #endif
 		else repeat_delay[i] = 0;
 	}
+
+	for (int i = 0; i < 128; i++) {
+		if ((keymap[i >> 3] >> (i & 7)) & 1) {
+			if (!((old_keymap[i >> 3] >> (i & 7)) & 1)) {
+				text_input_add_char(key2ascii[i]);
+			}
+		}
+	}
+
+	memcpy(old_keymap, keymap, sizeof (keymap));
 }
