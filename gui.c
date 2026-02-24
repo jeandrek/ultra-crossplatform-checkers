@@ -45,6 +45,10 @@ static struct row {
 
 static void (*action)(int, int);
 
+static int mouse_x, mouse_y;
+
+static void gui_mouse_focus(int x, int y);
+
 uint32_t
 button_color(int i, int j)
 {
@@ -90,6 +94,8 @@ gui_set_rows(int num, ...)
 			gui_set_element(i, j, va_arg(ap, struct element *));
 	}
 	va_end(ap);
+
+	gui_mouse_focus(mouse_x, mouse_y);
 }
 
 void
@@ -155,6 +161,14 @@ quit:
 
 void
 gui_mouse_move_event(int x, int y)
+{
+	mouse_x = x;
+	mouse_y = y;
+	gui_mouse_focus(x, y);
+}
+
+static void
+gui_mouse_focus(int x, int y)
 {
 	for (int i = 0; i < num_rows; i++) {
 		for (int j = 0; j < rows[i].len; j++) {
