@@ -127,6 +127,7 @@ input_handle(void)
 		else repeat_delay[i] = 0;
 	}
 
+#ifdef macintosh
 	for (int i = 0; i < 128; i++) {
 		if ((keymap[i >> 3] >> (i & 7)) & 1) {
 			if (!((old_keymap[i >> 3] >> (i & 7)) & 1)) {
@@ -136,4 +137,5 @@ input_handle(void)
 	}
 
 	memcpy(old_keymap, keymap, sizeof (keymap));
+#endif
 }

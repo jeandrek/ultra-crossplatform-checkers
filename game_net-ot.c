@@ -218,7 +218,55 @@ typedef struct {
 	char name[256];
 } DNSAddress;
 
-OSStatus join_error = 0;
+#define kOTNoDataErr -3162
+
+#define T_CONNECT 0x2
+#define T_DATA 0x4
+#define T_EXDATA 0x8
+
+void
+notify_callback(void *context, uint32_t code, int32_t result, void *cookie)
+{
+	if (code == T_CONNECT) {
+		TCall call;
+		OTRcvConnect(conn_endpoint, &call);
+		conn_sock_state = WAITING_FOR_HEADER;
+		OTRemoveNotifier(conn_endpoint);
+		OTSetNonBlocking(conn_endpoint);
+		OTSetSynchronous(conn_endpoint);
+		game_net_send_header();
+	}
+	/* if (code == T_DATA || code == T_EXDATA) { */
+	/* 	if (conn_sock_state == WAITING_FOR_HEADER) { */
+	/* 		char opponent; */
+
+	/* 		if (!game_net_check_header()) { */
+	/* 			OTCloseProvider(conn_endpoint); */
+	/* 			conn_sock_state = CANT_CONNECT; */
+	/* 			return; */
+	/* 		} */
+	/* 		conn_sock_state = WAITING_FOR_OPPONENT; */
+
+	/* 		if (OTRcv(conn_endpoint, &opponent, 1, 0) == 1) { */
+	/* 			game_net_player = !opponent; */
+	/* 			conn_sock_state = CONNECTED; */
+
+	/* 			if (OTRcv(conn_endpoint,  */
+	/* 		} */
+	/* 	} else if (conn_sock_state == WAITING_FOR_OPPONENT) { */
+	/* 		char opponent; */
+	/* 		if (OTRcv(conn_endpoint, &opponent, 1, 0) != 1) { */
+	/* 			OTCloseProvider(conn_endpoint); */
+	/* 			conn_sock_state = CANT_CONNECT; */
+	/* 			return; */
+	/* 		} */
+	/* 		game_net_player = !opponent; */
+	/* 		conn_sock_state = CONNECTED; */
+	/* 	} else if (conn_sock_state == CONNECTED) { */
+	/* 		move_avail = 1; */
+	/* 	} */
+	/* } */
+}
 
 void
 game_net_join(const char *nodename)
@@ -231,53 +279,91 @@ game_net_join(const char *nodename)
 	conn_endpoint = OTOpenEndpointInContext(OTCreateConfiguration("tcp"),
 						0, NULL, &err, ot);
 	if (err != 0) {
-		join_error = err;
 		conn_sock_state = CANT_CONNECT;
 		return;
 	}
 
+	OTInstallNotifier(conn_endpoint, NewOTNotifyUPP(notify_callback), NULL);
+
 	OTSetBlocking(conn_endpoint);
 	OTSetSynchronous(conn_endpoint);
+
 	OTBind(conn_endpoint, NULL, NULL);
+
+	OTSetAsynchronous(conn_endpoint);
 
 	OTMemzero(&conn, sizeof (conn));
 	len = OTInitDNSAddress(&addr, nodename);
 	conn.addr.len = len;
 	conn.addr.buf = &addr;
 
-	if ((err = OTConnect(conn_endpoint, &conn, NULL)) != 0) {
-		join_error = err;
-		conn_sock_state = CANT_CONNECT;
-		return;
-	}
-
 	conn_sock_state = CONNECTING;
-	join_error = 0;
-	game_net_send_header();
-
-	if (!game_net_check_header()) {
-		OTCloseProvider(conn_endpoint);
+	if (OTConnect(conn_endpoint, &conn, NULL) != kOTNoDataErr)
 		conn_sock_state = CANT_CONNECT;
-		return;
-	}
-
-	char opponent;
-	if (OTRcv(conn_endpoint, &opponent, 1, 0) != 1) {
-		OTCloseProvider(conn_endpoint);
-		conn_sock_state = CANT_CONNECT;
-		return;
-	}
-
-	game_net_player = !opponent;
 }
 
 int
 game_net_poll_connected(void)
 {
+	uint32_t len;
+
 	if (conn_sock_state == CANT_CONNECT) {
-		return join_error;
+		return -1;
+	} else if (conn_sock_state == CONNECTING) {
+		return 0;
+	} else if (conn_sock_state == WAITING_FOR_HEADER) {
+		OTCountDataBytes(conn_endpoint, &len);
+		if (len >= sizeof (struct checkers_header)) {
+			if (!game_net_check_header()) {
+				OTCloseProvider(conn_endpoint);
+				return -100;
+			}
+			conn_sock_state = WAITING_FOR_OPPONENT;
+		}
+		return 0;
+	} else if (conn_sock_state == WAITING_FOR_OPPONENT) {
+		OTCountDataBytes(conn_endpoint, &len);
+		if (len >= 1) {
+			char opponent;
+			if (OTRcv(conn_endpoint, &opponent, 1, 0) < 1) {
+				OTCloseProvider(conn_endpoint);
+				return -200;
+			}
+			game_net_player = !opponent;
+			return 1;
+		}
+		return 0;
 	}
-	return 0;
+
+
+	/* game_net_send_header(); */
+
+	/* if (!game_net_check_header()) { */
+	/* 	OTCloseProvider(conn_endpoint); */
+	/* 	conn_sock_state = CANT_CONNECT; */
+	/* 	return; */
+	/* } */
+
+	/* char opponent; */
+	/* if (OTRcv(conn_endpoint, &opponent, 1, 0) != 1) { */
+	/* 	OTCloseProvider(conn_endpoint); */
+	/* 	conn_sock_state = CANT_CONNECT; */
+	/* 	return; */
+	/* } */
+
+	/* game_net_player = !opponent; */
+
+	/* if (conn_sock_state == CANT_CONNECT) { */
+	/* 	return -1; */
+	/* } */
+	/* return 0; */
+
+	/* if (conn_sock_state == CONNECTED) */
+	/* 	return 1; */
+	/* else if (conn_sock_state == CANT_CONNECT) */
+	/* 	return -1; */
+	/* else */
+	/* 	return 0; */
 }
 
 void
@@ -312,10 +398,24 @@ game_net_check_header(void)
 	return 1;
 }
 
+/* void */
+/* game_net_lock(void) */
+/* { */
+/* 	OTEnterNotifier(conn_endpoint); */
+/* } */
+
+/* void */
+/* game_net_unlock(void) */
+/* { */
+/* 	OTLeaveNotifier(conn_endpoint); */
+/* } */
+
 int
 game_net_poll_move(void)
 {
-	return 1;
+	uint32_t len = 0;
+	OTCountDataBytes(conn_endpoint, &len);
+	return len == sizeof (struct move);
 }
 
 int
@@ -325,7 +425,7 @@ game_net_recv_move(struct move *move)
 	uint32_t val;
 
 	val = OTRcv(conn_endpoint, (char *)&move_be, sizeof (move_be), 0);
-	if (val == 0 || val == -1)
+	if (val < sizeof (move_be))
 		return 0;
 	move->location = ntohl(move_be.location);
 	move->capture = ntohl(move_be.capture);
