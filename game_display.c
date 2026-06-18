@@ -24,6 +24,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
@@ -234,5 +235,46 @@ game_display_set_viewpoint(int player)
 		game.sg.cam_z = -1.5;
 		game.sg.cam_dir_horiz = M_PI;
 		game.sg.cam_dir_vert = -M_PI/4;
+	}
+}
+
+static void
+world_pos_to_screen_pos(float x_w, float y_w, float z_w, int *x_s, int *y_s)
+{
+	float tan_fov_2 = tanf(game.sg.fov/2.0 * M_PI/180.0);
+	float aspect = (float)game.sg.width/(float)game.sg.height;
+	float x_e = x_w;
+	float y_e = (y_w - 1.5) * cos(M_PI/4) - (z_w - 1.5) * sin(M_PI/4);
+	float z_e = (z_w - 1.5) * cos(M_PI/4) + (y_w - 1.5) * sin(M_PI/4);
+	float x_c = x_e * (2*game.sg.near_plane)/(0.2*tan_fov_2*aspect);
+	float y_c = y_e * (2*game.sg.near_plane)/(0.2*tan_fov_2);
+	*x_s = (x_c / -z_e + 1.0f) * game.sg.width/2;
+	*y_s = (-y_c / -z_e + 1.0f) * game.sg.height/2;
+	/* glGetFloatv(GL_MODELVIEW_MATRIX, modelview); */
+	/* glGetFloatv(GL_PROJECTION_MATRIX, projection); */
+}
+
+void
+game_init_squares_buffer(void)
+{
+	size_t len = game.sg.width * game.sg.height * sizeof (int);
+	squares_buffer = malloc(len);
+	memset(squares_buffer, -1, len);
+	for (int i = 0; i < 64; i++) {
+		float world_top = 1 - (i/8)/4.0;
+		float world_bottom = 1 - (i/8 + 1)/4.0;
+		float world_left = -1 + (i%8)/4.0;
+		float world_right = -1 + (i%8 + 1)/4.0;
+		int top, bottom, x1, x2, x3, x4;
+		world_pos_to_screen_pos(world_left, .1, world_top, &x1, &top);
+		world_pos_to_screen_pos(world_right, .1, world_top, &x2, &top);
+		world_pos_to_screen_pos(world_left, .1, world_bottom, &x3, &bottom);
+		world_pos_to_screen_pos(world_right, .1, world_bottom, &x4, &bottom);
+		for (int y = bottom; y <= top; y++) {
+			int left = x3 + (y - bottom)/(float)(top - bottom) * (x1 - x3);
+			int right = x4 + (y - bottom)/(float)(top - bottom) * (x2 - x4);
+			for (int x = left; x <= right; x++)
+				squares_buffer[y*game.sg.width + x] = i;
+		}
 	}
 }

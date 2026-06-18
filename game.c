@@ -24,6 +24,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdlib.h>
 #include "checkers.h"
 #include "game.h"
 #include "game_display.h"
@@ -32,12 +33,14 @@
 
 enum type game_type;
 enum mode cur_mode;
+int *squares_buffer;
 
 static void
 game_init(void)
 {
 	board_init();
 	game_display_init();
+	game_init_squares_buffer();
 	if (game_net_connected()) {
 		game_dirty = 1;
 		game_type = NETWORK;
@@ -95,14 +98,10 @@ game_anim_rotate_finished(void)
 }
 
 static void
-game_mouse_up_event(int x, int y)
-{
-}
-
-static void
 game_destroy(void)
 {
 	if (game_net_connected()) game_net_disconnect();
+	if (squares_buffer) free(squares_buffer);
 	game_dirty = 0;
 }
 
@@ -112,5 +111,6 @@ struct state game = {
 	.update = game_update,
 	.destroy = game_destroy,
 	.button_event = game_button_event,
-	.mouse_up_event = game_mouse_up_event
+	.mouse_up_event = game_mouse_up_event,
+	.mouse_move_event = game_mouse_move_event
 };

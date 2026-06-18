@@ -47,6 +47,7 @@ enum type {
 extern struct state game;
 extern enum type game_type;
 extern enum mode cur_mode;
+extern int *squares_buffer;
 
 void game_over(void);
 void game_start_anim_rotate(void);

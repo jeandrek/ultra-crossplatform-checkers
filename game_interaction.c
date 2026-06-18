@@ -170,3 +170,59 @@ game_button_event(int button)
 		}
 	}
 }
+
+static int
+mouse_coords_to_square(int x, int y)
+{
+	int idx = squares_buffer[y * game.sg.width + x];
+	if (idx < 0)
+		return idx;
+	return player_turn == 0 ? idx : 63 - idx;
+}
+
+void
+game_mouse_up_event(int x, int y)
+{
+	int idx = mouse_coords_to_square(x, y);
+
+	if (cur_mode == SELECT_PIECE) {
+		if (idx < 0) return;
+		set_sel_square(idx);
+		if ((board[player_turn][sel_piece_type] >> sel_square) & 1) {
+			cur_mode = SELECT_MOVE;
+			sel_move_idx = (player_turn == 0 ?
+					0 : sel_piece_moves_len - 1);
+		}
+	} else if (cur_mode == SELECT_MOVE) {
+		if (idx >= 0) {
+			for (int i = 0; i < sel_piece_moves_len; i++) {
+				if (sel_piece_moves[i].location == idx) {
+					sel_move_idx = i;
+					move_piece();
+					return;
+				}
+			}
+		} else {
+			set_sel_square(idx);
+		}
+		cur_mode = SELECT_PIECE;
+	}
+}
+
+void
+game_mouse_move_event(int x, int y)
+{
+	int idx = mouse_coords_to_square(x, y);
+	if (idx < 0) return;
+
+	if (cur_mode == SELECT_PIECE) {
+		set_sel_square(idx);
+	} else if (cur_mode == SELECT_MOVE) {
+		for (int i = 0; i < sel_piece_moves_len; i++) {
+			if (sel_piece_moves[i].location == idx) {
+				sel_move_idx = i;
+				break;
+			}
+		}
+	}
+}

@@ -39,5 +39,7 @@ extern int player_turn;
 void game_interaction_init(void);
 void game_interaction_turn(void);
 void game_button_event(int button);
+void game_mouse_up_event(int x, int y);
+void game_mouse_move_event(int x, int y);
 
 #endif /* !_GAME_INTERACTION_H_ */
