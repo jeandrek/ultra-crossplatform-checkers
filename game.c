@@ -25,15 +25,22 @@
  */
 
 #include <stdlib.h>
+#include <string.h>
 #include "checkers.h"
 #include "game.h"
 #include "game_display.h"
 #include "game_interaction.h"
 #include "game_net.h"
+#include "text.h"
 
 enum type game_type;
 enum mode cur_mode;
 int *squares_buffer;
+
+/* XXX */
+float menu_button_x, menu_button_y;
+struct rect menu_button_bounds;
+int menu_button_highlighted;
 
 static void
 game_init(void)
@@ -48,6 +55,13 @@ game_init(void)
 		game_type = LOCAL_2PLAYER;
 	}
 	game_interaction_init();
+
+	menu_button_x = -game.sg.width/(float)game.sg.height + 0.01;
+	menu_button_y = 1 - 0.01;
+	text_screen_bounds(&game.sg, strlen("Menu"),
+			   menu_button_x, menu_button_y,
+			   TEXT_TOPLEFT, &menu_button_bounds);
+	menu_button_highlighted = 0;
 }
 
 static void

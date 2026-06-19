@@ -185,6 +185,13 @@ game_mouse_up_event(int x, int y)
 {
 	int idx = mouse_coords_to_square(x, y);
 
+	if (x >= menu_button_bounds.left && x <= menu_button_bounds.right
+	    && y >= menu_button_bounds.top && y <= menu_button_bounds.bottom) {
+		menu.init();
+		checkers_switch_state(&menu);
+		return;
+	}
+
 	if (cur_mode == SELECT_PIECE) {
 		if (idx < 0) return;
 		set_sel_square(idx);
@@ -212,6 +219,13 @@ void
 game_mouse_move_event(int x, int y)
 {
 	int idx = mouse_coords_to_square(x, y);
+
+	menu_button_highlighted =
+		(x >= menu_button_bounds.left
+		 && x <= menu_button_bounds.right
+		 && y >= menu_button_bounds.top
+		 && y <= menu_button_bounds.bottom);
+
 	if (idx < 0) return;
 
 	if (cur_mode == SELECT_PIECE) {

@@ -165,11 +165,20 @@ render_game_over(struct scenegraph *scenegraph)
 	}
 }
 
+static void
+render_menu_button(struct scenegraph *scenegraph)
+{
+	text_scale(1);
+	text_color(menu_button_highlighted ? 0xffffffff : 0xffaaaaaa);
+	text_draw(scenegraph, "Menu", menu_button_x, menu_button_y, TEXT_TOPLEFT);
+}
+
 static void (*render_functions[])(struct scenegraph *) = {
 	render_board,
 	render_highlight,
 	render_pieces,
-	render_game_over
+	render_game_over,
+	render_menu_button
 };
 
 void

@@ -24,6 +24,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/wgl.h>

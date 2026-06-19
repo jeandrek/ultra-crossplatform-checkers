@@ -49,6 +49,10 @@ extern enum type game_type;
 extern enum mode cur_mode;
 extern int *squares_buffer;
 
+extern float menu_button_x, menu_button_y;
+extern struct rect menu_button_bounds;
+extern int menu_button_highlighted;
+
 void game_over(void);
 void game_start_anim_rotate(void);
 void game_anim_rotate_finished(void);
