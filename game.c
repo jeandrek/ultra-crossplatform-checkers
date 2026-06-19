@@ -61,6 +61,10 @@ game_init(void)
 	text_screen_bounds(&game.sg, strlen("Menu"),
 			   menu_button_x, menu_button_y,
 			   TEXT_TOPLEFT, &menu_button_bounds);
+	menu_button_bounds.left -= 8;
+	menu_button_bounds.top -= 8;
+	menu_button_bounds.right += 8;
+	menu_button_bounds.bottom += 8;
 	menu_button_highlighted = 0;
 }
 

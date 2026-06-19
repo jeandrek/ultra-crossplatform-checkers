@@ -92,7 +92,7 @@ text_input_render(struct scenegraph *scenegraph)
 	cursor.y = -10.0 / scenegraph->height;
 	sprite_draw(scenegraph, &cursor);
 
-	text_scale(1);
+	text_size(1);
 	text_color(0xffffffff);
 	text_draw(scenegraph, text_buffer, 0, 0, TEXT_CENTRE);
 	text_color(0xffaaaaaa);

@@ -159,7 +159,7 @@ render_game_over(struct scenegraph *scenegraph)
 
 	if (text != NULL) {
 		sprite_draw(scenegraph, &overlay_sprite);
-		text_scale(1);
+		text_size(1);
 		text_color(0xffffffff);
 		text_draw(scenegraph, text, 0, 0, TEXT_CENTRE);
 	}
@@ -168,7 +168,7 @@ render_game_over(struct scenegraph *scenegraph)
 static void
 render_menu_button(struct scenegraph *scenegraph)
 {
-	text_scale(1);
+	text_size(1);
 	text_color(menu_button_highlighted ? 0xffffffff : 0xffaaaaaa);
 	text_draw(scenegraph, "Menu", menu_button_x, menu_button_y, TEXT_TOPLEFT);
 }

@@ -138,7 +138,7 @@ menu_set_elements(int num, struct element *new_elems)
 void
 menu_render_items(struct scenegraph *scenegraph)
 {
-	text_scale(1);
+	text_size(1);
 	for (int i = 0; i < num_elems; i++) {
 		text_color(button_color(elems[i].row, elems[i].col));
 		text_draw(scenegraph, elems[i].data, elems[i].x, elems[i].y,
@@ -150,7 +150,7 @@ static void
 menu_render_message(struct scenegraph *scenegraph)
 {
 	if (message == NULL) return;
-	text_scale(1);
+	text_size(1);
 	text_color(0xffaaaaaa);
 	text_draw(scenegraph, message, 0, 0.1, TEXT_CENTRE);
 }

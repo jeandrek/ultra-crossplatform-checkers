@@ -34,6 +34,7 @@
 
 #include "checkers.h"
 #include "scenegraph.h"
+#include "text.h"
 
 /* JNIEnv for GLSurfaceView's rendering thread */
 JNIEnv *checkers_jnienv;
@@ -53,6 +54,7 @@ Java_jeandre_checkers_Checkers_init(JNIEnv *env, jobject obj,
 
 	sg_init(width, height);
 	checkers_init();
+	text_scale_factor(2.0);
 }
 
 JNIEXPORT void JNICALL
