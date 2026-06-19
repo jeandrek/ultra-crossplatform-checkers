@@ -202,7 +202,6 @@ game_mouse_up_event(int x, int y)
 					return;
 				}
 			}
-		} else {
 			set_sel_square(idx);
 		}
 		cur_mode = SELECT_PIECE;

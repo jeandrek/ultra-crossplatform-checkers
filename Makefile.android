@@ -21,12 +21,11 @@ CFLAGS+=	-DUSE_GL_ES
 LDFLAGS=	--target=$(TARGET) -shared $(LIBS) -Wl,--no-undefined
 
 CLASSES=	android/jeandre/checkers/MainActivity.class \
-		android/jeandre/checkers/Checkers.class \
-		android/jeandre/checkers/R.class
+		android/jeandre/checkers/Checkers.class
 
 $(PROGRAM): android/AndroidManifest.xml libcheckers.so classes.dex
-	$(AAPT) p -I $(ANDROID_JAR) -M android/AndroidManifest.xml \
-		-F $@ -S android/res -A assets
+	$(AAPT) p -f -I $(ANDROID_JAR) -M android/AndroidManifest.xml \
+		-F $@ -A assets
 	mkdir -p lib/arm64-v8a
 	cp libcheckers.so lib/arm64-v8a
 	$(JAR) -u -f $@ lib
@@ -47,12 +46,6 @@ classes.dex: $(CLASSES)
 
 .java.class:
 	$(JAVAC) -sourcepath android -cp $(ANDROID_JAR) $<
-
-android/jeandre/checkers/MainActivity.java: android/jeandre/checkers/R.java
-
-android/jeandre/checkers/R.java: android/res/layout/main.xml
-	$(AAPT) p -I $(ANDROID_JAR) -M android/AndroidManifest.xml \
-		-J android/jeandre/checkers -S android/res
 
 clean:
 	rm -f $(PROGRAM) $(PROGRAM).idsig libcheckers.so classes.dex \

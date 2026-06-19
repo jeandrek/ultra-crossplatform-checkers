@@ -35,6 +35,8 @@ class Checkers {
 	public native void init(int width, int height);
 	public native void update();
 	public native void inputEvent(int button);
+	public native void mouseMoveEvent(int x, int y);
+	public native void mouseUpEvent(int x, int y);
 
 	public Checkers(Activity activity) {
 		this.activity = activity;
