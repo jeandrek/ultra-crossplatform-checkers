@@ -128,6 +128,7 @@ game_destroy(void)
 {
 	if (game_net_connected()) game_net_disconnect();
 	if (squares_buffer) free(squares_buffer);
+	squares_buffer = NULL;
 	game_dirty = 0;
 }
 
