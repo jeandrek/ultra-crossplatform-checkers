@@ -42,6 +42,8 @@ float menu_button_x, menu_button_y;
 struct rect menu_button_bounds;
 int menu_button_highlighted;
 
+static void menu_button_init(void);
+
 static void
 game_init(void)
 {
@@ -55,9 +57,15 @@ game_init(void)
 		game_type = LOCAL_2PLAYER;
 	}
 	game_interaction_init();
+	menu_button_init();
+}
 
-	menu_button_x = -game.sg.width/(float)game.sg.height + 0.01;
-	menu_button_y = 1 - 0.01;
+static void
+menu_button_init(void)
+{
+	float margin = 8 * 2.0/game.sg.height;
+	menu_button_x = -game.sg.width/(float)game.sg.height + margin;
+	menu_button_y = 1 - margin;
 	text_screen_bounds(&game.sg, strlen("Menu"),
 			   menu_button_x, menu_button_y,
 			   TEXT_TOPLEFT, &menu_button_bounds);
