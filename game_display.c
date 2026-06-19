@@ -185,7 +185,9 @@ static void (*render_functions[])(struct scenegraph *) = {
 	render_highlight,
 	render_pieces,
 	render_status,
+#ifndef __psp__
 	render_menu_button
+#endif
 };
 
 void

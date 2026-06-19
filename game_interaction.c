@@ -89,6 +89,16 @@ game_interaction_turn(void)
 }
 
 static void
+select_piece_at_sel_square(void)
+{
+	if (sel_piece_moves_len > 0) {
+		cur_mode = SELECT_MOVE;
+		sel_move_idx = (player_turn == 0 ?
+				0 : sel_piece_moves_len - 1);
+	}
+}
+
+static void
 move_piece(void)
 {
 	int location = sel_piece_moves[sel_move_idx].location;
@@ -132,11 +142,7 @@ game_button_event(int button)
 	if (cur_mode == SELECT_PIECE) {
 		switch (button) {
 		case INPUT_ACCEPT:
-			if ((board[player_turn][sel_piece_type] >> sel_square) & 1) {
-				cur_mode = SELECT_MOVE;
-				sel_move_idx = (player_turn == 0 ?
-						0 : sel_piece_moves_len - 1);
-			}
+			select_piece_at_sel_square();
 			break;
 		case INPUT_UP:
 			move_sel_square(player_turn == 0 ? 8 : -8);
@@ -200,11 +206,7 @@ game_mouse_up_event(int x, int y)
 	if (cur_mode == SELECT_PIECE) {
 		if (idx < 0) return;
 		set_sel_square(idx);
-		if ((board[player_turn][sel_piece_type] >> sel_square) & 1) {
-			cur_mode = SELECT_MOVE;
-			sel_move_idx = (player_turn == 0 ?
-					0 : sel_piece_moves_len - 1);
-		}
+		select_piece_at_sel_square();
 	} else if (cur_mode == SELECT_MOVE) {
 		if (idx >= 0) {
 			for (int i = 0; i < sel_piece_moves_len; i++) {

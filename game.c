@@ -49,7 +49,9 @@ game_init(void)
 {
 	board_init();
 	game_display_init();
+#ifndef __psp__
 	game_init_squares_buffer();
+#endif
 	if (game_net_connected()) {
 		game_dirty = 1;
 		game_type = NETWORK;
