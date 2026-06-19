@@ -35,7 +35,7 @@
 
 enum type game_type;
 enum mode cur_mode;
-int *squares_buffer;
+char *squares_buffer;
 
 /* XXX */
 float menu_button_x, menu_button_y;

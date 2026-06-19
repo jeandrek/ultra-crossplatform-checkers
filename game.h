@@ -47,7 +47,7 @@ enum type {
 extern struct state game;
 extern enum type game_type;
 extern enum mode cur_mode;
-extern int *squares_buffer;
+extern char *squares_buffer;
 
 extern float menu_button_x, menu_button_y;
 extern struct rect menu_button_bounds;
