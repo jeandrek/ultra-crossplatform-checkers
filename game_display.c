@@ -148,13 +148,13 @@ render_pieces(struct scenegraph *scenegraph)
 }
 
 static void
-render_game_over(struct scenegraph *scenegraph)
+render_status(struct scenegraph *scenegraph)
 {
 	char *text = NULL;
 
 	if (cur_mode == GAME_OVER)
 		text = winner() == 0 ? "Red wins" : "Black wins";
-	if (cur_mode == LOST_CONNECTION)
+	else if (cur_mode == LOST_CONNECTION)
 		text = "Lost connection";
 
 	if (text != NULL) {
@@ -162,6 +162,13 @@ render_game_over(struct scenegraph *scenegraph)
 		text_size(1);
 		text_color(0xffffffff);
 		text_draw(scenegraph, text, 0, 0, TEXT_CENTRE);
+	} else {
+		float margin = (FONT_HEIGHT/2 + 8) * 2.0/game.sg.height;
+		int player = cur_mode == WAIT_TURN ? !player_turn : player_turn;
+		text = player == 0 ? "Red to move" : "Black to move";
+		text_size(1);
+		text_color(0xffaaaaaa);
+		text_draw(scenegraph, text, 0, 1 - margin, TEXT_CENTRE);
 	}
 }
 
@@ -177,7 +184,7 @@ static void (*render_functions[])(struct scenegraph *) = {
 	render_board,
 	render_highlight,
 	render_pieces,
-	render_game_over,
+	render_status,
 	render_menu_button
 };
 
