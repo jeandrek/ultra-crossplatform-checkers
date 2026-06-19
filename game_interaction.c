@@ -174,7 +174,12 @@ game_button_event(int button)
 static int
 mouse_coords_to_square(int x, int y)
 {
-	int idx = squares_buffer[y * game.sg.width + x];
+	int idx;
+
+	if (squares_buffer == NULL || x < 0 || x >= game.sg.width
+	    || y < 0 || y >= game.sg.height)
+		return -1;
+	idx = squares_buffer[y * game.sg.width + x];
 	if (idx < 0)
 		return idx;
 	return player_turn == 0 ? idx : 63 - idx;
