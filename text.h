@@ -33,7 +33,8 @@ enum {
 };
 
 void text_init(void);
-void text_scale(float new_scale);
+void text_scale_factor(float new_factor);
+void text_size(float new_size);
 void text_color(uint32_t new_color);
 void text_draw(struct scenegraph *scenegraph, char *s, float x, float y,
 	       int alignment);

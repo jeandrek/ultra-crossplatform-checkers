@@ -35,16 +35,6 @@ import android.view.*;
 import android.widget.*;
 
 public class MainActivity extends Activity {
-	private static final int buttonIds[] = {
-		R.id.upButton,
-		R.id.downButton,
-		R.id.leftButton,
-		R.id.rightButton,
-		R.id.pauseButton,
-		R.id.acceptButton,
-		R.id.backButton
-	};
-
 	private Checkers checkers;
 	private GLSurfaceView view;
 
@@ -54,9 +44,27 @@ public class MainActivity extends Activity {
 
 		checkers = new Checkers(this);
 
-		setContentView(R.layout.main);
-
 		view = new GLSurfaceView(getApplicationContext());
+		view.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View view, MotionEvent event) {
+				switch (event.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+					checkers.mouseMoveEvent((int)event.getX(),
+								(int)event.getY());
+					return true;
+				case MotionEvent.ACTION_MOVE:
+					checkers.mouseMoveEvent((int)event.getX(),
+								(int)event.getY());
+					return true;
+				case MotionEvent.ACTION_UP:
+					checkers.mouseUpEvent((int)event.getX(),
+							      (int)event.getY());
+					return true;
+				}
+				return false;
+			}
+		});
 		view.setRenderer(new GLSurfaceView.Renderer() {
 			@Override
 			public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -75,19 +83,7 @@ public class MainActivity extends Activity {
 			}
 		});
 		view.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-		((RelativeLayout)findViewById(R.id.main)).addView(view, 0);
-		for (int i = 0; i < buttonIds.length; i++)
-			((Button)findViewById(buttonIds[i]))
-				.setOnClickListener(onClickFor(i));
-	}
-
-	private View.OnClickListener onClickFor(int button) {
-		return new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				checkers.inputEvent(button);
-			}
-		};
+		setContentView(view);
 	}
 
 	@Override

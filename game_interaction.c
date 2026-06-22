@@ -89,6 +89,16 @@ game_interaction_turn(void)
 }
 
 static void
+select_piece_at_sel_square(void)
+{
+	if (sel_piece_moves_len > 0) {
+		cur_mode = SELECT_MOVE;
+		sel_move_idx = (player_turn == 0 ?
+				0 : sel_piece_moves_len - 1);
+	}
+}
+
+static void
 move_piece(void)
 {
 	int location = sel_piece_moves[sel_move_idx].location;
@@ -132,11 +142,7 @@ game_button_event(int button)
 	if (cur_mode == SELECT_PIECE) {
 		switch (button) {
 		case INPUT_ACCEPT:
-			if ((board[player_turn][sel_piece_type] >> sel_square) & 1) {
-				cur_mode = SELECT_MOVE;
-				sel_move_idx = (player_turn == 0 ?
-						0 : sel_piece_moves_len - 1);
-			}
+			select_piece_at_sel_square();
 			break;
 		case INPUT_UP:
 			move_sel_square(player_turn == 0 ? 8 : -8);
@@ -167,6 +173,76 @@ game_button_event(int button)
 			if (sel_piece_moves_len > 0)
 				sel_move_idx = (sel_move_idx + 1) % sel_piece_moves_len;
 			break;
+		}
+	}
+}
+
+static int
+mouse_coords_to_square(int x, int y)
+{
+	int idx;
+
+	if (squares_buffer == NULL || x < 0 || x >= game.sg.width
+	    || y < 0 || y >= game.sg.height)
+		return -1;
+	idx = squares_buffer[y * game.sg.width + x];
+	if (idx < 0)
+		return idx;
+	return player_turn == 0 ? idx : 63 - idx;
+}
+
+void
+game_mouse_up_event(int x, int y)
+{
+	int idx = mouse_coords_to_square(x, y);
+
+	if (x >= menu_button_bounds.left && x <= menu_button_bounds.right
+	    && y >= menu_button_bounds.top && y <= menu_button_bounds.bottom) {
+		menu.init();
+		checkers_switch_state(&menu);
+		return;
+	}
+
+	if (cur_mode == SELECT_PIECE) {
+		if (idx < 0) return;
+		set_sel_square(idx);
+		select_piece_at_sel_square();
+	} else if (cur_mode == SELECT_MOVE) {
+		if (idx >= 0) {
+			for (int i = 0; i < sel_piece_moves_len; i++) {
+				if (sel_piece_moves[i].location == idx) {
+					sel_move_idx = i;
+					move_piece();
+					return;
+				}
+			}
+			set_sel_square(idx);
+		}
+		cur_mode = SELECT_PIECE;
+	}
+}
+
+void
+game_mouse_move_event(int x, int y)
+{
+	int idx = mouse_coords_to_square(x, y);
+
+	menu_button_highlighted =
+		(x >= menu_button_bounds.left
+		 && x <= menu_button_bounds.right
+		 && y >= menu_button_bounds.top
+		 && y <= menu_button_bounds.bottom);
+
+	if (idx < 0) return;
+
+	if (cur_mode == SELECT_PIECE) {
+		set_sel_square(idx);
+	} else if (cur_mode == SELECT_MOVE) {
+		for (int i = 0; i < sel_piece_moves_len; i++) {
+			if (sel_piece_moves[i].location == idx) {
+				sel_move_idx = i;
+				break;
+			}
 		}
 	}
 }

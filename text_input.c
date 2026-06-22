@@ -92,7 +92,7 @@ text_input_render(struct scenegraph *scenegraph)
 	cursor.y = -10.0 / scenegraph->height;
 	sprite_draw(scenegraph, &cursor);
 
-	text_scale(1);
+	text_size(1);
 	text_color(0xffffffff);
 	text_draw(scenegraph, text_buffer, 0, 0, TEXT_CENTRE);
 	text_color(0xffaaaaaa);
@@ -246,14 +246,18 @@ text_input_psp(char *label, void (*accept)(char *),
 			sceUtilityOskShutdownStart();
 			break;
 		case PSP_UTILITY_DIALOG_FINISHED:
-			c16s_to_cs(text_buffer, out_text, 64);
-			accept(text_buffer);
-			return;
-		case PSP_UTILITY_DIALOG_NONE:
 			break;
+		case PSP_UTILITY_DIALOG_NONE:
+			c16s_to_cs(text_buffer, out_text, 64);
+			goto done;
 		}
 		sceDisplayWaitVblankStart();
 		sceGuSwapBuffers();
 	}
+done:
+	if (data.result != PSP_UTILITY_OSK_RESULT_CANCELLED)
+		accept(text_buffer);
+	else
+		cancel();
 }
 #endif

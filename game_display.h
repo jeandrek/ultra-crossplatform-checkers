@@ -32,5 +32,6 @@ void game_display_init(void);
 void game_display_set_viewpoint(int player);
 void game_display_game_over(void);
 void game_anim(void);
+void game_init_squares_buffer(void);
 
 #endif /* !_GAME_DISPLAY_H_ */

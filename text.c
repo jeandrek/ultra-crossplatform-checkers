@@ -65,13 +65,20 @@ text_init(void)
 	}
 }
 
-static float scale = 1.0;
+static float factor = 1.0;
+static float size = 1.0;
 static uint32_t color = 0xffffffff;
 
 void
-text_scale(float new_scale)
+text_scale_factor(float new_factor)
 {
-	scale = new_scale;
+	factor = new_factor;
+}
+
+void
+text_size(float new_size)
+{
+	size = factor * new_size;
 }
 
 void
@@ -86,7 +93,7 @@ draw_glyph(struct scenegraph *scenegraph, struct glyph *g, float x, float y)
 	struct sprite s;
 	sprite_init(&s, &texture_font, g->tex_left, g->tex_top,
 		    g->width, FONT_HEIGHT);
-	s.scale = scale;
+	s.scale = size;
 	s.base_color = color;
 	s.x = x;
 	s.y = y;
@@ -102,11 +109,11 @@ text_draw(struct scenegraph *scenegraph, char *str, float x, float y,
 
 	switch (alignment) {
 	case TEXT_TOPLEFT:
-		x += scale * FONT_WIDTH/2.0 * pixel_size;
-		y -= scale * FONT_HEIGHT/2.0 * pixel_size;
+		x += size * FONT_WIDTH/2.0 * pixel_size;
+		y -= size * FONT_HEIGHT/2.0 * pixel_size;
 		break;
 	case TEXT_CENTRE:
-		x -= scale * FONT_WIDTH/2.0 * pixel_size * (strlen(str) - 1);
+		x -= size * FONT_WIDTH/2.0 * pixel_size * (strlen(str) - 1);
 		break;
 	}
 
@@ -114,7 +121,7 @@ text_draw(struct scenegraph *scenegraph, char *str, float x, float y,
 		if (ascii_glyphs[c] != NULL) {
 			draw_glyph(scenegraph, ascii_glyphs[c], x, y);
 		}
-		x += scale * FONT_WIDTH * pixel_size;
+		x += size * FONT_WIDTH * pixel_size;
 	}
 }
 
@@ -127,16 +134,16 @@ text_screen_bounds(struct scenegraph *scenegraph, size_t len, float x, float y,
 
 	switch (alignment) {
 	case TEXT_CENTRE:
-		rect->left = screen_x - scale * FONT_WIDTH/2 * len;
-		rect->top = screen_y - scale * FONT_HEIGHT/2;
-		rect->right = screen_x + scale * FONT_WIDTH/2 * len;
-		rect->bottom = screen_y + scale * FONT_HEIGHT/2;
+		rect->left = screen_x - size * FONT_WIDTH/2 * len;
+		rect->top = screen_y - size * FONT_HEIGHT/2;
+		rect->right = screen_x + size * FONT_WIDTH/2 * len;
+		rect->bottom = screen_y + size * FONT_HEIGHT/2;
 		break;
 	case TEXT_TOPLEFT:
 		rect->left = screen_x;
 		rect->top = screen_y;
-		rect->right = screen_x + scale * FONT_WIDTH * len;
-		rect->bottom = screen_y + scale * FONT_HEIGHT;
+		rect->right = screen_x + size * FONT_WIDTH * len;
+		rect->bottom = screen_y + size * FONT_HEIGHT;
 		break;
 	}
 }

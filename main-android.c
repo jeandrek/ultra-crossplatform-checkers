@@ -25,9 +25,7 @@
  */
 
 /*
- * We could rather use NativeActivity/native_app_glue, but the (currently
- * rather poor) Android UI uses several Buttons for input, rather than
- * supporting proper touch input.
+ * We could rather use NativeActivity/native_app_glue.
  */
 
 #include <jni.h>
@@ -36,6 +34,7 @@
 
 #include "checkers.h"
 #include "scenegraph.h"
+#include "text.h"
 
 /* JNIEnv for GLSurfaceView's rendering thread */
 JNIEnv *checkers_jnienv;
@@ -55,6 +54,7 @@ Java_jeandre_checkers_Checkers_init(JNIEnv *env, jobject obj,
 
 	sg_init(width, height);
 	checkers_init();
+	text_scale_factor(2.0);
 }
 
 JNIEXPORT void JNICALL
@@ -73,5 +73,23 @@ Java_jeandre_checkers_Checkers_inputEvent(JNIEnv *env, jobject obj, jint button)
 	/* Alternatively, this could enqueue events and input_handle processes
 	   them; but this is fine for now. */
 	checkers_button_event(button);
+	mtx_unlock(&checkers_mutex);
+}
+
+JNIEXPORT void JNICALL
+Java_jeandre_checkers_Checkers_mouseMoveEvent(JNIEnv *env, jobject obj,
+					      jint x, jint y)
+{
+	mtx_lock(&checkers_mutex);
+	checkers_mouse_move(x, y);
+	mtx_unlock(&checkers_mutex);
+}
+
+JNIEXPORT void JNICALL
+Java_jeandre_checkers_Checkers_mouseUpEvent(JNIEnv *env, jobject obj,
+					      jint x, jint y)
+{
+	mtx_lock(&checkers_mutex);
+	checkers_mouse_up(x, y);
 	mtx_unlock(&checkers_mutex);
 }

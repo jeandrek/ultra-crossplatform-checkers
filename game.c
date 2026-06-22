@@ -24,20 +24,34 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdlib.h>
+#include <string.h>
 #include "checkers.h"
 #include "game.h"
 #include "game_display.h"
 #include "game_interaction.h"
 #include "game_net.h"
+#include "text.h"
 
 enum type game_type;
 enum mode cur_mode;
+char *squares_buffer;
+
+/* XXX */
+float menu_button_x, menu_button_y;
+struct rect menu_button_bounds;
+int menu_button_highlighted;
+
+static void menu_button_init(void);
 
 static void
 game_init(void)
 {
 	board_init();
 	game_display_init();
+#ifndef __psp__
+	game_init_squares_buffer();
+#endif
 	if (game_net_connected()) {
 		game_dirty = 1;
 		game_type = NETWORK;
@@ -45,6 +59,23 @@ game_init(void)
 		game_type = LOCAL_2PLAYER;
 	}
 	game_interaction_init();
+	menu_button_init();
+}
+
+static void
+menu_button_init(void)
+{
+	float margin = 8 * 2.0/game.sg.height;
+	menu_button_x = -game.sg.width/(float)game.sg.height + margin;
+	menu_button_y = 1 - margin;
+	text_screen_bounds(&game.sg, strlen("Menu"),
+			   menu_button_x, menu_button_y,
+			   TEXT_TOPLEFT, &menu_button_bounds);
+	menu_button_bounds.left -= 8;
+	menu_button_bounds.top -= 8;
+	menu_button_bounds.right += 8;
+	menu_button_bounds.bottom += 8;
+	menu_button_highlighted = 0;
 }
 
 static void
@@ -95,14 +126,13 @@ game_anim_rotate_finished(void)
 }
 
 static void
-game_mouse_up_event(int x, int y)
-{
-}
-
-static void
 game_destroy(void)
 {
 	if (game_net_connected()) game_net_disconnect();
+	if (squares_buffer) {
+		free(squares_buffer);
+		squares_buffer = NULL;
+	}
 	game_dirty = 0;
 }
 
@@ -112,5 +142,6 @@ struct state game = {
 	.update = game_update,
 	.destroy = game_destroy,
 	.button_event = game_button_event,
-	.mouse_up_event = game_mouse_up_event
+	.mouse_up_event = game_mouse_up_event,
+	.mouse_move_event = game_mouse_move_event
 };
