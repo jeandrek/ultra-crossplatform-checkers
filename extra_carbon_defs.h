@@ -2,9 +2,12 @@
 #define kWindowStandardHandlerAttribute (1<<25)
 #define kDocumentWindowClass 6
 #define kEventClassWindow 'wind'
+#define kEventClassMouse 'mous'
 #define kEventWindowDrawContent 2
 #define kEventWindowActivated 5
 #define kEventWindowBoundsChanged 27
+#define kEventMouseUp 2
+#define kEventMouseMoved 5
 #define eventNotHandledErr -9874
 
 typedef void *EventHandlerCallRef;

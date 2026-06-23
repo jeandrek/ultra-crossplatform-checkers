@@ -20,8 +20,8 @@
 #include "scenegraph.h"
 #include "input.h"
 
-#define WIDTH 800
-#define HEIGHT 600
+#define WIDTH 400
+#define HEIGHT 300
 
 static AGLContext context;
 
@@ -35,7 +35,9 @@ main(void)
 	static EventTypeSpec kWindowEvents[] = {
 		{kEventClassWindow, kEventWindowDrawContent},
 		{kEventClassWindow, kEventWindowBoundsChanged},
-		{kEventClassWindow, kEventWindowActivated}
+		{kEventClassWindow, kEventWindowActivated},
+		{kEventClassMouse, kEventMouseMoved},
+		{kEventClassMouse, kEventMouseUp}
 	};
 	CGrafPtr port;
 	GLint attribs[] = {
@@ -94,6 +96,7 @@ WindowEventHandler(EventHandlerCallRef inCaller, EventRef inEvent,
 {
 	OSStatus err = eventNotHandledErr;
 	WindowRef window;
+	Point mouse;
 
 	GetEventParameter(inEvent, '----', 'wind', NULL,
 			  sizeof (WindowRef), NULL, &window);
@@ -115,6 +118,18 @@ WindowEventHandler(EventHandlerCallRef inCaller, EventRef inEvent,
 			}
 			break;
 		}
+		break;
+	case kEventClassMouse:
+		GetMouse(&mouse);
+		switch (GetEventKind(inEvent)) {
+		case kEventMouseMoved:
+			checkers_mouse_move(mouse.h, mouse.v);
+			break;
+		case kEventMouseUp:
+			checkers_mouse_up(mouse.h, mouse.v);
+			break;
+		}
+		break;
 	default:
 		break;
 	}
