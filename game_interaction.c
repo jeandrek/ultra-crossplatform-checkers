@@ -80,18 +80,8 @@ game_interaction_init(void)
 	} else {
 		cur_mode = WAIT_TURN;
 		sel_piece_moves_len = 0;
-		if (game_type == COMPUTER) {
-			struct move computer_move;
-			game_computer_next_move(&computer_move);
-			int finished = perform_move(&computer_move, !game_net_player);
-			if (finished) {
-				if (winner() != -1)
-					game_over();
-				else
-					game_interaction_turn();
-			}
-			game_interaction_turn();
-		}
+		if (game_type == COMPUTER)
+			game_computer_turn();
 	}
 }
 
@@ -121,6 +111,8 @@ move_piece(void)
 				    player_turn);
 	if (game_type == NETWORK)
 		game_net_send_move(&sel_piece_moves[sel_move_idx]);
+	else if (game_type == COMPUTER)
+		game_computer_turn();
 	sel_move_idx = 0;
 	if (finished) {
 		if (winner() != -1) {
@@ -128,20 +120,9 @@ move_piece(void)
 			return;
 		}
 
-		if (game_type == NETWORK) {
+		if (game_type == NETWORK || game_type == COMPUTER) {
 			cur_mode = WAIT_TURN;
 			sel_piece_moves_len = 0;
-		} else if (game_type == COMPUTER) {
-			struct move computer_move;
-			game_computer_next_move(&computer_move);
-			finished = perform_move(&computer_move, !game_net_player);
-			if (finished) {
-				if (winner() != -1)
-					game_over();
-				else
-					game_interaction_turn();
-			}
-			game_interaction_turn();
 		} else {
 			player_turn = !player_turn;
 			board_available_moves(board_moves, board_num_moves,

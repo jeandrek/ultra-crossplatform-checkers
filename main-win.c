@@ -36,6 +36,7 @@
 #include "scenegraph.h"
 #include "input.h"
 #include "text_input.h"
+#include "game_computer.h"
 
 static PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 
@@ -77,6 +78,9 @@ init_window(HWND hWnd)
 	sg_init(800, 600);
 	checkers_init();
 	ReleaseDC(hWnd, hdc);
+
+	game_computer_turn_event = CreateEvent(NULL, 0, 0, NULL);
+	CreateThread(NULL, 0, game_computer_thread_start, NULL, 0, NULL);
 }
 
 LRESULT WINAPI

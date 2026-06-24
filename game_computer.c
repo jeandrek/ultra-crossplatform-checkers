@@ -26,6 +26,11 @@
 
 #include "game.h"
 #include "game_checkers.h"
+#include "game_computer.h"
+
+#ifdef _WIN32
+HANDLE game_computer_turn_event;
+#endif
 
 int game_computer_player;
 
@@ -82,9 +87,44 @@ search(board_t board, int player, int depth, int moved_piece_idx)
 	return best_move;
 }
 
+static struct move my_move;
+static int move_made = 0;
+
+void
+game_computer_turn(void)
+{
+#ifdef _WIN32
+	SetEvent(game_computer_turn_event);
+#endif
+}
+
+int
+game_computer_poll_move(void)
+{
+	return move_made;
+}
+
 int
 game_computer_next_move(struct move *move)
 {
-	*move = search(board, game_computer_player, 6, -1);
-	return 1;
+	if (move_made) {
+		move_made = 0;
+		*move = my_move;
+		return 1;
+	}
+	return 0;
+}
+
+void
+game_computer_thread_start(void *arg)
+{
+	for (;;) {
+#ifdef _WIN32
+		WaitForSingleObject(game_computer_turn_event, INFINITE);
+#else
+#error Not yet supported
+#endif
+		my_move = search(board, game_computer_player, 6, -1);
+		move_made = 1;
+	}
 }

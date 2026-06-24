@@ -31,6 +31,7 @@
 #include "game_display.h"
 #include "game_interaction.h"
 #include "game_net.h"
+#include "game_computer.h"
 #include "text.h"
 
 enum type game_type;
@@ -76,28 +77,48 @@ menu_button_init(void)
 	menu_button_highlighted = 0;
 }
 
+int
+abs_move_avail(void)
+{
+	return game_type == NETWORK ? game_net_poll_move() : game_computer_poll_move();
+}
+
+int
+abs_move_read(struct move *move)
+{
+	return game_type == NETWORK ? game_net_recv_move(move) : game_computer_next_move(move);
+}
+
+int
+abs_player(void)
+{
+	return game_type == NETWORK ? game_net_player : !game_computer_player;
+}
+
 static void
 game_update(void)
 {
 	if (cur_mode == ANIM_ROTATE_BOARD) {
 		game_anim();
-	} else if (cur_mode == WAIT_TURN && game_net_poll_move()) {
+	} else if (cur_mode == WAIT_TURN && abs_move_avail()) {
 		struct move move;
 		int finished;
 
-		if (!game_net_recv_move(&move)) {
+		if (!abs_move_read(&move)) {
 			cur_mode = LOST_CONNECTION;
 			game_display_game_over();
 			game_net_disconnect();
 			return;
 		}
 
-		finished = perform_move(&move, !game_net_player);
+		finished = perform_move(&move, !abs_player());
 		if (finished) {
 			if (winner() != -1)
 				game_over();
 			else
 				game_interaction_turn();
+		} else if (game_type == COMPUTER) {
+			game_computer_turn();
 		}
 	}
 }
