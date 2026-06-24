@@ -30,6 +30,7 @@
 #include "game_checkers.h"
 #include "game_display.h"
 #include "game_net.h"
+#include "game_computer.h"
 #include "menu.h"
 #include "input.h"
 
@@ -66,6 +67,8 @@ game_interaction_init(void)
 {
 	if (game_type == NETWORK)
 		player_turn = game_net_player;
+	else if (game_type == COMPUTER)
+		player_turn = !game_computer_player;
 	else
 		player_turn = 0;
 
@@ -77,6 +80,18 @@ game_interaction_init(void)
 	} else {
 		cur_mode = WAIT_TURN;
 		sel_piece_moves_len = 0;
+		if (game_type == COMPUTER) {
+			struct move computer_move;
+			game_computer_next_move(&computer_move);
+			int finished = perform_move(&computer_move, !game_net_player);
+			if (finished) {
+				if (winner() != -1)
+					game_over();
+				else
+					game_interaction_turn();
+			}
+			game_interaction_turn();
+		}
 	}
 }
 
@@ -116,6 +131,17 @@ move_piece(void)
 		if (game_type == NETWORK) {
 			cur_mode = WAIT_TURN;
 			sel_piece_moves_len = 0;
+		} else if (game_type == COMPUTER) {
+			struct move computer_move;
+			game_computer_next_move(&computer_move);
+			finished = perform_move(&computer_move, !game_net_player);
+			if (finished) {
+				if (winner() != -1)
+					game_over();
+				else
+					game_interaction_turn();
+			}
+			game_interaction_turn();
 		} else {
 			player_turn = !player_turn;
 			board_available_moves(board_moves, board_num_moves,

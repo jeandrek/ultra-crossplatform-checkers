@@ -24,58 +24,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _GAME_CHECKERS_H_
-#define _GAME_CHECKERS_H_
+#ifndef _GAME_COMPUTER_H_
+#define _GAME_COMPUTER_H_
 
-#include <stdint.h>
+extern int game_computer_player;
 
-#define MAN	0
-#define KING	1
-#define NUM_PIECE_TYPES	2
+int game_computer_next_move(struct move *move);
 
-typedef uint64_t board_t[2][2];
-
-/*
- * Note: for the sake of implementation a "move" has at most 1
- * capture; hence a turn may consist of several moves.
- */
-
-struct __attribute__ ((packed)) move {
-	int	location;
-	int	capture;
-	int	promotion;
-	board_t	resulting_board;
-};
-
-extern board_t board;
-extern int game_dirty;
-
-#define MAX_MOVES	4
-
-void board_init(void); /* Rename? */
-
-/*
- * Returns piece or -1.
- */
-int piece_occupying_square_belonging_to_player(int i, int player);
-
-int piece_moves(board_t board, struct move *moves, int player, int i, int capturing);
-
-void board_available_moves_pure(board_t board, struct move moves[64][MAX_MOVES],
-				int *num_moves, int player,
-				int moved_piece_idx);
-
-void board_available_moves(struct move moves[64][MAX_MOVES], int *num_moves,
-			   int player, int moved_piece_idx);
-
-/*
- * Performs move and returns whether the player's turn has ended yet.
- */
-int perform_move(struct move *move, int player);
-
-/*
- * Returns winner or -1.
- */
-int winner(void);
-
-#endif /* !_GAME_CHECKERS_H_ */
+#endif /* !_GAME_COMPUTER_H_ */

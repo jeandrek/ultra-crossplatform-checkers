@@ -40,7 +40,7 @@ board_init(void)
 }
 
 static int
-is_square_empty(int i)
+is_square_empty(board_t board, int i)
 {
 	return !(((board[0][MAN] >> i) & 1)
 		 || ((board[1][MAN] >> i) & 1)
@@ -51,12 +51,18 @@ is_square_empty(int i)
 /*
  * Returns piece or -1.
  */
-int
-piece_occupying_square_belonging_to_player(int i, int player)
+static int
+piece_occupying_square_belonging_to_player_pure(board_t board, int i, int player)
 {
 	if ((board[player][MAN] >> i) & 1) return MAN;
 	if ((board[player][KING] >> i) & 1) return KING;
 	return -1;
+}
+
+int
+piece_occupying_square_belonging_to_player(int i, int player)
+{
+	return piece_occupying_square_belonging_to_player_pure(board, i, player);
 }
 
 static uint64_t
@@ -95,7 +101,7 @@ diag_adj_squares(int x, int y)
 #define LAST_ROW(player) ((player) == 0 ? 7 : 0)
 
 static void
-move_go_to_square(struct move *move, int player, int piece, int i, int j)
+move_go_to_square(struct move *move, board_t board, int player, int piece, int i, int j)
 {
 	move->location = j;
 	move->capture = 0;
@@ -116,16 +122,16 @@ move_go_to_square(struct move *move, int player, int piece, int i, int j)
 }
 
 static void
-move_capture(struct move *move, int player, int capturing, int captured,
+move_capture(struct move *move, board_t board, int player, int capturing, int captured,
 	     int i, int j, int k)
 {
-	move_go_to_square(move, player, capturing, i, k);
+	move_go_to_square(move, board, player, capturing, i, k);
 	move->capture = 1;
 	move->resulting_board[!player][captured] ^= (uint64_t)1<<j;
 }
 
-static int
-piece_moves(struct move *moves, int player, int i, int capturing)
+int
+piece_moves(board_t board, struct move *moves, int player, int i, int capturing)
 {
 	int piece;
 	uint64_t squares;
@@ -133,7 +139,7 @@ piece_moves(struct move *moves, int player, int i, int capturing)
 	int y = i / 8;
 	int n = 0;
 
-	piece = piece_occupying_square_belonging_to_player(i, player);
+	piece = piece_occupying_square_belonging_to_player_pure(board, i, player);
 	if (piece == -1)
 		return 0;
 
@@ -142,7 +148,7 @@ piece_moves(struct move *moves, int player, int i, int capturing)
 	for (int j = 0; j < 64; j++) {
 		if ((squares >> j) & 1) {
 			int other;
-			if (capturing && (other = piece_occupying_square_belonging_to_player(j, !player)) != -1) {
+			if (capturing && (other = piece_occupying_square_belonging_to_player_pure(board, j, !player)) != -1) {
 				int x2 = j % 8;
 				int y2 = j / 8;
 				int x3, y3;
@@ -152,13 +158,13 @@ piece_moves(struct move *moves, int player, int i, int capturing)
 				if (y3 < 0 || y3 > 7) continue;
 				if (x3 < 0 || x3 > 7) continue;
 				k = 8 * y3 + x3;
-				if (is_square_empty(k)) {
-					move_capture(&moves[n], player, piece,
+				if (is_square_empty(board, k)) {
+					move_capture(&moves[n], board, player, piece,
 						     other, i, j, k);
 					n++;
 				}
-			} else if (!capturing && is_square_empty(j)) {
-				move_go_to_square(&moves[n], player, piece, i, j);
+			} else if (!capturing && is_square_empty(board, j)) {
+				move_go_to_square(&moves[n], board, player, piece, i, j);
 				n++;
 			}
 		}
@@ -167,22 +173,22 @@ piece_moves(struct move *moves, int player, int i, int capturing)
 }
 
 void
-board_available_moves(struct move moves[64][MAX_MOVES], int *num_moves,
-		      int player, int moved_piece_idx)
+board_available_moves_pure(board_t board, struct move moves[64][MAX_MOVES],
+			   int *num_moves, int player, int moved_piece_idx)
 {
 	int can_capture = 0;
 
 	if (moved_piece_idx != -1) {
 		for (int i = 0; i < 64; i++) num_moves[i] = 0;
 		num_moves[moved_piece_idx] =
-			piece_moves(moves[moved_piece_idx],
+			piece_moves(board, moves[moved_piece_idx],
 				    player, moved_piece_idx, 1);
 		return;
 	}
 
 	/* Available captures */
 	for (int i = 0; i < 64; i++) {
-		num_moves[i] = piece_moves(moves[i], player, i, 1);
+		num_moves[i] = piece_moves(board, moves[i], player, i, 1);
 		if (num_moves[i] > 0)
 			can_capture = 1;
 	}
@@ -191,7 +197,15 @@ board_available_moves(struct move moves[64][MAX_MOVES], int *num_moves,
 		return;
 	/* Available non-captures */
 	for (int i = 0; i < 64; i++)
-		num_moves[i] = piece_moves(moves[i], player, i, 0);
+		num_moves[i] = piece_moves(board, moves[i], player, i, 0);
+}
+
+void
+board_available_moves(struct move moves[64][MAX_MOVES], int *num_moves,
+		      int player, int moved_piece_idx)
+{
+	return board_available_moves_pure(board, moves, num_moves, player,
+					  moved_piece_idx);
 }
 
 /*
@@ -210,7 +224,7 @@ perform_move(struct move *move, int player)
 	board[1][KING] = move->resulting_board[1][KING];
 
 	if (move->capture && !move->promotion &&
-	    piece_moves(further_captures, player, move->location, 1) > 0)
+	    piece_moves(board, further_captures, player, move->location, 1) > 0)
 		return 0;
 	else
 		return 1;

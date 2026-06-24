@@ -55,8 +55,6 @@ game_init(void)
 	if (game_net_connected()) {
 		game_dirty = 1;
 		game_type = NETWORK;
-	} else {
-		game_type = LOCAL_2PLAYER;
 	}
 	game_interaction_init();
 	menu_button_init();

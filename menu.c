@@ -29,6 +29,7 @@
 #include "checkers.h"
 #include "game.h"
 #include "game_checkers.h"
+#include "game_computer.h"
 #include "scenegraph.h"
 #include "text.h"
 #include "gui.h"
@@ -42,11 +43,47 @@ static char *message = NULL;
 static void confirm_dlg(void (*yes_action)(void));
 
 static void
-new_game(void)
+new_2player_game(void)
 {
+	game_type = LOCAL_2PLAYER;
 	game.destroy();
 	game.init();
 	checkers_switch_state(&game);
+}
+
+static void
+new_computer_game(int player)
+{
+	game_type = COMPUTER;
+	game_computer_player = !player;
+	game.destroy();
+	game.init();
+	checkers_switch_state(&game);
+}
+
+static void
+new_game_menu_action(int row, int col)
+{
+	switch (row) {
+	case 0: new_2player_game(); break;
+	case 1: new_computer_game(0); break;
+	case 2: new_computer_game(1); break;
+	case 3: main_menu(); break;
+	}
+}
+
+static void
+new_game_menu(void)
+{
+	static struct element new_game_menu_elems[] = {
+		{.x = 0, .y = 0.3, .data = "Player vs. player"},
+		{.x = 0, .y = 0.1, .data = "Play as red vs. computer"},
+		{.x = 0, .y = -0.1, .data = "Play as black vs. computer"},
+		{.x = 0, .y = -0.3, .data = "Back"}
+	};
+	menu_set_elements(4, new_game_menu_elems);
+	gui_set_rows(4, 1, &elems[0], 1, &elems[1], 1, &elems[2], 1, &elems[3]);
+	gui_set_action_proc(new_game_menu_action);
 }
 
 static void
@@ -54,8 +91,8 @@ main_menu_action(int row, int col)
 {
 	switch (row) {
 	case 0:
-		if (game_dirty) confirm_dlg(new_game);
-		else new_game();
+		if (game_dirty) confirm_dlg(new_game_menu);
+		else new_game_menu();
 		break;
 
 	case 1:
