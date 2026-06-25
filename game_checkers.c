@@ -103,8 +103,9 @@ diag_adj_squares(int x, int y)
 static void
 move_go_to_square(struct move *move, board_t board, int player, int piece, int i, int j)
 {
+	move->from = i;
 	move->location = j;
-	move->capture = 0;
+	move->captured = -1;
 	if (piece == MAN && j / 8 == LAST_ROW(player)) {
 		move->promotion = 1;
 		move->resulting_board[player][MAN] =
@@ -126,7 +127,7 @@ move_capture(struct move *move, board_t board, int player, int capturing, int ca
 	     int i, int j, int k)
 {
 	move_go_to_square(move, board, player, capturing, i, k);
-	move->capture = 1;
+	move->captured = j;
 	move->resulting_board[!player][captured] ^= (uint64_t)1<<j;
 }
 
@@ -223,7 +224,7 @@ perform_move(struct move *move, int player)
 	cur_board[1][MAN] = move->resulting_board[1][MAN];
 	cur_board[1][KING] = move->resulting_board[1][KING];
 
-	if (move->capture && !move->promotion &&
+	if (move->captured > 0 && !move->promotion &&
 	    piece_moves(cur_board, further_captures, player, move->location, 1) > 0)
 		return 0;
 	else

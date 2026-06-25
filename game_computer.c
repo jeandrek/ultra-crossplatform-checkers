@@ -68,7 +68,7 @@ search(board_t board, int player, int depth, int moved_piece_idx)
 				/* XXX better to make a pure version
 				   of perform_move */
 				struct move further_captures[MAX_MOVES];
-				int same_player = (move->capture &&
+				int same_player = (move->captured > 0 &&
 						   !move->promotion &&
 						   piece_moves(board, further_captures, player, move->location, 1) > 0);
 				int next_player = same_player ? player : !player;

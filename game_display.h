@@ -27,11 +27,16 @@
 #ifndef _GAME_DISPLAY_H_
 #define _GAME_DISPLAY_H_
 
-void game_display_load(void);
-void game_display_init(void);
-void game_display_set_viewpoint(int player);
-void game_display_game_over(void);
-void game_anim(void);
-void game_init_squares_buffer(void);
+#include "game_checkers.h"
+
+void	game_display_load(void);
+void	game_display_init(void);
+void	game_display_apply_move(struct move *move);
+void	game_display_set_viewpoint(int player);
+void	game_display_game_over(void);
+void	game_display_destroy(void);
+int	game_anim_move_piece(void);
+int	game_anim_rotate_board(void);
+void	game_init_squares_buffer(void);
 
 #endif /* !_GAME_DISPLAY_H_ */
