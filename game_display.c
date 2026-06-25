@@ -126,10 +126,11 @@ static void
 render_pieces(struct scenegraph *scenegraph)
 {
 	for (struct piece *piece = pieces; piece != NULL; piece = piece->next) {
-		int color = (piece->player == player_turn
-			     && piece->location == sel_square
-			     ? colors[piece->player][1]
-			     : colors[piece->player][0]);
+		int selected =
+			(cur_mode == SELECT_PIECE || cur_mode == SELECT_MOVE)
+			&& piece->player == player_turn
+			&& piece->location == sel_square;
+		int color = colors[piece->player][selected];
 		render_piece(scenegraph, piece->type,
 			     piece->x, piece->y, piece->z, color);
 	}
@@ -287,15 +288,34 @@ game_display_game_over(void)
 }
 
 static int anim_ticks = 0;
+struct piece_animation {
+	struct piece *piece;
+	float x1, y1, z1;
+	float x2, y2, z2;
+} anim;
+
+float
+interp(float x1, float x2, float fac)
+{
+	return x1 + fac*(x2 - x1);
+}
 
 void
 game_anim(void)
 {
 	anim_ticks++;
-	game.sg.cam_dir_horiz += 1 / 30.0 * M_PI;
-	game.sg.cam_x = 1.5 * sinf(game.sg.cam_dir_horiz);
-	game.sg.cam_z = 1.5 * cosf(game.sg.cam_dir_horiz);
-	if (anim_ticks == 30) {
+	if (anim_ticks <= 15) {
+		float fac = anim_ticks / 15.0;
+		anim.piece->x = interp(anim.x1, anim.x2, fac);
+		anim.piece->y = interp(anim.y1, anim.y2, fac);
+		anim.piece->z = interp(anim.z1, anim.z2, fac);
+	}
+	if (anim_ticks > 15) {
+		game.sg.cam_dir_horiz += 1 / 30.0 * M_PI;
+		game.sg.cam_x = 1.5 * sinf(game.sg.cam_dir_horiz);
+		game.sg.cam_z = 1.5 * cosf(game.sg.cam_dir_horiz);
+	}
+	if (anim_ticks == 45) {
 		anim_ticks = 0;
 		game_anim_rotate_finished();
 	}
@@ -309,7 +329,13 @@ game_display_apply_move(struct move *move)
 	piece = piece_at_location(move->from);
 
 	piece->location = move->location;
-	board_pos_to_world_pos(&piece->x, &piece->y, &piece->z, move->location);
+
+	anim.piece = piece;
+	anim.x1 = piece->x;
+	anim.y1 = piece->y;
+	anim.z1 = piece->z;
+	board_pos_to_world_pos(&anim.x2, &anim.y2, &anim.z2, move->location);
+
 	if (move->promotion)
 		piece->type = KING;
 
