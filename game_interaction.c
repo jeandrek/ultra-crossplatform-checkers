@@ -116,11 +116,6 @@ move_piece(void)
 	sel_move_idx = 0;
 	end_turn = finished;
 	if (finished) {
-		if (winner() != -1) {
-			game_over();
-			return;
-		}
-
 		if (game_type == NETWORK || game_type == COMPUTER) {
 			anim_done_mode = WAIT_TURN;
 			sel_piece_moves_len = 0;

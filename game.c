@@ -102,10 +102,10 @@ game_update(void)
 {
 	if (cur_mode == ANIM_MOVE_PIECE) {
 		if (!game_anim_move_piece()) {
-			if (end_turn && game_type == LOCAL_2PLAYER)
-				cur_mode = ANIM_ROTATE_BOARD;
-			else if (end_turn && winner() != -1)
+			if (end_turn && winner() != -1)
 				game_over();
+			else if (end_turn && game_type == LOCAL_2PLAYER)
+				cur_mode = ANIM_ROTATE_BOARD;
 			else
 				cur_mode = anim_done_mode;
 		}
