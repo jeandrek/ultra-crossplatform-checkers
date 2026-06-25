@@ -300,25 +300,34 @@ interp(float x1, float x2, float fac)
 	return x1 + fac*(x2 - x1);
 }
 
-void
-game_anim(void)
+int
+game_anim_move_piece(void)
+{
+	float fac;
+	anim_ticks++;
+	fac = anim_ticks / 15.0;
+	anim.piece->x = interp(anim.x1, anim.x2, fac);
+	anim.piece->y = interp(anim.y1, anim.y2, fac);
+	anim.piece->z = interp(anim.z1, anim.z2, fac);
+	if (anim_ticks == 15) {
+		anim_ticks = 0;
+		return 0;
+	}
+	return 1;
+}
+
+int
+game_anim_rotate_board(void)
 {
 	anim_ticks++;
-	if (anim_ticks <= 15) {
-		float fac = anim_ticks / 15.0;
-		anim.piece->x = interp(anim.x1, anim.x2, fac);
-		anim.piece->y = interp(anim.y1, anim.y2, fac);
-		anim.piece->z = interp(anim.z1, anim.z2, fac);
-	}
-	if (anim_ticks > 15) {
-		game.sg.cam_dir_horiz += 1 / 30.0 * M_PI;
-		game.sg.cam_x = 1.5 * sinf(game.sg.cam_dir_horiz);
-		game.sg.cam_z = 1.5 * cosf(game.sg.cam_dir_horiz);
-	}
-	if (anim_ticks == 45) {
+	game.sg.cam_dir_horiz += 1 / 30.0 * M_PI;
+	game.sg.cam_x = 1.5 * sinf(game.sg.cam_dir_horiz);
+	game.sg.cam_z = 1.5 * cosf(game.sg.cam_dir_horiz);
+	if (anim_ticks == 30) {
 		anim_ticks = 0;
-		game_anim_rotate_finished();
+		return 0;
 	}
+	return 1;
 }
 
 void

@@ -468,6 +468,7 @@ game_net_recv_move(struct move *move)
 	val = recv(conn_sock, (char *)&move_be, sizeof (move_be), 0);
 	if (val == 0 || val == -1)
 		return 0;
+	move->from = ntohl(move_be.from);
 	move->location = ntohl(move_be.location);
 	move->captured = ntohl(move_be.captured);
 	move->promotion = ntohl(move_be.promotion);
@@ -481,6 +482,7 @@ void
 game_net_send_move(struct move *move)
 {
 	struct move move_be;
+	move_be.from = htonl(move->from);
 	move_be.location = htonl(move->location);
 	move_be.captured = htonl(move->captured);
 	move_be.promotion = htonl(move->promotion);
