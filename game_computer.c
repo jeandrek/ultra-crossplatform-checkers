@@ -35,7 +35,15 @@ int game_computer_thread;
 #endif
 
 #ifdef _WIN32
+#include <windows.h>
+
 HANDLE game_computer_turn_event;
+#endif
+
+#if defined(__unix__) || defined(__APPLE__)
+#include <semaphore.h>
+
+sem_t game_computer_turn_sem;
 #endif
 
 int game_computer_player;
@@ -106,6 +114,8 @@ game_computer_turn(void)
 	SetEvent(game_computer_turn_event);
 #elif defined(__psp__)
 	sceKernelWakeupThread(game_computer_thread);
+#elif defined(__unix__) || defined(__APPLE__)
+	sem_post(&game_computer_turn_sem);
 #else
 #error Not yet supported
 #endif
@@ -136,6 +146,8 @@ game_computer_thread_start(void *arg)
 		WaitForSingleObject(game_computer_turn_event, INFINITE);
 #elif defined(__psp__)
 		sceKernelSleepThread();
+#elif defined(__unix__) || defined(__APPLE__)
+		sem_wait(&game_computer_turn_sem);
 #else
 #error Not yet supported
 #endif

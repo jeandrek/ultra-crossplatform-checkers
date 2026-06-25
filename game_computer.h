@@ -39,6 +39,12 @@ extern HANDLE game_computer_turn_event;
 extern int game_computer_thread;
 #endif
 
+#if defined(__unix__) || defined(__APPLE__)
+#include <semaphore.h>
+
+extern sem_t game_computer_turn_sem;
+#endif
+
 extern int game_computer_player;
 
 void game_computer_thread_start(void *arg);
