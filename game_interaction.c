@@ -104,6 +104,7 @@ move_piece(void)
 	int location = sel_piece_moves[sel_move_idx].location;
 	int finished = perform_move(&sel_piece_moves[sel_move_idx],
 				    player_turn);
+	game_display_apply_move(&sel_piece_moves[sel_move_idx]);
 	if (game_type == NETWORK)
 		game_net_send_move(&sel_piece_moves[sel_move_idx]);
 	sel_move_idx = 0;

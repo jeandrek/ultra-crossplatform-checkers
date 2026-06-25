@@ -41,8 +41,9 @@ typedef uint64_t board_t[2][2];
  */
 
 struct __attribute__ ((packed)) move {
+	int	from;
 	int	location;
-	int	capture;
+	int	captured;
 	int	promotion;
 	board_t	resulting_board;
 };

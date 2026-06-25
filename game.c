@@ -95,6 +95,7 @@ game_update(void)
 		}
 
 		finished = perform_move(&move, !game_net_player);
+		game_display_apply_move(&move);
 		if (finished) {
 			if (winner() != -1)
 				game_over();
@@ -133,6 +134,7 @@ game_destroy(void)
 		free(squares_buffer);
 		squares_buffer = NULL;
 	}
+	game_display_destroy();
 	game_dirty = 0;
 }
 
