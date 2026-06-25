@@ -124,7 +124,7 @@ game_computer_thread_start(void *arg)
 #else
 #error Not yet supported
 #endif
-		my_move = search(board, game_computer_player, 6, -1);
+		my_move = search(cur_board, game_computer_player, 6, -1);
 		move_made = 1;
 	}
 }

@@ -26,16 +26,16 @@
 
 #include "game_checkers.h"
 
-board_t board;
+board_t cur_board;
 int game_dirty;
 
 void
 board_init(void)
 {
-	board[0][MAN] = 0x55aa55;
-	board[1][MAN] = 0xaa55aa0000000000;
-	board[0][KING] = 0;
-	board[1][KING] = 0;
+	cur_board[0][MAN] = 0x55aa55;
+	cur_board[1][MAN] = 0xaa55aa0000000000;
+	cur_board[0][KING] = 0;
+	cur_board[1][KING] = 0;
 	game_dirty = 0;
 }
 
@@ -62,7 +62,7 @@ piece_occupying_square_belonging_to_player_pure(board_t board, int i, int player
 int
 piece_occupying_square_belonging_to_player(int i, int player)
 {
-	return piece_occupying_square_belonging_to_player_pure(board, i, player);
+	return piece_occupying_square_belonging_to_player_pure(cur_board, i, player);
 }
 
 static uint64_t
@@ -204,7 +204,7 @@ void
 board_available_moves(struct move moves[64][MAX_MOVES], int *num_moves,
 		      int player, int moved_piece_idx)
 {
-	return board_available_moves_pure(board, moves, num_moves, player,
+	return board_available_moves_pure(cur_board, moves, num_moves, player,
 					  moved_piece_idx);
 }
 
@@ -218,13 +218,13 @@ perform_move(struct move *move, int player)
 
 	if (!game_dirty) game_dirty = 1;
 
-	board[0][MAN] = move->resulting_board[0][MAN];
-	board[0][KING] = move->resulting_board[0][KING];
-	board[1][MAN] = move->resulting_board[1][MAN];
-	board[1][KING] = move->resulting_board[1][KING];
+	cur_board[0][MAN] = move->resulting_board[0][MAN];
+	cur_board[0][KING] = move->resulting_board[0][KING];
+	cur_board[1][MAN] = move->resulting_board[1][MAN];
+	cur_board[1][KING] = move->resulting_board[1][KING];
 
 	if (move->capture && !move->promotion &&
-	    piece_moves(board, further_captures, player, move->location, 1) > 0)
+	    piece_moves(cur_board, further_captures, player, move->location, 1) > 0)
 		return 0;
 	else
 		return 1;
@@ -236,7 +236,7 @@ perform_move(struct move *move, int player)
 int
 winner(void)
 {
-	if (board[0][MAN] == 0 && board[0][KING] == 0) return 1;
-	if (board[1][MAN] == 0 && board[1][KING] == 0) return 0;
+	if (cur_board[0][MAN] == 0 && cur_board[0][KING] == 0) return 1;
+	if (cur_board[1][MAN] == 0 && cur_board[1][KING] == 0) return 0;
 	return -1;
 }

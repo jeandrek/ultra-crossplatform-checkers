@@ -47,7 +47,7 @@ struct __attribute__ ((packed)) move {
 	board_t	resulting_board;
 };
 
-extern board_t board;
+extern board_t cur_board;
 extern int game_dirty;
 
 #define MAX_MOVES	4
