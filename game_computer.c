@@ -28,6 +28,12 @@
 #include "game_checkers.h"
 #include "game_computer.h"
 
+#ifdef __psp__
+#include <pspkernel.h>
+
+int game_computer_thread;
+#endif
+
 #ifdef _WIN32
 HANDLE game_computer_turn_event;
 #endif
@@ -93,8 +99,12 @@ static int move_made = 0;
 void
 game_computer_turn(void)
 {
-#ifdef _WIN32
+#if defined(_WIN32)
 	SetEvent(game_computer_turn_event);
+#elif defined(__psp__)
+	sceKernelWakeupThread(game_computer_thread);
+#else
+#error Not yet supported
 #endif
 }
 
@@ -119,8 +129,10 @@ void
 game_computer_thread_start(void *arg)
 {
 	for (;;) {
-#ifdef _WIN32
+#if defined(_WIN32)
 		WaitForSingleObject(game_computer_turn_event, INFINITE);
+#elif defined(__psp__)
+		sceKernelSleepThread();
 #else
 #error Not yet supported
 #endif

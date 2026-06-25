@@ -35,6 +35,10 @@
 extern HANDLE game_computer_turn_event;
 #endif
 
+#ifdef __psp__
+extern int game_computer_thread;
+#endif
+
 extern int game_computer_player;
 
 void game_computer_thread_start(void *arg);

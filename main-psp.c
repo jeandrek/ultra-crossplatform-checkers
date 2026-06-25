@@ -37,16 +37,17 @@
 #include "checkers.h"
 #include "scenegraph.h"
 #include "input.h"
+#include "game_computer.h"
 
 PSP_MODULE_INFO("checkers", 0, 1, 1);
 
-int
+static int
 exit_callback(int arg1, int arg2, void *argp)
 {
 	sceKernelExitGame();
 }
 
-int
+static int
 callback_thread(SceSize args, void *arg)
 {
 	int cbid;
@@ -56,6 +57,13 @@ callback_thread(SceSize args, void *arg)
 	sceKernelSleepThreadCB();
 }
 
+static int
+engine_thread(SceSize args, void *arg)
+{
+	game_computer_thread_start(arg);
+	return 0;
+}
+
 int
 main(void)
 {
@@ -63,6 +71,12 @@ main(void)
 					   0x11, 0xfa0, 0, NULL);
 	if (thread >= 0)
 		sceKernelStartThread(thread, 0, NULL);
+
+	game_computer_thread = sceKernelCreateThread("engine_thread",
+						     engine_thread,
+						     0x30, 0x3000, 0, NULL);
+	if (game_computer_thread >= 0)
+		sceKernelStartThread(game_computer_thread, 0, NULL);
 
 	/* XXX */
 	sceCtrlSetSamplingCycle(0);
