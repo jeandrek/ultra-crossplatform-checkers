@@ -113,7 +113,7 @@ render_pieces(struct scenegraph *scenegraph)
 
 	for (int piece = 0; piece < NUM_PIECE_TYPES; piece++) {
 		for (int i = 0; i < 64; i++) {
-			if ((board[0][piece] >> i) & 1) {
+			if ((cur_board[0][piece] >> i) & 1) {
 				int color = (player_turn == 0 && i == sel_square ?
 					     COLOR_PLAYER_0_SEL : COLOR_PLAYER_0);
 				board_pos_to_world_pos(&x, &y, &z, i);
@@ -124,7 +124,7 @@ render_pieces(struct scenegraph *scenegraph)
 
 	for (int piece = 0; piece < NUM_PIECE_TYPES; piece++) {
 		for (int i = 0; i < 64; i++) {
-			if ((board[1][piece] >> i) & 1) {
+			if ((cur_board[1][piece] >> i) & 1) {
 				int color = (player_turn == 1 && i == sel_square ?
 					     COLOR_PLAYER_1_SEL : COLOR_PLAYER_1);
 				board_pos_to_world_pos(&x, &y, &z, i);
