@@ -60,6 +60,9 @@ search(board_t board, int player, int depth, int moved_piece_idx)
 	struct move best_move;
 	float best_score = -1e10;
 	int num_moves[64];
+#ifdef __psp__
+	sceKernelRotateThreadReadyQueue(0);
+#endif
 	board_available_moves_pure(board, moves, num_moves, player,
 				   moved_piece_idx);
 	for (int i = 0; i < 64; i++) {

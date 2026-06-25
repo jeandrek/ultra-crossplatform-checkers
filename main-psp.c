@@ -74,7 +74,7 @@ main(void)
 
 	game_computer_thread = sceKernelCreateThread("engine_thread",
 						     engine_thread,
-						     0x30, 0x3000, 0, NULL);
+						     0x21, 0x3000, 0, NULL);
 	if (game_computer_thread >= 0)
 		sceKernelStartThread(game_computer_thread, 0, NULL);
 
