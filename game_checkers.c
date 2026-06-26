@@ -26,26 +26,26 @@
 
 #include "game_checkers.h"
 
-board_t board;
+board_t cur_board;
 int game_dirty;
 
 void
 board_init(void)
 {
-	board[0][MAN] = 0x55aa55;
-	board[1][MAN] = 0xaa55aa0000000000;
-	board[0][KING] = 0;
-	board[1][KING] = 0;
+	cur_board[0][MAN] = 0x55aa55;
+	cur_board[1][MAN] = 0xaa55aa0000000000;
+	cur_board[0][KING] = 0;
+	cur_board[1][KING] = 0;
 	game_dirty = 0;
 }
 
 static int
 is_square_empty(int i)
 {
-	return !(((board[0][MAN] >> i) & 1)
-		 || ((board[1][MAN] >> i) & 1)
-		 || ((board[0][KING] >> i) & 1)
-		 || ((board[1][KING] >> i) & 1));
+	return !(((cur_board[0][MAN] >> i) & 1)
+		 || ((cur_board[1][MAN] >> i) & 1)
+		 || ((cur_board[0][KING] >> i) & 1)
+		 || ((cur_board[1][KING] >> i) & 1));
 }
 
 /*
@@ -54,8 +54,8 @@ is_square_empty(int i)
 int
 piece_occupying_square_belonging_to_player(int i, int player)
 {
-	if ((board[player][MAN] >> i) & 1) return MAN;
-	if ((board[player][KING] >> i) & 1) return KING;
+	if ((cur_board[player][MAN] >> i) & 1) return MAN;
+	if ((cur_board[player][KING] >> i) & 1) return KING;
 	return -1;
 }
 
@@ -97,22 +97,23 @@ diag_adj_squares(int x, int y)
 static void
 move_go_to_square(struct move *move, int player, int piece, int i, int j)
 {
+	move->from = i;
 	move->location = j;
-	move->capture = 0;
+	move->captured = -1;
 	if (piece == MAN && j / 8 == LAST_ROW(player)) {
 		move->promotion = 1;
 		move->resulting_board[player][MAN] =
-			board[player][MAN] ^ (uint64_t)1<<i;
+			cur_board[player][MAN] ^ (uint64_t)1<<i;
 		move->resulting_board[player][KING] =
-			board[player][KING] | (uint64_t)1<<j;
+			cur_board[player][KING] | (uint64_t)1<<j;
 	} else {
 		move->promotion = 0;
 		move->resulting_board[player][piece] =
-			(board[player][piece] ^ (uint64_t)1<<i) | (uint64_t)1<<j;
-		move->resulting_board[player][!piece] = board[player][!piece];
+			(cur_board[player][piece] ^ (uint64_t)1<<i) | (uint64_t)1<<j;
+		move->resulting_board[player][!piece] = cur_board[player][!piece];
 	}
-	move->resulting_board[!player][piece] = board[!player][piece];
-	move->resulting_board[!player][!piece] = board[!player][!piece];
+	move->resulting_board[!player][piece] = cur_board[!player][piece];
+	move->resulting_board[!player][!piece] = cur_board[!player][!piece];
 }
 
 static void
@@ -120,7 +121,7 @@ move_capture(struct move *move, int player, int capturing, int captured,
 	     int i, int j, int k)
 {
 	move_go_to_square(move, player, capturing, i, k);
-	move->capture = 1;
+	move->captured = j;
 	move->resulting_board[!player][captured] ^= (uint64_t)1<<j;
 }
 
@@ -204,12 +205,12 @@ perform_move(struct move *move, int player)
 
 	if (!game_dirty) game_dirty = 1;
 
-	board[0][MAN] = move->resulting_board[0][MAN];
-	board[0][KING] = move->resulting_board[0][KING];
-	board[1][MAN] = move->resulting_board[1][MAN];
-	board[1][KING] = move->resulting_board[1][KING];
+	cur_board[0][MAN] = move->resulting_board[0][MAN];
+	cur_board[0][KING] = move->resulting_board[0][KING];
+	cur_board[1][MAN] = move->resulting_board[1][MAN];
+	cur_board[1][KING] = move->resulting_board[1][KING];
 
-	if (move->capture && !move->promotion &&
+	if (move->captured > 0 && !move->promotion &&
 	    piece_moves(further_captures, player, move->location, 1) > 0)
 		return 0;
 	else
@@ -222,7 +223,7 @@ perform_move(struct move *move, int player)
 int
 winner(void)
 {
-	if (board[0][MAN] == 0 && board[0][KING] == 0) return 1;
-	if (board[1][MAN] == 0 && board[1][KING] == 0) return 0;
+	if (cur_board[0][MAN] == 0 && cur_board[0][KING] == 0) return 1;
+	if (cur_board[1][MAN] == 0 && cur_board[1][KING] == 0) return 0;
 	return -1;
 }

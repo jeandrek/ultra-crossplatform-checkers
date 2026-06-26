@@ -33,6 +33,7 @@ enum mode {
 	SELECT_PIECE,
 	SELECT_MOVE,
 	ANIM_ROTATE_BOARD,
+	ANIM_MOVE_PIECE,
 	WAIT_TURN,
 	GAME_OVER,
 	LOST_CONNECTION
@@ -47,6 +48,8 @@ enum type {
 extern struct state game;
 extern enum type game_type;
 extern enum mode cur_mode;
+extern enum mode anim_done_mode;
+extern int end_turn;
 extern char *squares_buffer;
 
 extern float menu_button_x, menu_button_y;
@@ -54,7 +57,5 @@ extern struct rect menu_button_bounds;
 extern int menu_button_highlighted;
 
 void game_over(void);
-void game_start_anim_rotate(void);
-void game_anim_rotate_finished(void);
 
 #endif /* !_GAME_H_ */

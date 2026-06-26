@@ -83,7 +83,6 @@ game_interaction_init(void)
 void
 game_interaction_turn(void)
 {
-	cur_mode = SELECT_PIECE;
 	board_available_moves(board_moves, board_num_moves, player_turn, -1);
 	set_sel_square(player_turn == 0 ? 0 : 63);
 }
@@ -104,9 +103,11 @@ move_piece(void)
 	int location = sel_piece_moves[sel_move_idx].location;
 	int finished = perform_move(&sel_piece_moves[sel_move_idx],
 				    player_turn);
+	game_display_apply_move(&sel_piece_moves[sel_move_idx]);
 	if (game_type == NETWORK)
 		game_net_send_move(&sel_piece_moves[sel_move_idx]);
 	sel_move_idx = 0;
+	end_turn = finished;
 	if (finished) {
 		if (winner() != -1) {
 			game_over();
@@ -114,20 +115,21 @@ move_piece(void)
 		}
 
 		if (game_type == NETWORK) {
-			cur_mode = WAIT_TURN;
+			anim_done_mode = WAIT_TURN;
 			sel_piece_moves_len = 0;
 		} else {
 			player_turn = !player_turn;
 			board_available_moves(board_moves, board_num_moves,
 					      player_turn, -1);
-			game_start_anim_rotate();
 			set_sel_square(player_turn == 0 ? 0 : 63);
 		}
 	} else {
+		anim_done_mode = SELECT_PIECE;
 		board_available_moves(board_moves, board_num_moves,
 				      player_turn, location);
 		set_sel_square(location);
 	}
+	cur_mode = ANIM_MOVE_PIECE;
 }
 
 void

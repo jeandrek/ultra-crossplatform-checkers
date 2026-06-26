@@ -45,8 +45,24 @@
 
 #define HALF_ALPHA(col)		(((col) & 0xffffff) | (0x80 << 24))
 
+static const uint32_t colors[2][2] = {
+	{COLOR_PLAYER_0, COLOR_PLAYER_0_SEL},
+	{COLOR_PLAYER_1, COLOR_PLAYER_1_SEL}
+};
+
+struct piece {
+	//struct	sg_obj obj;
+	float	x, y, z;
+	int	location;
+	int	player;
+	int	type;
+	struct	piece *prev;
+	struct	piece *next;
+};
+
 static struct texture texture_board;
 static struct sprite overlay_sprite;
+static struct piece *pieces = NULL;
 
 static void
 render_board(struct scenegraph *scenegraph)
@@ -109,31 +125,20 @@ board_pos_to_world_pos(float *x, float *y, float *z, int i)
 static void
 render_pieces(struct scenegraph *scenegraph)
 {
-	float x, y, z;
-
-	for (int piece = 0; piece < NUM_PIECE_TYPES; piece++) {
-		for (int i = 0; i < 64; i++) {
-			if ((board[0][piece] >> i) & 1) {
-				int color = (player_turn == 0 && i == sel_square ?
-					     COLOR_PLAYER_0_SEL : COLOR_PLAYER_0);
-				board_pos_to_world_pos(&x, &y, &z, i);
-				render_piece(scenegraph, piece, x, y, z, color);
-			}
-		}
+	for (struct piece *piece = pieces; piece != NULL; piece = piece->next) {
+		int selected =
+			(cur_mode == SELECT_PIECE || cur_mode == SELECT_MOVE)
+			&& piece->player == player_turn
+			&& piece->location == sel_square;
+		int color = colors[piece->player][selected];
+		render_piece(scenegraph, piece->type,
+			     piece->x, piece->y, piece->z, color);
 	}
 
-	for (int piece = 0; piece < NUM_PIECE_TYPES; piece++) {
-		for (int i = 0; i < 64; i++) {
-			if ((board[1][piece] >> i) & 1) {
-				int color = (player_turn == 1 && i == sel_square ?
-					     COLOR_PLAYER_1_SEL : COLOR_PLAYER_1);
-				board_pos_to_world_pos(&x, &y, &z, i);
-				render_piece(scenegraph, piece, x, y, z, color);
-			}
-		}
-	}
+	if (cur_mode != SELECT_PIECE && cur_mode != SELECT_MOVE) return;
 
 	for (int i = 0; i < sel_piece_moves_len; i++) {
+		float x, y, z;
 		int color;
 		if (player_turn == 0)
 			color = (cur_mode == SELECT_MOVE && i == sel_move_idx ?
@@ -197,9 +202,49 @@ game_display_load(void)
 			       TEXTURES_DIR "board");
 }
 
+static void
+add_piece(int location, float x, float y, float z, int player, int type)
+{
+	struct piece *piece;
+	piece = malloc(sizeof (*piece));
+	piece->location = location;
+	piece->x = x;
+	piece->y = y;
+	piece->z = z;
+	piece->player = player;
+	piece->type = type;
+	piece->prev = NULL;
+	piece->next = pieces;
+	if (pieces != NULL) pieces->prev = piece;
+	pieces = piece;
+}
+
+static struct piece *
+piece_at_location(int location)
+{
+	for (struct piece *piece = pieces; piece; piece = piece->next)
+		if (piece->location == location)
+			return piece;
+	return NULL;
+}
+
+static void
+delete_piece(struct piece *piece)
+{
+	if (piece->prev != NULL)
+		piece->prev->next = piece->next;
+	else
+		pieces = piece->next;
+	if (piece->next != NULL)
+		piece->next->prev = piece->prev;
+	free(piece);
+}
+
 void
 game_display_init(void)
 {
+	float x, y, z;
+
 	memset(&game.sg, 0, sizeof (game.sg));
 	game.sg.num_render = sizeof (render_functions)/sizeof (render_functions[1]);
 	game.sg.render = render_functions;
@@ -213,6 +258,27 @@ game_display_init(void)
 	game.sg.light0_z = 0;
 	game.sg.light0_color = 0xffffffff;
 	sg_init_scenegraph(&game.sg);
+
+	for (int player = 0; player < 2; player++) {
+		for (int type = 0; type < NUM_PIECE_TYPES; type++) {
+			for (int i = 0; i < 64; i++) {
+				if ((cur_board[player][type] >> i) & 1) {
+					board_pos_to_world_pos(&x, &y, &z, i);
+					add_piece(i, x, y, z, player, type);
+				}
+			}
+		}
+	}
+}
+
+void
+game_display_destroy(void)
+{
+	while (pieces != NULL) {
+		struct piece *piece = pieces;
+		pieces = pieces->next;
+		free(piece);
+	}
 }
 
 void
@@ -224,9 +290,36 @@ game_display_game_over(void)
 }
 
 static int anim_ticks = 0;
+struct piece_animation {
+	struct piece *piece;
+	float x1, y1, z1;
+	float x2, y2, z2;
+} anim;
 
-void
-game_anim(void)
+float
+interp(float x1, float x2, float fac)
+{
+	return x1 + fac*(x2 - x1);
+}
+
+int
+game_anim_move_piece(void)
+{
+	float fac;
+	anim_ticks++;
+	fac = anim_ticks / 15.0;
+	anim.piece->x = interp(anim.x1, anim.x2, fac);
+	anim.piece->y = interp(anim.y1, anim.y2, fac);
+	anim.piece->z = interp(anim.z1, anim.z2, fac);
+	if (anim_ticks == 15) {
+		anim_ticks = 0;
+		return 0;
+	}
+	return 1;
+}
+
+int
+game_anim_rotate_board(void)
 {
 	anim_ticks++;
 	game.sg.cam_dir_horiz += 1 / 30.0 * M_PI;
@@ -234,8 +327,31 @@ game_anim(void)
 	game.sg.cam_z = 1.5 * cosf(game.sg.cam_dir_horiz);
 	if (anim_ticks == 30) {
 		anim_ticks = 0;
-		game_anim_rotate_finished();
+		return 0;
 	}
+	return 1;
+}
+
+void
+game_display_apply_move(struct move *move)
+{
+	struct piece *piece;
+
+	piece = piece_at_location(move->from);
+
+	piece->location = move->location;
+
+	anim.piece = piece;
+	anim.x1 = piece->x;
+	anim.y1 = piece->y;
+	anim.z1 = piece->z;
+	board_pos_to_world_pos(&anim.x2, &anim.y2, &anim.z2, move->location);
+
+	if (move->promotion)
+		piece->type = KING;
+
+	if (move->captured > 0)
+		delete_piece(piece_at_location(move->captured));
 }
 
 void

@@ -35,6 +35,8 @@
 
 enum type game_type;
 enum mode cur_mode;
+enum mode anim_done_mode;
+int end_turn;
 char *squares_buffer;
 
 /* XXX */
@@ -81,8 +83,16 @@ menu_button_init(void)
 static void
 game_update(void)
 {
-	if (cur_mode == ANIM_ROTATE_BOARD) {
-		game_anim();
+	if (cur_mode == ANIM_MOVE_PIECE) {
+		if (!game_anim_move_piece()) {
+			if (end_turn && game_type == LOCAL_2PLAYER)
+				cur_mode = ANIM_ROTATE_BOARD;
+			else
+				cur_mode = anim_done_mode;
+		}
+	} else if (cur_mode == ANIM_ROTATE_BOARD) {
+		if (!game_anim_rotate_board())
+			cur_mode = SELECT_PIECE;
 	} else if (cur_mode == WAIT_TURN && game_net_poll_move()) {
 		struct move move;
 		int finished;
@@ -95,12 +105,15 @@ game_update(void)
 		}
 
 		finished = perform_move(&move, !game_net_player);
+		game_display_apply_move(&move);
+		cur_mode = ANIM_MOVE_PIECE;
+		anim_done_mode = finished ? SELECT_PIECE : WAIT_TURN;
 		if (finished) {
 			if (winner() != -1)
 				game_over();
-			else
-				game_interaction_turn();
+			game_interaction_turn();
 		}
+		end_turn = finished;
 	}
 }
 
@@ -113,18 +126,6 @@ game_over(void)
 		game_net_disconnect();
 }
 
-void
-game_start_anim_rotate(void)
-{
-	cur_mode = ANIM_ROTATE_BOARD;
-}
-
-void
-game_anim_rotate_finished(void)
-{
-	cur_mode = SELECT_PIECE;
-}
-
 static void
 game_destroy(void)
 {
@@ -133,6 +134,7 @@ game_destroy(void)
 		free(squares_buffer);
 		squares_buffer = NULL;
 	}
+	game_display_destroy();
 	game_dirty = 0;
 }
 
