@@ -20,9 +20,10 @@
 #include "scenegraph.h"
 #include "input.h"
 
-#define WIDTH 400
-#define HEIGHT 300
+#define WIDTH 480
+#define HEIGHT 360
 
+static WindowRef window;
 static AGLContext context;
 
 static OSStatus WindowEventHandler(EventHandlerCallRef inCaller, EventRef inEvent, void* inRefcon);
@@ -31,7 +32,6 @@ int
 main(void)
 {
 	OSStatus err;
-	WindowRef window;
 	static EventTypeSpec kWindowEvents[] = {
 		{kEventClassWindow, kEventWindowDrawContent},
 		{kEventClassWindow, kEventWindowBoundsChanged},
@@ -95,11 +95,7 @@ WindowEventHandler(EventHandlerCallRef inCaller, EventRef inEvent,
 		   void *inRefcon)
 {
 	OSStatus err = eventNotHandledErr;
-	WindowRef window;
 	Point mouse;
-
-	GetEventParameter(inEvent, '----', 'wind', NULL,
-			  sizeof (WindowRef), NULL, &window);
 
 	switch (GetEventClass(inEvent)) {
 	case kEventClassWindow:
@@ -120,7 +116,11 @@ WindowEventHandler(EventHandlerCallRef inCaller, EventRef inEvent,
 		}
 		break;
 	case kEventClassMouse:
-		GetMouse(&mouse);
+		GetEventParameter(inEvent, kEventParamMouseLocation,
+				  typeQDPoint, NULL, sizeof (mouse),
+				  NULL, &mouse);
+		SetPortWindowPort(window);
+		GlobalToLocal(&mouse);
 		switch (GetEventKind(inEvent)) {
 		case kEventMouseMoved:
 			checkers_mouse_move(mouse.h, mouse.v);

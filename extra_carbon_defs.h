@@ -8,6 +8,8 @@
 #define kEventWindowBoundsChanged 27
 #define kEventMouseUp 2
 #define kEventMouseMoved 5
+#define kEventParamMouseLocation 'mloc'
+#define typeQDPoint 'QDpt'
 #define eventNotHandledErr -9874
 
 typedef void *EventHandlerCallRef;
@@ -20,7 +22,7 @@ OSStatus CreateNewWindow(unsigned, unsigned, Rect *, WindowRef *);
 typedef ProcPtr EventHandlerUPP;
 
 typedef struct {
-  uint32_t eventClass, eventKind;
+	uint32_t eventClass, eventKind;
 } EventTypeSpec;
 
 CGrafPtr GetWindowPort(WindowRef);
