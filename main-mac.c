@@ -95,6 +95,8 @@ WindowEventHandler(EventHandlerCallRef inCaller, EventRef inEvent,
 		   void *inRefcon)
 {
 	OSStatus err = eventNotHandledErr;
+	WindowRef mouseEventWindow;
+	int16_t part;
 	Point mouse;
 
 	switch (GetEventClass(inEvent)) {
@@ -119,6 +121,9 @@ WindowEventHandler(EventHandlerCallRef inCaller, EventRef inEvent,
 		GetEventParameter(inEvent, kEventParamMouseLocation,
 				  typeQDPoint, NULL, sizeof (mouse),
 				  NULL, &mouse);
+		part = FindWindow(mouse, &mouseEventWindow);
+		if (part != inContent)
+			break;
 		SetPortWindowPort(window);
 		GlobalToLocal(&mouse);
 		switch (GetEventKind(inEvent)) {
