@@ -135,6 +135,8 @@ render_pieces(struct scenegraph *scenegraph)
 			     piece->x, piece->y, piece->z, color);
 	}
 
+	if (cur_mode != SELECT_PIECE && cur_mode != SELECT_MOVE) return;
+
 	for (int i = 0; i < sel_piece_moves_len; i++) {
 		float x, y, z;
 		int color;
