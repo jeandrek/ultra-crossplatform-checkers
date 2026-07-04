@@ -27,7 +27,7 @@
 #ifndef _TEXT_INPUT_H_
 #define _TEXT_INPUT_H_
 
-void text_input(char *label, void (*accept)(char *),
+void text_input(char *label, void (*accept)(const char *),
 		void (*cancel)(void));
 
 void text_input_add_char(char c);

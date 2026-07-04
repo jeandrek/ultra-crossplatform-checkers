@@ -27,10 +27,9 @@
 package jeandre.checkers;
 
 import java.io.*;
-import android.app.Activity;
 
 class Checkers {
-	private Activity activity;
+	private MainActivity activity;
 
 	public native void init(int width, int height);
 	public native void update();
@@ -38,11 +37,14 @@ class Checkers {
 	public native void mouseMoveEvent(int x, int y);
 	public native void mouseUpEvent(int x, int y);
 
-	public Checkers(Activity activity) {
+	private native void textInputAccept(String value);
+	private native void textInputCancel();
+
+	public Checkers(MainActivity activity) {
 		this.activity = activity;
 	}
 
-	private byte[] textureDataFromAsset(String fileName)
+	public byte[] textureDataFromAsset(String fileName)
 		throws IOException {
 		InputStream stream = activity.getAssets().open(fileName);
 		stream.mark(Integer.MAX_VALUE);
@@ -52,6 +54,10 @@ class Checkers {
 		stream.read(pixels, 0, length);
 		stream.close();
 		return pixels;
+	}
+
+	public void getTextInput(String label) {
+		activity.getTextInput(label, this::textInputAccept, this::textInputCancel);
 	}
 
 	static {

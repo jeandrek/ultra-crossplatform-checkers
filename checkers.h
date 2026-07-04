@@ -57,10 +57,13 @@ void checkers_mouse_move(int x, int y);
 #ifdef __ANDROID__
 #include <jni.h>
 
-/* JNIEnv for GLSurfaceView's rendering thread */
+/* The current JNIEnv to use, whether for the UI thread or GLSurfaceView's
+   rendering thread. */
 extern JNIEnv *checkers_jnienv;
 /* jeandre.checkers.Checkers instance */
 extern jobject checkers_java;
+/* Big lock */
+extern mtx_t checkers_mutex;
 #endif
 
 #endif /* !_CHECKERS_H_ */

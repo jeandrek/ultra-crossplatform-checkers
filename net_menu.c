@@ -132,7 +132,7 @@ update_connecting_wait_screen(void)
 }
 
 static void
-join_game(char *addr)
+join_game(const char *addr)
 {
 	static char wait_screen_msg[128];
 
