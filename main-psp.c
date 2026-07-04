@@ -60,7 +60,7 @@ callback_thread(SceSize args, void *arg)
 static int
 engine_thread(SceSize args, void *arg)
 {
-	game_computer_thread_start(arg);
+	game_computer_thread_start();
 	return 0;
 }
 

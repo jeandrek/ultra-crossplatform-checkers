@@ -43,6 +43,13 @@ static PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 static HGLRC hglrc;
 static int vsync = 0;
 
+static DWORD
+engine_thread(void *arg)
+{
+	game_computer_thread_start();
+	return 0;
+}
+
 static void
 init_window(HWND hWnd)
 {
@@ -80,7 +87,7 @@ init_window(HWND hWnd)
 	ReleaseDC(hWnd, hdc);
 
 	game_computer_turn_event = CreateEvent(NULL, 0, 0, NULL);
-	CreateThread(NULL, 0, game_computer_thread_start, NULL, 0, NULL);
+	CreateThread(NULL, 0, engine_thread, NULL, 0, NULL);
 }
 
 LRESULT WINAPI

@@ -45,7 +45,7 @@ jobject checkers_java;
 
 static pthread_mutex_t checkers_mutex;	/* Big lock */
 
-void *
+static void *
 engine_thread_start(void *arg)
 {
 	game_computer_thread_start();

@@ -39,7 +39,14 @@
 #include "text_input.h"
 #include "game_computer.h"
 
-int
+static void *
+engine_thread_start(void *arg)
+{
+	game_computer_thread_start();
+	return NULL;
+}
+
+static int
 respond_to_event(Display *dpy, XEvent *evt, XPointer arg)
 {
 	return 1;
@@ -131,9 +138,7 @@ main()
 		perror("checkers");
 		return 1;
 	}
-	if (pthread_create(&engine_thread, NULL,
-			   game_computer_thread_start,
-			   NULL) < 0) {
+	if (pthread_create(&engine_thread, NULL, engine_thread_start, NULL) < 0) {
 		perror("checkers");
 		return 1;
 	}
