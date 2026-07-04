@@ -56,6 +56,7 @@ void checkers_mouse_move(int x, int y);
 
 #ifdef __ANDROID__
 #include <jni.h>
+#include <threads.h>
 
 /* The current JNIEnv to use, whether for the UI thread or GLSurfaceView's
    rendering thread. */
