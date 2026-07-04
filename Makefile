@@ -3,7 +3,7 @@ OBJECTS=	checkers.o game.o game_display.o game_interaction.o game_checkers.o men
 CFLAGS+=	-Wall -O0 -g $(CFLAGS_BONJOUR$(USE_BONJOUR))
 CFLAGS_BONJOUR1=-DUSE_BONJOUR
 CFLAGS+=	-DUSE_X11
-LDFLAGS+=	-lX11 -lGL -lGLU -lm $(LIBS_BONJOUR$(USE_BONJOUR))
+LDFLAGS+=	-lX11 -lGL -lGLU -lm -pthread $(LIBS_BONJOUR$(USE_BONJOUR))
 LIBS_BONJOUR1=	-ldns_sd
 
 $(PROGRAM): $(OBJECTS)

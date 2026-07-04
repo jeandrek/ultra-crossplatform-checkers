@@ -139,7 +139,7 @@ game_computer_next_move(struct move *move)
 }
 
 void
-game_computer_thread_start(void *arg)
+game_computer_thread_start(void)
 {
 	for (;;) {
 #if defined(_WIN32)

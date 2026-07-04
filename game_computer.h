@@ -47,7 +47,7 @@ extern sem_t game_computer_turn_sem;
 
 extern int game_computer_player;
 
-void game_computer_thread_start(void *arg);
+void game_computer_thread_start(void);
 void game_computer_turn(void);
 int game_computer_poll_move(void);
 int game_computer_next_move(struct move *move);
