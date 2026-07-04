@@ -41,65 +41,68 @@ JNIEnv *checkers_jnienv;
 /* jeandre.checkers.Checkers instance */
 jobject checkers_java;
 
-mtx_t checkers_mutex;	/* Big lock */
+static mtx_t checkers_mutex;	/* Big lock */
+
+void
+enter_android_call(JNIEnv *env, jobject *checkers)
+{
+	mtx_lock(&checkers_mutex);
+	checkers_jnienv = env;
+	checkers_java = checkers;
+}
+
+void
+leave_android_call(void)
+{
+	mtx_unlock(&checkers_mutex);
+}
 
 JNIEXPORT void JNICALL
 Java_jeandre_checkers_Checkers_init(JNIEnv *env, jobject obj,
 				    jint width, jint height)
 {
-	checkers_jnienv = env;
-	checkers_java = obj;
-
 	mtx_init(&checkers_mutex, mtx_plain);
 
-	mtx_lock(&checkers_mutex);
+	enter_android_call(env, obj);
 	sg_init(width, height);
 	checkers_init();
 	text_scale_factor(2.0);
-	mtx_unlock(&checkers_mutex);
+	leave_android_call();
 }
 
 JNIEXPORT void JNICALL
 Java_jeandre_checkers_Checkers_update(JNIEnv *env, jobject obj)
 {
+	enter_android_call(env, obj);
 	/* input_handle(); */
-	mtx_lock(&checkers_mutex);
-	checkers_jnienv = env;
-	checkers_java = obj;
 	checkers_update();
-	mtx_unlock(&checkers_mutex);
+	leave_android_call();
 }
 
 JNIEXPORT void JNICALL
 Java_jeandre_checkers_Checkers_inputEvent(JNIEnv *env, jobject obj, jint button)
 {
-	mtx_lock(&checkers_mutex);
-	checkers_jnienv = env;
-	checkers_java = obj;
+	enter_android_call(env, obj);
 	/* Alternatively, this could enqueue events and input_handle processes
 	   them; but this is fine for now. */
 	checkers_button_event(button);
-	mtx_unlock(&checkers_mutex);
+	leave_android_call();
 }
 
 JNIEXPORT void JNICALL
 Java_jeandre_checkers_Checkers_mouseMoveEvent(JNIEnv *env, jobject obj,
 					      jint x, jint y)
 {
-	mtx_lock(&checkers_mutex);
-	checkers_jnienv = env;
-	checkers_java = obj;
+	enter_android_call(env, obj);
 	checkers_mouse_move(x, y);
-	mtx_unlock(&checkers_mutex);
+	leave_android_call();
 }
 
 JNIEXPORT void JNICALL
 Java_jeandre_checkers_Checkers_mouseUpEvent(JNIEnv *env, jobject obj,
 					    jint x, jint y)
 {
-	mtx_lock(&checkers_mutex);
-	checkers_jnienv = env;
-	checkers_java = obj;
+	enter_android_call(env, obj);
 	checkers_mouse_up(x, y);
-	mtx_unlock(&checkers_mutex);
+	leave_android_call();
 }

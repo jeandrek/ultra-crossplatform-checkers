@@ -37,7 +37,6 @@
 
 #ifdef __ANDROID__
 #include <jni.h>
-#include <threads.h>
 #endif
 
 #include "checkers.h"
@@ -291,21 +290,17 @@ JNIEXPORT void JNICALL
 Java_jeandre_checkers_Checkers_textInputAccept(JNIEnv *env, jobject obj, jstring value)
 {
 	const char *str = (*env)->GetStringUTFChars(env, value, NULL);
-	mtx_lock(&checkers_mutex);
-	checkers_jnienv = env;
-	checkers_java = obj;
+	enter_android_call(env, obj);
 	text_input_accept(str);
-	mtx_unlock(&checkers_mutex);
+	leave_android_call();
 	(*env)->ReleaseStringUTFChars(env, value, str);
 }
 
 JNIEXPORT void JNICALL
 Java_jeandre_checkers_Checkers_textInputCancel(JNIEnv *env, jobject obj)
 {
-	mtx_lock(&checkers_mutex);
-	checkers_jnienv = env;
-	checkers_java = obj;
+	enter_android_call(env, obj);
 	text_input_cancel();
-	mtx_unlock(&checkers_mutex);
+	leave_android_call();
 }
 #endif
