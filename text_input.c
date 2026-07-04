@@ -35,6 +35,10 @@
 #include <psputility.h>
 #endif
 
+#ifdef __ANDROID__
+#include <jni.h>
+#endif
+
 #include "checkers.h"
 #include "scenegraph.h"
 #include "text.h"
@@ -43,9 +47,12 @@
 #include "text_input.h"
 
 static void text_input_update(void);
-#ifdef __psp__
-static void text_input_psp(char *label, void (*accept)(char *),
+#if defined(__psp__)
+static void text_input_psp(char *label, void (*accept)(const char *),
 			   void (*cancel)(void));
+#elif defined(__ANDROID__)
+static void text_input_android(char *label, void (*accept)(const char *),
+			       void (*cancel)(void));
 #endif
 
 struct state text_input_screen = {
@@ -58,7 +65,7 @@ struct state text_input_screen = {
 static char text_input_label[64];
 static char text_buffer[64];
 static int text_len = 0;
-static void (*text_input_accept)(char *);
+static void (*text_input_accept)(const char *);
 static void (*text_input_cancel)(void);
 static struct sprite cursor;
 static struct state *old_state;
@@ -130,10 +137,12 @@ text_field_bounds(struct scenegraph *scenegraph, struct rect *bounds)
 }
 
 void
-text_input(char *label, void (*accept)(char *), void (*cancel)(void))
+text_input(char *label, void (*accept)(const char *), void (*cancel)(void))
 {
-#ifdef __psp__
+#if defined(__psp__)
 	text_input_psp(label, accept, cancel);
+#elif defined(__ANDROID__)
+	text_input_android(label, accept, cancel);
 #else
 	static struct element text_field;
 	static struct element ok_but;
@@ -198,7 +207,7 @@ cs_to_c16s(uint16_t *dst, char *src, size_t n)
 }
 
 static void
-text_input_psp(char *label, void (*accept)(char *),
+text_input_psp(char *label, void (*accept)(const char *),
 	       void (*cancel)(void))
 {
 	SceUtilityOskParams params;
@@ -259,5 +268,39 @@ done:
 		accept(text_buffer);
 	else
 		cancel();
+}
+#endif
+
+#ifdef __ANDROID__
+static void
+text_input_android(char *label, void (*accept)(const char *),
+		   void (*cancel)(void))
+{
+	JNIEnv *env = checkers_jnienv;
+	jclass cls = (*env)->FindClass(env, "jeandre/checkers/Checkers");
+	jmethodID mid = (*env)->GetMethodID(env, cls, "getTextInput",
+					    "(Ljava/lang/String;)V");
+	jstring label_obj = (*env)->NewStringUTF(env, label);
+	text_input_accept = accept;
+	text_input_cancel = cancel;
+	(*env)->CallVoidMethod(env, checkers_java, mid, label_obj);
+}
+
+JNIEXPORT void JNICALL
+Java_jeandre_checkers_Checkers_textInputAccept(JNIEnv *env, jobject obj, jstring value)
+{
+	const char *str = (*env)->GetStringUTFChars(env, value, NULL);
+	enter_android_call(env, obj);
+	text_input_accept(str);
+	leave_android_call();
+	(*env)->ReleaseStringUTFChars(env, value, str);
+}
+
+JNIEXPORT void JNICALL
+Java_jeandre_checkers_Checkers_textInputCancel(JNIEnv *env, jobject obj)
+{
+	enter_android_call(env, obj);
+	text_input_cancel();
+	leave_android_call();
 }
 #endif

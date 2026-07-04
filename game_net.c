@@ -368,11 +368,12 @@ game_net_poll_connected(void)
 	struct timeval timeout = {0, 0};
 	fd_set fds;
 
+	if (conn_sock_state == CANT_CONNECT)
+		return -1;
+
 	FD_ZERO(&fds);
 	FD_SET(conn_sock, &fds);
-	if (conn_sock_state == CANT_CONNECT) {
-		return -1;
-	} else if (conn_sock_state == CONNECTING) {
+	if (conn_sock_state == CONNECTING) {
 		if (select(conn_sock + 1, NULL, &fds, NULL, &timeout) > 0) {
 #ifndef _WIN32
 			int err;

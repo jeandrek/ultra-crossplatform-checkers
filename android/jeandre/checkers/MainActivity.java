@@ -28,11 +28,14 @@ package jeandre.checkers;
 
 import javax.microedition.khronos.egl.*;
 import javax.microedition.khronos.opengles.*;
-import android.app.Activity;
+import java.util.function.Consumer;
+import android.app.*;
+import android.content.DialogInterface;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
+import android.R;
 
 public class MainActivity extends Activity {
 	private Checkers checkers;
@@ -96,5 +99,46 @@ public class MainActivity extends Activity {
 	protected void onStop() {
 		super.onStop();
 		view.onPause();
+	}
+
+	public static class TextInputDialogFragment extends DialogFragment {
+		private String label;
+		private Consumer<String> accept;
+		private Runnable cancel;
+		private EditText input;
+		public void initTextInput(String label,
+					  Consumer<String> accept,
+					  Runnable cancel) {
+			this.label = label;
+			this.accept = accept;
+			this.cancel = cancel;
+		}
+		@Override
+		public Dialog onCreateDialog(Bundle savedInstanceState) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+			input = new EditText(getActivity().getApplicationContext());
+			DialogInterface.OnClickListener listener =
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						if (which == DialogInterface.BUTTON_POSITIVE) {
+							accept.accept(input.getText().toString());
+						} else {
+							cancel.run();
+						}
+					}
+				};
+			builder.setTitle(label);
+			builder.setPositiveButton(R.string.ok, listener);
+			builder.setNegativeButton(R.string.cancel, listener);
+			builder.setView(input);
+			return builder.create();
+		}
+	}
+
+	public void getTextInput(String label, Consumer<String> accept, Runnable cancel) {
+		TextInputDialogFragment fragment = new TextInputDialogFragment();
+		fragment.initTextInput(label, accept, cancel);
+		fragment.show(getFragmentManager(), "TEXT_INPUT_DIALOG");
 	}
 }
