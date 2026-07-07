@@ -163,6 +163,7 @@ engine_thread(SceSize args, void *arg)
 		pthread_mutex_lock(&turn_mutex);
 		while (!turn_flag)
 			pthread_cond_wait(&turn_cond, &turn_mutex);
+		turn_flag = 0;
 		pthread_mutex_unlock(&turn_mutex);
 #elif defined(__psp__)
 		sceKernelSleepThread();
