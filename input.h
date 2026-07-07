@@ -40,4 +40,8 @@
 
 void input_handle(void);
 
+#if defined(USE_X11) || defined(__APPLE__)
+extern int button_state[NUM_BUTTONS];
+#endif
+
 #endif /* !_INPUT_H_ */

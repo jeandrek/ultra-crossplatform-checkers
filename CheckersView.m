@@ -33,7 +33,6 @@
 #import "input_mapping-osx.h"
 #import "CheckersView.h"
 
-int button_state[NUM_BUTTONS] = {0};
 int keycode_buttons[256];
 
 @implementation CheckersView
