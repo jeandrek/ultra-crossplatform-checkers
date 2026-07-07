@@ -33,7 +33,7 @@
 #import "input_mapping-osx.h"
 #import "CheckersView.h"
 
-int keycode_buttons[256];
+static int8_t keycode_buttons[128];
 
 @implementation CheckersView
 
@@ -54,7 +54,7 @@ int keycode_buttons[256];
 		initWithAttributes:(NSOpenGLPixelFormatAttribute *)attribs]; 
 
 	[[self window] setAcceptsMouseMovedEvents:YES];
-	memset(keycode_buttons, -1, 256);
+	memset(keycode_buttons, -1, 128);
 	for (int i = 0; i < NUM_BUTTONS; i++)
 		keycode_buttons[input_mapping[i]] = i;
 
