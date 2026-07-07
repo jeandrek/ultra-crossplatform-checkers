@@ -28,22 +28,26 @@
 #include "game_checkers.h"
 #include "game_computer.h"
 
-#ifdef __psp__
-#include <pspkernel.h>
-
-int game_computer_thread;
-#endif
-
 #ifdef _WIN32
 #include <windows.h>
 
-HANDLE game_computer_turn_event;
+static HANDLE turn_event;
 #endif
 
 #if defined(__unix__) || defined(__APPLE__)
-#include <semaphore.h>
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-sem_t game_computer_turn_sem;
+static pthread_mutex_t turn_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t turn_cond = PTHREAD_COND_INITIALIZER;
+static int turn_flag = 0;
+#endif
+
+#ifdef __psp__
+#include <pspkernel.h>
+
+static int game_computer_thread;
 #endif
 
 int game_computer_player;
@@ -111,11 +115,14 @@ void
 game_computer_turn(void)
 {
 #if defined(_WIN32)
-	SetEvent(game_computer_turn_event);
+	SetEvent(turn_event);
+#elif defined(__unix__) || defined(__APPLE__)
+	pthread_mutex_lock(&turn_mutex);
+	turn_flag = 1;
+	pthread_cond_signal(&turn_cond);
+	pthread_mutex_unlock(&turn_mutex);
 #elif defined(__psp__)
 	sceKernelWakeupThread(game_computer_thread);
-#elif defined(__unix__) || defined(__APPLE__)
-	sem_post(&game_computer_turn_sem);
 #else
 #error Not yet supported
 #endif
@@ -138,20 +145,66 @@ game_computer_next_move(struct move *move)
 	return 0;
 }
 
-void
-game_computer_thread_start(void)
+#if defined(_WIN32)
+static DWORD
+engine_thread(void *arg)
+#elif defined(__unix__) || defined(__APPLE__)
+static void *
+engine_thread(void *arg)
+#elif defined(__psp__)
+static int
+engine_thread(SceSize args, void *arg)
+#endif
 {
 	for (;;) {
 #if defined(_WIN32)
-		WaitForSingleObject(game_computer_turn_event, INFINITE);
+		WaitForSingleObject(turn_event, INFINITE);
+#elif defined(__unix__) || defined(__APPLE__)
+		pthread_mutex_lock(&turn_mutex);
+		while (!turn_flag)
+			pthread_cond_wait(&turn_cond, &turn_mutex);
+		pthread_mutex_unlock(&turn_mutex);
 #elif defined(__psp__)
 		sceKernelSleepThread();
-#elif defined(__unix__) || defined(__APPLE__)
-		sem_wait(&game_computer_turn_sem);
 #else
 #error Not yet supported
 #endif
 		my_move = search(cur_board, game_computer_player, 6, -1);
 		move_made = 1;
 	}
+	return 0;
 }
+
+#ifdef _WIN32
+void
+game_computer_init(void)
+{
+	turn_event = CreateEvent(NULL, 0, 0, NULL);
+	CreateThread(NULL, 0, engine_thread, NULL, 0, NULL);
+}
+#endif
+
+#ifdef __psp__
+void
+game_computer_init(void)
+{
+	game_computer_thread = sceKernelCreateThread("engine_thread",
+						     engine_thread,
+						     0x21, 0x3000, 0, NULL);
+	if (game_computer_thread >= 0)
+		sceKernelStartThread(game_computer_thread, 0, NULL);
+}
+#endif
+
+#if defined(__unix__) || defined(__APPLE__)
+void
+game_computer_init(void)
+{
+	pthread_t thread;
+
+	if (pthread_create(&thread, NULL, engine_thread, NULL) < 0) {
+		perror("checkers");
+		exit(1);
+	}
+}
+#endif

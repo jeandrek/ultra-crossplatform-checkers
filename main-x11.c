@@ -28,7 +28,6 @@
 #include <X11/XKBlib.h>
 #define GLX_GLXEXT_PROTOTYPES
 #include <GL/glx.h>
-#include <pthread.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -38,13 +37,6 @@
 #include "input_mapping-x11.h"
 #include "text_input.h"
 #include "game_computer.h"
-
-static void *
-engine_thread_start(void *arg)
-{
-	game_computer_thread_start();
-	return NULL;
-}
 
 static int
 respond_to_event(Display *dpy, XEvent *evt, XPointer arg)
@@ -84,7 +76,6 @@ main()
 		None
 	};
 	XSetWindowAttributes win_attribs;
-	pthread_t engine_thread;
 	char *name = "Checkers";
 	XTextProperty prop;
 	Atom protocols[1];
@@ -132,15 +123,6 @@ main()
 	sg_init(400, 300);
 
 	checkers_init();
-
-	if (sem_init(&game_computer_turn_sem, 0, 0) < 0) {
-		perror("checkers");
-		return 1;
-	}
-	if (pthread_create(&engine_thread, NULL, engine_thread_start, NULL) < 0) {
-		perror("checkers");
-		return 1;
-	}
 
 	XkbSetDetectableAutoRepeat(dpy, True, NULL);
 

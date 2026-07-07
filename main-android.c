@@ -30,7 +30,6 @@
 
 #include <jni.h>
 #include <pthread.h>
-#include <semaphore.h>
 #include <GLES/gl.h>
 
 #include "checkers.h"
@@ -43,14 +42,8 @@ JNIEnv *checkers_jnienv;
 /* jeandre.checkers.Checkers instance */
 jobject checkers_java;
 
-static pthread_mutex_t checkers_mutex;	/* Big lock */
-
-static void *
-engine_thread_start(void *arg)
-{
-	game_computer_thread_start();
-	return NULL;
-}
+/* Big lock */
+static pthread_mutex_t checkers_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void
 enter_android_call(JNIEnv *env, jobject *checkers)
@@ -70,13 +63,6 @@ JNIEXPORT void JNICALL
 Java_jeandre_checkers_Checkers_init(JNIEnv *env, jobject obj,
 				    jint width, jint height)
 {
-	pthread_t engine_thread;
-
-	sem_init(&game_computer_turn_sem, 0, 0);
-	pthread_create(&engine_thread, NULL, engine_thread_start, NULL);
-
-	pthread_mutex_init(&checkers_mutex, NULL);
-
 	enter_android_call(env, obj);
 	sg_init(width, height);
 	checkers_init();

@@ -29,27 +29,11 @@
 
 #include "game_checkers.h"
 
-#ifdef _WIN32
-#include <windows.h>
-
-extern HANDLE game_computer_turn_event;
-#endif
-
-#ifdef __psp__
-extern int game_computer_thread;
-#endif
-
-#if defined(__unix__) || defined(__APPLE__)
-#include <semaphore.h>
-
-extern sem_t game_computer_turn_sem;
-#endif
-
 extern int game_computer_player;
 
-void game_computer_thread_start(void);
-void game_computer_turn(void);
-int game_computer_poll_move(void);
-int game_computer_next_move(struct move *move);
+void	game_computer_init(void);
+void	game_computer_turn(void);
+int	game_computer_poll_move(void);
+int	game_computer_next_move(struct move *move);
 
 #endif /* !_GAME_COMPUTER_H_ */
