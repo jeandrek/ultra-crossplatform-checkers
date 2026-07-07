@@ -45,6 +45,8 @@ float menu_button_x, menu_button_y;
 struct rect menu_button_bounds;
 int menu_button_highlighted;
 
+static struct other_player *other_player = NULL;
+
 static void menu_button_init(void);
 
 static void
@@ -61,6 +63,9 @@ game_init(void)
 	}
 	game_interaction_init();
 	menu_button_init();
+
+	if (game_type == NETWORK)	other_player = &other_player_net;
+	else if (game_type == COMPUTER)	other_player = &other_player_computer;
 }
 
 static void
@@ -79,24 +84,6 @@ menu_button_init(void)
 	menu_button_highlighted = 0;
 }
 
-int
-abs_move_avail(void)
-{
-	return game_type == NETWORK ? game_net_poll_move() : game_computer_poll_move();
-}
-
-int
-abs_move_read(struct move *move)
-{
-	return game_type == NETWORK ? game_net_recv_move(move) : game_computer_next_move(move);
-}
-
-int
-abs_player(void)
-{
-	return game_type == NETWORK ? game_net_player : !game_computer_player;
-}
-
 static void
 game_update(void)
 {
@@ -112,18 +99,18 @@ game_update(void)
 	} else if (cur_mode == ANIM_ROTATE_BOARD) {
 		if (!game_anim_rotate_board())
 			cur_mode = SELECT_PIECE;
-	} else if (cur_mode == WAIT_TURN && abs_move_avail()) {
+	} else if (cur_mode == WAIT_TURN && other_player->poll_move()) {
 		struct move move;
 		int finished;
 
-		if (!abs_move_read(&move)) {
+		if (!other_player->next_move(&move)) {
 			cur_mode = LOST_CONNECTION;
 			game_display_game_over();
 			game_net_disconnect();
 			return;
 		}
 
-		finished = perform_move(&move, !abs_player());
+		finished = perform_move(&move, !user_player);
 		game_display_apply_move(&move);
 		cur_mode = ANIM_MOVE_PIECE;
 		anim_done_mode = finished ? SELECT_PIECE : WAIT_TURN;

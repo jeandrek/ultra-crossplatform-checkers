@@ -50,6 +50,11 @@ static int turn_flag = 0;
 static int game_computer_thread;
 #endif
 
+struct other_player other_player_computer = {
+	.poll_move = game_computer_poll_move,
+	.next_move = game_computer_next_move
+};
+
 int game_computer_player;
 
 static float

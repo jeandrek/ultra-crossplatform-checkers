@@ -56,6 +56,11 @@
 #include "net_menu.h"
 #include "game_net.h"
 
+struct other_player other_player_net = {
+	.poll_move = game_net_poll_move,
+	.next_move = game_net_recv_move
+};
+
 #ifndef _WIN32
 #if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 /* LE system */

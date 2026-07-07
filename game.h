@@ -28,6 +28,7 @@
 #define _GAME_H_
 
 #include "checkers.h"
+#include "game_checkers.h"
 
 enum mode {
 	SELECT_PIECE,
@@ -57,5 +58,10 @@ extern struct rect menu_button_bounds;
 extern int menu_button_highlighted;
 
 void game_over(void);
+
+struct other_player {
+	int	(*poll_move)(void);
+	int	(*next_move)(struct move *);
+};
 
 #endif /* !_GAME_H_ */

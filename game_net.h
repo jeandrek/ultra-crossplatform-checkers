@@ -27,6 +27,7 @@
 #ifndef _GAME_NET_H_
 #define _GAME_NET_H_
 
+#include "game.h"
 #include "game_checkers.h"
 
 struct disc_ent {
@@ -68,5 +69,7 @@ struct __attribute__ ((packed)) checkers_header {
 	uint8_t	major;
 	uint8_t	minor;
 };
+
+extern struct other_player other_player_net;
 
 #endif /* !_GAME_NET_H_ */

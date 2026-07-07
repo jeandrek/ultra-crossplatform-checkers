@@ -128,7 +128,7 @@ render_pieces(struct scenegraph *scenegraph)
 	for (struct piece *piece = pieces; piece != NULL; piece = piece->next) {
 		int selected =
 			(cur_mode == SELECT_PIECE || cur_mode == SELECT_MOVE)
-			&& piece->player == player_turn
+			&& piece->player == user_player
 			&& piece->location == sel_square;
 		int color = colors[piece->player][selected];
 		render_piece(scenegraph, piece->type,
@@ -140,7 +140,7 @@ render_pieces(struct scenegraph *scenegraph)
 	for (int i = 0; i < sel_piece_moves_len; i++) {
 		float x, y, z;
 		int color;
-		if (player_turn == 0)
+		if (user_player == 0)
 			color = (cur_mode == SELECT_MOVE && i == sel_move_idx ?
 				 COLOR_PLAYER_0_SEL : COLOR_PLAYER_0);
 		else
@@ -169,7 +169,7 @@ render_status(struct scenegraph *scenegraph)
 		text_draw(scenegraph, text, 0, 0, TEXT_CENTRE);
 	} else {
 		float margin = (FONT_HEIGHT/2 + 8) * 2.0/game.sg.height;
-		int player = cur_mode == WAIT_TURN ? !player_turn : player_turn;
+		int player = cur_mode == WAIT_TURN ? !user_player : user_player;
 		text = player == 0 ? "Red to move" : "Black to move";
 		text_size(1);
 		text_color(0xffaaaaaa);
