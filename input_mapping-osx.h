@@ -29,13 +29,13 @@
 #include "input.h"
 
 static int input_mapping[] = {
-	[INPUT_UP] = 126,
-	[INPUT_DOWN] = 125,
-	[INPUT_LEFT] = 123,
-	[INPUT_RIGHT] = 124,
-	[INPUT_PAUSE] = 53,
-	[INPUT_ACCEPT] = 49,
-	[INPUT_BACK] = 51
+	[INPUT_UP] = 126,	/* up */
+	[INPUT_DOWN] = 125,	/* down */
+	[INPUT_LEFT] = 123,	/* left */
+	[INPUT_RIGHT] = 124,	/* right */
+	[INPUT_PAUSE] = 53,	/* escape */
+	[INPUT_ACCEPT] = 49,	/* space */
+	[INPUT_BACK] = 51	/* backspace */
 };
 
 #endif /* !_INPUT_MAPPING_H_ */
