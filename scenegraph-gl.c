@@ -30,9 +30,11 @@
 #include <math.h>
 #include <stdint.h>
 
-#ifdef USE_GL_ES
+#if defined(USE_GL_ES)
 #include <GLES/gl.h>
 #define glFrustum glFrustumf
+#elif defined(__APPLE__)
+#include <OpenGL/gl.h>
 #else
 #include <GL/gl.h>
 #endif

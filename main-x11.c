@@ -42,7 +42,6 @@ respond_to_event(Display *dpy, XEvent *evt, XPointer arg)
 	return 1;
 }
 
-int button_state[NUM_BUTTONS] = {0};
 static int8_t keycode_buttons[256];
 
 static void

@@ -40,6 +40,10 @@
 #include <pspgum.h>
 #elif defined(USE_GL_ES)
 #include <GLES/gl.h>
+#elif defined(__APPLE__)
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#include <CoreFoundation/CoreFoundation.h>
 #else
 #include <GL/gl.h>
 #endif
@@ -94,8 +98,25 @@ texture_data_from_asset(char *path, char *buf)
 
 void
 texture_init_from_file(struct texture *texture, int width, int height,
-		       char *path)
+		       char *name)
 {
+#ifdef __APPLE__
+	CFBundleRef bundle;
+	CFURLRef url;
+	char path[128];
+
+	bundle = CFBundleGetMainBundle();
+	url = CFBundleCopyResourceURL(bundle,
+				      CFStringCreateWithCString(NULL, name, 0),
+				      NULL, CFSTR("textures"));
+	if (url == NULL)
+		exit(1);
+	CFURLGetFileSystemRepresentation(url, 1, path, 128);
+	CFRelease(url);
+#else
+	char *path = name;
+#endif
+
 	size_t size = 4*width*height;
 	char *buf = malloc(size);
 #ifdef __ANDROID__
