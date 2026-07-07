@@ -47,6 +47,8 @@ enum type {
 };
 
 extern struct state game;
+extern board_t cur_board;
+extern int game_dirty;
 extern enum type game_type;
 extern enum mode cur_mode;
 extern enum mode anim_done_mode;

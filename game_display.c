@@ -158,7 +158,7 @@ render_status(struct scenegraph *scenegraph)
 	char *text = NULL;
 
 	if (cur_mode == GAME_OVER)
-		text = winner() == 0 ? "Red wins" : "Black wins";
+		text = winner(cur_board) == 0 ? "Red wins" : "Black wins";
 	else if (cur_mode == LOST_CONNECTION)
 		text = "Lost connection";
 

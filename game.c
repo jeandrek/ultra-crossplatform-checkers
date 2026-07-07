@@ -34,6 +34,8 @@
 #include "game_computer.h"
 #include "text.h"
 
+board_t cur_board;
+int game_dirty;
 enum type game_type;
 enum mode cur_mode;
 enum mode anim_done_mode;
@@ -52,7 +54,8 @@ static void menu_button_init(void);
 static void
 game_init(void)
 {
-	board_init();
+	game_dirty = 0;
+	board_init(cur_board);
 	game_display_init();
 #ifndef __psp__
 	game_init_squares_buffer();
@@ -89,7 +92,7 @@ game_update(void)
 {
 	if (cur_mode == ANIM_MOVE_PIECE) {
 		if (!game_anim_move_piece()) {
-			if (end_turn && winner() != -1)
+			if (end_turn && winner(cur_board) != -1)
 				game_over();
 			else if (end_turn && game_type == LOCAL_2PLAYER)
 				cur_mode = ANIM_ROTATE_BOARD;
@@ -110,7 +113,8 @@ game_update(void)
 			return;
 		}
 
-		finished = perform_move(&move, !user_player);
+		finished = perform_move(cur_board, &move, !user_player);
+		game_dirty = 1;
 		game_display_apply_move(&move);
 		cur_mode = ANIM_MOVE_PIECE;
 		anim_done_mode = finished ? SELECT_PIECE : WAIT_TURN;

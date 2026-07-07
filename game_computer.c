@@ -80,8 +80,8 @@ search(board_t board, int player, int depth, int moved_piece_idx)
 #ifdef __psp__
 	sceKernelRotateThreadReadyQueue(0);
 #endif
-	board_available_moves_pure(board, moves, num_moves, player,
-				   moved_piece_idx);
+	board_available_moves(board, moves, num_moves, player,
+			      moved_piece_idx);
 	for (int i = 0; i < 64; i++) {
 		for (int j = 0; j < num_moves[i]; j++) {
 			float score;

@@ -26,17 +26,13 @@
 
 #include "game_checkers.h"
 
-board_t cur_board;
-int game_dirty;
-
 void
-board_init(void)
+board_init(board_t board)
 {
-	cur_board[0][MAN] = 0x55aa55;
-	cur_board[1][MAN] = 0xaa55aa0000000000;
-	cur_board[0][KING] = 0;
-	cur_board[1][KING] = 0;
-	game_dirty = 0;
+	board[0][MAN] = 0x55aa55;
+	board[1][MAN] = 0xaa55aa0000000000;
+	board[0][KING] = 0;
+	board[1][KING] = 0;
 }
 
 static int
@@ -51,18 +47,12 @@ is_square_empty(board_t board, int i)
 /*
  * Returns piece or -1.
  */
-static int
-piece_occupying_square_belonging_to_player_pure(board_t board, int i, int player)
+int
+piece_occupying_square_belonging_to_player(board_t board, int i, int player)
 {
 	if ((board[player][MAN] >> i) & 1) return MAN;
 	if ((board[player][KING] >> i) & 1) return KING;
 	return -1;
-}
-
-int
-piece_occupying_square_belonging_to_player(int i, int player)
-{
-	return piece_occupying_square_belonging_to_player_pure(cur_board, i, player);
 }
 
 static uint64_t
@@ -140,7 +130,7 @@ piece_moves(board_t board, struct move *moves, int player, int i, int capturing)
 	int y = i / 8;
 	int n = 0;
 
-	piece = piece_occupying_square_belonging_to_player_pure(board, i, player);
+	piece = piece_occupying_square_belonging_to_player(board, i, player);
 	if (piece == -1)
 		return 0;
 
@@ -149,7 +139,7 @@ piece_moves(board_t board, struct move *moves, int player, int i, int capturing)
 	for (int j = 0; j < 64; j++) {
 		if ((squares >> j) & 1) {
 			int other;
-			if (capturing && (other = piece_occupying_square_belonging_to_player_pure(board, j, !player)) != -1) {
+			if (capturing && (other = piece_occupying_square_belonging_to_player(board, j, !player)) != -1) {
 				int x2 = j % 8;
 				int y2 = j / 8;
 				int x3, y3;
@@ -174,8 +164,8 @@ piece_moves(board_t board, struct move *moves, int player, int i, int capturing)
 }
 
 void
-board_available_moves_pure(board_t board, struct move moves[64][MAX_MOVES],
-			   int *num_moves, int player, int moved_piece_idx)
+board_available_moves(board_t board, struct move moves[64][MAX_MOVES],
+		      int *num_moves, int player, int moved_piece_idx)
 {
 	int can_capture = 0;
 
@@ -201,31 +191,21 @@ board_available_moves_pure(board_t board, struct move moves[64][MAX_MOVES],
 		num_moves[i] = piece_moves(board, moves[i], player, i, 0);
 }
 
-void
-board_available_moves(struct move moves[64][MAX_MOVES], int *num_moves,
-		      int player, int moved_piece_idx)
-{
-	return board_available_moves_pure(cur_board, moves, num_moves, player,
-					  moved_piece_idx);
-}
-
 /*
  * Performs move and returns whether the player's turn has ended yet.
  */
 int
-perform_move(struct move *move, int player)
+perform_move(board_t board, struct move *move, int player)
 {
 	struct move further_captures[MAX_MOVES];
 
-	if (!game_dirty) game_dirty = 1;
-
-	cur_board[0][MAN] = move->resulting_board[0][MAN];
-	cur_board[0][KING] = move->resulting_board[0][KING];
-	cur_board[1][MAN] = move->resulting_board[1][MAN];
-	cur_board[1][KING] = move->resulting_board[1][KING];
+	board[0][MAN] = move->resulting_board[0][MAN];
+	board[0][KING] = move->resulting_board[0][KING];
+	board[1][MAN] = move->resulting_board[1][MAN];
+	board[1][KING] = move->resulting_board[1][KING];
 
 	if (move->captured > 0 && !move->promotion &&
-	    piece_moves(cur_board, further_captures, player, move->location, 1) > 0)
+	    piece_moves(board, further_captures, player, move->location, 1) > 0)
 		return 0;
 	else
 		return 1;
@@ -235,9 +215,9 @@ perform_move(struct move *move, int player)
  * Returns winner or -1.
  */
 int
-winner(void)
+winner(board_t board)
 {
-	if (cur_board[0][MAN] == 0 && cur_board[0][KING] == 0) return 1;
-	if (cur_board[1][MAN] == 0 && cur_board[1][KING] == 0) return 0;
+	if (board[0][MAN] == 0 && board[0][KING] == 0) return 1;
+	if (board[1][MAN] == 0 && board[1][KING] == 0) return 0;
 	return -1;
 }

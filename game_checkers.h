@@ -48,35 +48,29 @@ struct __attribute__ ((packed)) move {
 	board_t	resulting_board;
 };
 
-extern board_t cur_board;
-extern int game_dirty;
-
 #define MAX_MOVES	4
 
-void board_init(void); /* Rename? */
+void board_init(board_t board);
 
 /*
  * Returns piece or -1.
  */
-int piece_occupying_square_belonging_to_player(int i, int player);
+int piece_occupying_square_belonging_to_player(board_t board, int i, int player);
 
 int piece_moves(board_t board, struct move *moves, int player, int i, int capturing);
 
-void board_available_moves_pure(board_t board, struct move moves[64][MAX_MOVES],
-				int *num_moves, int player,
-				int moved_piece_idx);
-
-void board_available_moves(struct move moves[64][MAX_MOVES], int *num_moves,
-			   int player, int moved_piece_idx);
+void board_available_moves(board_t board, struct move moves[64][MAX_MOVES],
+			   int *num_moves, int player,
+			   int moved_piece_idx);
 
 /*
  * Performs move and returns whether the player's turn has ended yet.
  */
-int perform_move(struct move *move, int player);
+int perform_move(board_t board, struct move *move, int player);
 
 /*
  * Returns winner or -1.
  */
-int winner(void);
+int winner(board_t board);
 
 #endif /* !_GAME_CHECKERS_H_ */

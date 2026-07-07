@@ -49,7 +49,8 @@ set_sel_square(int i)
 {
 	sel_square = i;
 	sel_piece_type =
-		piece_occupying_square_belonging_to_player(i, user_player);
+		piece_occupying_square_belonging_to_player(cur_board, i,
+							   user_player);
 	sel_piece_moves = board_moves[i];
 	sel_piece_moves_len = board_num_moves[i];
 }
@@ -75,7 +76,8 @@ game_interaction_init(void)
 	game_display_set_viewpoint(user_player);
 	if (user_player == 0) {
 		cur_mode = SELECT_PIECE;
-		board_available_moves(board_moves, board_num_moves, user_player, -1);
+		board_available_moves(cur_board, board_moves, board_num_moves,
+				      user_player, -1);
 		set_sel_square(0);
 	} else {
 		cur_mode = WAIT_TURN;
@@ -88,7 +90,8 @@ game_interaction_init(void)
 void
 game_interaction_turn(void)
 {
-	board_available_moves(board_moves, board_num_moves, user_player, -1);
+	board_available_moves(cur_board, board_moves, board_num_moves,
+			      user_player, -1);
 	set_sel_square(user_player == 0 ? 0 : 63);
 }
 
@@ -106,8 +109,9 @@ static void
 move_piece(void)
 {
 	int location = sel_piece_moves[sel_move_idx].location;
-	int finished = perform_move(&sel_piece_moves[sel_move_idx],
+	int finished = perform_move(cur_board, &sel_piece_moves[sel_move_idx],
 				    user_player);
+	game_dirty = 1;
 	game_display_apply_move(&sel_piece_moves[sel_move_idx]);
 	if (game_type == NETWORK)
 		game_net_send_move(&sel_piece_moves[sel_move_idx]);
@@ -121,13 +125,13 @@ move_piece(void)
 			sel_piece_moves_len = 0;
 		} else {
 			user_player = !user_player;
-			board_available_moves(board_moves, board_num_moves,
+			board_available_moves(cur_board, board_moves, board_num_moves,
 					      user_player, -1);
 			set_sel_square(user_player == 0 ? 0 : 63);
 		}
 	} else {
 		anim_done_mode = SELECT_PIECE;
-		board_available_moves(board_moves, board_num_moves,
+		board_available_moves(cur_board, board_moves, board_num_moves,
 				      user_player, location);
 		set_sel_square(location);
 	}
