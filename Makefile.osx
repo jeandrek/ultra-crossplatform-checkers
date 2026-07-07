@@ -6,8 +6,8 @@ CFLAGS_BONJOUR=	-DUSE_BONJOUR
 
 Checkers.app: $(PROGRAM)
 	mkdir -p $@/Contents/{MacOS,Resources}
-	cp Info.plist $@/Contents
-	cp -r English.lproj assets/textures $@/Contents/Resources
+	cp cocoa/Info.plist $@/Contents
+	cp -r cocoa/English.lproj assets/textures $@/Contents/Resources
 	cp $< $@/Contents/MacOS
 
 $(PROGRAM): $(OBJECTS)
