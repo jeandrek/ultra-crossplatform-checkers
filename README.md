@@ -29,6 +29,8 @@ For Android, first edit the variables at the top of `Makefile.android` to
 change the Android SDK tool paths if necessary.  You will also need a keystore
 for signing.  Then run `make -f Makefile.android KEYSTORE=<path to keystore>`.
 
+For OS X, build with `make -f Makefile.osx`; Bonjour is enabled by default.
+
 ## Note
 
 Most platforms presently expect `assets` to be in the working directory.

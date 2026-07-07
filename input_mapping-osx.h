@@ -24,24 +24,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _INPUT_H_
-#define _INPUT_H_
+#ifndef _INPUT_MAPPING_H_
+#define _INPUT_MAPPING_H_
+#include "input.h"
 
-#define REPEAT_DELAY	7
+static int input_mapping[] = {
+	[INPUT_UP] = 126,	/* up */
+	[INPUT_DOWN] = 125,	/* down */
+	[INPUT_LEFT] = 123,	/* left */
+	[INPUT_RIGHT] = 124,	/* right */
+	[INPUT_PAUSE] = 53,	/* escape */
+	[INPUT_ACCEPT] = 49,	/* space */
+	[INPUT_BACK] = 51	/* backspace */
+};
 
-#define INPUT_UP	0
-#define INPUT_DOWN	1
-#define INPUT_LEFT	2
-#define INPUT_RIGHT	3
-#define INPUT_PAUSE	4
-#define INPUT_ACCEPT	5
-#define INPUT_BACK	6
-#define NUM_BUTTONS	7
-
-void input_handle(void);
-
-#if defined(USE_X11) || defined(__APPLE__)
-extern int button_state[NUM_BUTTONS];
-#endif
-
-#endif /* !_INPUT_H_ */
+#endif /* !_INPUT_MAPPING_H_ */

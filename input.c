@@ -37,6 +37,10 @@
 #include "checkers.h"
 #include "input.h"
 
+#if defined(USE_X11) || defined(__APPLE__)
+int button_state[NUM_BUTTONS] = {0};
+#endif
+
 static const int can_repeat[NUM_BUTTONS] = {
 	[INPUT_UP] = 1,
 	[INPUT_DOWN] = 1,
@@ -57,10 +61,6 @@ handle_button(int button)
 	}
 }
 
-#ifdef USE_X11
-extern int button_state[NUM_BUTTONS];
-#endif
-
 void
 input_handle(void)
 {
@@ -80,7 +80,7 @@ input_handle(void)
 #elif defined(_WIN32)
 		int val = input_mapping[i];
 		if (state[val] >> 7) handle_button(i);
-#elif defined(USE_X11)
+#elif defined(USE_X11) || defined(__APPLE__)
 		if (button_state[i]) handle_button(i);
 #else
 		if (0) handle_button(i);

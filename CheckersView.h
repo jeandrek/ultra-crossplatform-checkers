@@ -24,24 +24,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _INPUT_H_
-#define _INPUT_H_
+#import <Cocoa/Cocoa.h>
 
-#define REPEAT_DELAY	7
-
-#define INPUT_UP	0
-#define INPUT_DOWN	1
-#define INPUT_LEFT	2
-#define INPUT_RIGHT	3
-#define INPUT_PAUSE	4
-#define INPUT_ACCEPT	5
-#define INPUT_BACK	6
-#define NUM_BUTTONS	7
-
-void input_handle(void);
-
-#if defined(USE_X11) || defined(__APPLE__)
-extern int button_state[NUM_BUTTONS];
-#endif
-
-#endif /* !_INPUT_H_ */
+@interface CheckersView : NSOpenGLView
+{
+	NSTimer *timer;
+}
+@end

@@ -27,8 +27,10 @@
 #ifndef _CHECKERS_H_
 #define _CHECKERS_H_
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__)
 #define TEXTURES_DIR	"textures/"
+#elif defined(__APPLE__)
+#define TEXTURES_DIR	""
 #else
 #define TEXTURES_DIR	"assets/textures/"
 #endif
