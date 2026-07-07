@@ -1,0 +1,17 @@
+PROGRAM=Checkers
+OBJECTS=checkers.o game.o game_display.o game_interaction.o game_checkers.o menu.o net_menu.o main-mac.o sprite.o scenegraph-gl.o texture.o input.o text.o gui.o text_input.o game_net.o
+LDFLAGS=-framework Cocoa -framework OpenGL
+CFLAGS=	-Wall -O2 -std=c99 $(CFLAGS_BONJOUR$(USE_BONJOUR))
+CFLAGS_BONJOUR=	-DUSE_BONJOUR
+
+Checkers.app: $(PROGRAM)
+	mkdir -p $@/Contents/{MacOS,Resources}
+	cp Info.plist $@/Contents
+	cp -r assets/textures $@/Contents/Resources
+	cp $< $@/Contents/MacOS
+
+$(PROGRAM): $(OBJECTS)
+	$(CC) -o $@ $(OBJECTS) $(LDFLAGS)
+
+clean:
+	rm -f $(PROGRAM) $(OBJECTS)

@@ -1,0 +1,377 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3C0AE583C5B03BC200C81A6F /* textures in Resources */ = {isa = PBXBuildFile; fileRef = 3C0AE57FC5B03BC200C81A6F /* textures */; };
+		3C0AE5ADC5B03BC200C81A6F /* checkers.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C0AE58EC5B03BC200C81A6F /* checkers.c */; };
+		3C0AE5AEC5B03BC200C81A6F /* game_checkers.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C0AE590C5B03BC200C81A6F /* game_checkers.c */; };
+		3C0AE5AFC5B03BC200C81A6F /* game_display.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C0AE592C5B03BC200C81A6F /* game_display.c */; };
+		3C0AE5B0C5B03BC200C81A6F /* game_interaction.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C0AE594C5B03BC200C81A6F /* game_interaction.c */; };
+		3C0AE5B1C5B03BC200C81A6F /* game_net.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C0AE596C5B03BC200C81A6F /* game_net.c */; };
+		3C0AE5B2C5B03BC200C81A6F /* game.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C0AE598C5B03BC200C81A6F /* game.c */; };
+		3C0AE5B3C5B03BC200C81A6F /* gui.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C0AE59AC5B03BC200C81A6F /* gui.c */; };
+		3C0AE5B4C5B03BC200C81A6F /* input.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C0AE59CC5B03BC200C81A6F /* input.c */; };
+		3C0AE5B5C5B03BC200C81A6F /* menu.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C0AE59EC5B03BC200C81A6F /* menu.c */; };
+		3C0AE5B6C5B03BC200C81A6F /* net_menu.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C0AE5A1C5B03BC200C81A6F /* net_menu.c */; };
+		3C0AE5B7C5B03BC200C81A6F /* scenegraph-gl.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C0AE5A3C5B03BC200C81A6F /* scenegraph-gl.c */; };
+		3C0AE5B8C5B03BC200C81A6F /* sprite.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C0AE5A5C5B03BC200C81A6F /* sprite.c */; };
+		3C0AE5B9C5B03BC200C81A6F /* text_input.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C0AE5A7C5B03BC200C81A6F /* text_input.c */; };
+		3C0AE5BAC5B03BC200C81A6F /* text.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C0AE5A9C5B03BC200C81A6F /* text.c */; };
+		3C0AE5BBC5B03BC200C81A6F /* texture.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C0AE5ABC5B03BC200C81A6F /* texture.c */; };
+		3C54DE032F0BDD870078FB19 /* MyOpenGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3C54DE022F0BDD870078FB19 /* MyOpenGLView.m */; };
+		3C54DE0C2F0BDDE30078FB19 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C54DE0B2F0BDDE30078FB19 /* OpenGL.framework */; };
+		8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
+		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
+		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
+		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		29B97319FDCFA39411CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		32CA4F630368D1EE00C91783 /* CheckersCocoa_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CheckersCocoa_Prefix.pch; sourceTree = "<group>"; };
+		3C0AE57FC5B03BC200C81A6F /* textures */ = {isa = PBXFileReference; lastKnownFileType = folder; name = textures; path = assets/textures; sourceTree = "<group>"; };
+		3C0AE58EC5B03BC200C81A6F /* checkers.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = checkers.c; sourceTree = "<group>"; };
+		3C0AE58FC5B03BC200C81A6F /* checkers.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = checkers.h; sourceTree = "<group>"; };
+		3C0AE590C5B03BC200C81A6F /* game_checkers.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = game_checkers.c; sourceTree = "<group>"; };
+		3C0AE591C5B03BC200C81A6F /* game_checkers.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = game_checkers.h; sourceTree = "<group>"; };
+		3C0AE592C5B03BC200C81A6F /* game_display.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = game_display.c; sourceTree = "<group>"; };
+		3C0AE593C5B03BC200C81A6F /* game_display.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = game_display.h; sourceTree = "<group>"; };
+		3C0AE594C5B03BC200C81A6F /* game_interaction.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = game_interaction.c; sourceTree = "<group>"; };
+		3C0AE595C5B03BC200C81A6F /* game_interaction.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = game_interaction.h; sourceTree = "<group>"; };
+		3C0AE596C5B03BC200C81A6F /* game_net.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = game_net.c; sourceTree = "<group>"; };
+		3C0AE597C5B03BC200C81A6F /* game_net.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = game_net.h; sourceTree = "<group>"; };
+		3C0AE598C5B03BC200C81A6F /* game.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = game.c; sourceTree = "<group>"; };
+		3C0AE599C5B03BC200C81A6F /* game.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = game.h; sourceTree = "<group>"; };
+		3C0AE59AC5B03BC200C81A6F /* gui.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = gui.c; sourceTree = "<group>"; };
+		3C0AE59BC5B03BC200C81A6F /* gui.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = gui.h; sourceTree = "<group>"; };
+		3C0AE59CC5B03BC200C81A6F /* input.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = input.c; sourceTree = "<group>"; };
+		3C0AE59DC5B03BC200C81A6F /* input.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = input.h; sourceTree = "<group>"; };
+		3C0AE59EC5B03BC200C81A6F /* menu.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = menu.c; sourceTree = "<group>"; };
+		3C0AE59FC5B03BC200C81A6F /* menu.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = menu.h; sourceTree = "<group>"; };
+		3C0AE5A0C5B03BC200C81A6F /* models.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = models.h; sourceTree = "<group>"; };
+		3C0AE5A1C5B03BC200C81A6F /* net_menu.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = net_menu.c; sourceTree = "<group>"; };
+		3C0AE5A2C5B03BC200C81A6F /* net_menu.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = net_menu.h; sourceTree = "<group>"; };
+		3C0AE5A3C5B03BC200C81A6F /* scenegraph-gl.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = "scenegraph-gl.c"; sourceTree = "<group>"; };
+		3C0AE5A4C5B03BC200C81A6F /* scenegraph.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = scenegraph.h; sourceTree = "<group>"; };
+		3C0AE5A5C5B03BC200C81A6F /* sprite.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = sprite.c; sourceTree = "<group>"; };
+		3C0AE5A6C5B03BC200C81A6F /* sprite.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = sprite.h; sourceTree = "<group>"; };
+		3C0AE5A7C5B03BC200C81A6F /* text_input.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = text_input.c; sourceTree = "<group>"; };
+		3C0AE5A8C5B03BC200C81A6F /* text_input.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = text_input.h; sourceTree = "<group>"; };
+		3C0AE5A9C5B03BC200C81A6F /* text.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = text.c; sourceTree = "<group>"; };
+		3C0AE5AAC5B03BC200C81A6F /* text.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = text.h; sourceTree = "<group>"; };
+		3C0AE5ABC5B03BC200C81A6F /* texture.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; path = texture.c; sourceTree = "<group>"; };
+		3C0AE5ACC5B03BC200C81A6F /* texture.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = texture.h; sourceTree = "<group>"; };
+		3C54DE012F0BDD870078FB19 /* MyOpenGLView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = MyOpenGLView.h; sourceTree = "<group>"; };
+		3C54DE022F0BDD870078FB19 /* MyOpenGLView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = MyOpenGLView.m; sourceTree = "<group>"; };
+		3C54DE0B2F0BDDE30078FB19 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
+		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		8D1107320486CEB800E47090 /* CheckersCocoa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CheckersCocoa.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8D11072E0486CEB800E47090 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
+				3C54DE0C2F0BDDE30078FB19 /* OpenGL.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		080E96DDFE201D6D7F000001 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Classes;
+			sourceTree = "<group>";
+		};
+		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
+			);
+			name = "Linked Frameworks";
+			sourceTree = "<group>";
+		};
+		1058C7A2FEA54F0111CA2CBB /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
+				13E42FB307B3F0F600E4EEF1 /* CoreData.framework */,
+				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		19C28FACFE9D520D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8D1107320486CEB800E47090 /* CheckersCocoa.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29B97314FDCFA39411CA2CEA /* CheckersCocoa */ = {
+			isa = PBXGroup;
+			children = (
+				080E96DDFE201D6D7F000001 /* Classes */,
+				29B97315FDCFA39411CA2CEA /* Other Sources */,
+				29B97317FDCFA39411CA2CEA /* Resources */,
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
+				19C28FACFE9D520D11CA2CBB /* Products */,
+			);
+			name = CheckersCocoa;
+			sourceTree = "<group>";
+		};
+		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				3C0AE58EC5B03BC200C81A6F /* checkers.c */,
+				3C0AE58FC5B03BC200C81A6F /* checkers.h */,
+				3C0AE590C5B03BC200C81A6F /* game_checkers.c */,
+				3C0AE591C5B03BC200C81A6F /* game_checkers.h */,
+				3C0AE592C5B03BC200C81A6F /* game_display.c */,
+				3C0AE593C5B03BC200C81A6F /* game_display.h */,
+				3C0AE594C5B03BC200C81A6F /* game_interaction.c */,
+				3C0AE595C5B03BC200C81A6F /* game_interaction.h */,
+				3C0AE596C5B03BC200C81A6F /* game_net.c */,
+				3C0AE597C5B03BC200C81A6F /* game_net.h */,
+				3C0AE598C5B03BC200C81A6F /* game.c */,
+				3C0AE599C5B03BC200C81A6F /* game.h */,
+				3C0AE59AC5B03BC200C81A6F /* gui.c */,
+				3C0AE59BC5B03BC200C81A6F /* gui.h */,
+				3C0AE59CC5B03BC200C81A6F /* input.c */,
+				3C0AE59DC5B03BC200C81A6F /* input.h */,
+				3C0AE59EC5B03BC200C81A6F /* menu.c */,
+				3C0AE59FC5B03BC200C81A6F /* menu.h */,
+				3C0AE5A0C5B03BC200C81A6F /* models.h */,
+				3C0AE5A1C5B03BC200C81A6F /* net_menu.c */,
+				3C0AE5A2C5B03BC200C81A6F /* net_menu.h */,
+				3C0AE5A3C5B03BC200C81A6F /* scenegraph-gl.c */,
+				3C0AE5A4C5B03BC200C81A6F /* scenegraph.h */,
+				3C0AE5A5C5B03BC200C81A6F /* sprite.c */,
+				3C0AE5A6C5B03BC200C81A6F /* sprite.h */,
+				3C0AE5A7C5B03BC200C81A6F /* text_input.c */,
+				3C0AE5A8C5B03BC200C81A6F /* text_input.h */,
+				3C0AE5A9C5B03BC200C81A6F /* text.c */,
+				3C0AE5AAC5B03BC200C81A6F /* text.h */,
+				3C0AE5ABC5B03BC200C81A6F /* texture.c */,
+				3C0AE5ACC5B03BC200C81A6F /* texture.h */,
+				32CA4F630368D1EE00C91783 /* CheckersCocoa_Prefix.pch */,
+				29B97316FDCFA39411CA2CEA /* main.m */,
+				3C54DE012F0BDD870078FB19 /* MyOpenGLView.h */,
+				3C54DE022F0BDD870078FB19 /* MyOpenGLView.m */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		29B97317FDCFA39411CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				3C0AE57FC5B03BC200C81A6F /* textures */,
+				8D1107310486CEB800E47090 /* Info.plist */,
+				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
+				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3C54DE0B2F0BDDE30078FB19 /* OpenGL.framework */,
+				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
+				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8D1107260486CEB800E47090 /* CheckersCocoa */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "CheckersCocoa" */;
+			buildPhases = (
+				8D1107290486CEB800E47090 /* Resources */,
+				8D11072C0486CEB800E47090 /* Sources */,
+				8D11072E0486CEB800E47090 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CheckersCocoa;
+			productInstallPath = "$(HOME)/Applications";
+			productName = CheckersCocoa;
+			productReference = 8D1107320486CEB800E47090 /* CheckersCocoa.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29B97313FDCFA39411CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "CheckersCocoa" */;
+			hasScannedForEncodings = 1;
+			mainGroup = 29B97314FDCFA39411CA2CEA /* CheckersCocoa */;
+			projectDirPath = "";
+			targets = (
+				8D1107260486CEB800E47090 /* CheckersCocoa */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8D1107290486CEB800E47090 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */,
+				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
+				3C0AE583C5B03BC200C81A6F /* textures in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8D11072C0486CEB800E47090 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D11072D0486CEB800E47090 /* main.m in Sources */,
+				3C54DE032F0BDD870078FB19 /* MyOpenGLView.m in Sources */,
+				3C0AE5ADC5B03BC200C81A6F /* checkers.c in Sources */,
+				3C0AE5AEC5B03BC200C81A6F /* game_checkers.c in Sources */,
+				3C0AE5AFC5B03BC200C81A6F /* game_display.c in Sources */,
+				3C0AE5B0C5B03BC200C81A6F /* game_interaction.c in Sources */,
+				3C0AE5B1C5B03BC200C81A6F /* game_net.c in Sources */,
+				3C0AE5B2C5B03BC200C81A6F /* game.c in Sources */,
+				3C0AE5B3C5B03BC200C81A6F /* gui.c in Sources */,
+				3C0AE5B4C5B03BC200C81A6F /* input.c in Sources */,
+				3C0AE5B5C5B03BC200C81A6F /* menu.c in Sources */,
+				3C0AE5B6C5B03BC200C81A6F /* net_menu.c in Sources */,
+				3C0AE5B7C5B03BC200C81A6F /* scenegraph-gl.c in Sources */,
+				3C0AE5B8C5B03BC200C81A6F /* sprite.c in Sources */,
+				3C0AE5B9C5B03BC200C81A6F /* text_input.c in Sources */,
+				3C0AE5BAC5B03BC200C81A6F /* text.c in Sources */,
+				3C0AE5BBC5B03BC200C81A6F /* texture.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		089C165CFE840E0CC02AAC07 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				089C165DFE840E0CC02AAC07 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		29B97318FDCFA39411CA2CEA /* MainMenu.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				29B97319FDCFA39411CA2CEA /* English */,
+			);
+			name = MainMenu.nib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		C01FCF4B08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = CheckersCocoa;
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		C01FCF4C08A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = CheckersCocoa;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		C01FCF4F08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Debug;
+		};
+		C01FCF5008A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "CheckersCocoa" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4B08A954540054247B /* Debug */,
+				C01FCF4C08A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "CheckersCocoa" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4F08A954540054247B /* Debug */,
+				C01FCF5008A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+}

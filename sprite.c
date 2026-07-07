@@ -30,6 +30,8 @@
 #elif defined(USE_GL_ES)
 #include <GLES/gl.h>
 #define glOrtho glOrthof
+#elif defined(__APPLE__)
+#include <OpenGL/gl.h>
 #else
 #include <GL/gl.h>
 #endif
