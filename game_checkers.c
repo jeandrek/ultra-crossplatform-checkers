@@ -191,24 +191,27 @@ board_available_moves(board_t board, struct move moves[64][MAX_MOVES],
 		num_moves[i] = piece_moves(board, moves[i], player, i, 0);
 }
 
+int
+move_ends_turn(struct move *move, int player)
+{
+	struct move further_captures[MAX_MOVES];
+
+	return (move->captured < 0 || move->promotion ||
+		piece_moves(move->resulting_board, further_captures,
+			    player, move->location, 1) == 0);
+}
+
 /*
  * Performs move and returns whether the player's turn has ended yet.
  */
 int
 perform_move(board_t board, struct move *move, int player)
 {
-	struct move further_captures[MAX_MOVES];
-
 	board[0][MAN] = move->resulting_board[0][MAN];
 	board[0][KING] = move->resulting_board[0][KING];
 	board[1][MAN] = move->resulting_board[1][MAN];
 	board[1][KING] = move->resulting_board[1][KING];
-
-	if (move->captured > 0 && !move->promotion &&
-	    piece_moves(board, further_captures, player, move->location, 1) > 0)
-		return 0;
-	else
-		return 1;
+	return move_ends_turn(move, player);
 }
 
 /*

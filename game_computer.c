@@ -91,16 +91,11 @@ search(board_t board, int player, int depth, int moved_piece_idx)
 			} else {
 				struct move *move = &moves[i][j];
 				struct move next_move;
-				/* XXX better to make a pure version
-				   of perform_move */
-				struct move further_captures[MAX_MOVES];
-				int same_player = (move->captured > 0 &&
-						   !move->promotion &&
-						   piece_moves(board, further_captures, player, move->location, 1) > 0);
-				int next_player = same_player ? player : !player;
+				int ended = move_ends_turn(move, player);
+				int next_player = ended ? !player : player;
 				next_move = search(moves[i][j].resulting_board,
-						    next_player, depth - 1,
-						    same_player ? move->location : -1);
+						   next_player, depth - 1,
+						   ended ? -1 : move->location);
 				score = evaluate(next_move.resulting_board,
 						 player);
 			}

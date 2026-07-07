@@ -45,7 +45,7 @@ struct __attribute__ ((packed)) move {
 	int	location;
 	int	captured;
 	int	promotion;
-	board_t	resulting_board;
+	board_t	resulting_board; /* may remove */
 };
 
 #define MAX_MOVES	4
@@ -62,6 +62,8 @@ int piece_moves(board_t board, struct move *moves, int player, int i, int captur
 void board_available_moves(board_t board, struct move moves[64][MAX_MOVES],
 			   int *num_moves, int player,
 			   int moved_piece_idx);
+
+int move_ends_turn(struct move *move, int player);
 
 /*
  * Performs move and returns whether the player's turn has ended yet.

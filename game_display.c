@@ -350,7 +350,7 @@ game_display_apply_move(struct move *move)
 	if (move->promotion)
 		piece->type = KING;
 
-	if (move->captured > 0)
+	if (move->captured >= 0)
 		delete_piece(piece_at_location(move->captured));
 }
 
