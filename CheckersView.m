@@ -31,6 +31,7 @@
 #import "scenegraph.h"
 #import "input.h"
 #import "input_mapping-osx.h"
+#import "text_input.h"
 #import "CheckersView.h"
 
 static int8_t keycode_buttons[128];
@@ -80,8 +81,14 @@ static int8_t keycode_buttons[128];
 
 -(void)keyDown:(NSEvent *)evt {
 	int button = keycode_buttons[[evt keyCode]];
+	NSString *str = [evt characters];
 	if (button >= 0)
 		button_state[button] = 1;
+	for (int i = 0; i < [str length]; i++) {
+		unichar c = [str characterAtIndex:i];
+		if (c < 128)
+			text_input_add_char(c == 127 ? '\b' : c);
+	}
 }
 
 -(void)keyUp:(NSEvent *)evt {
