@@ -40,16 +40,6 @@ typedef uint64_t board_t[2][2];
  * capture; hence a turn may consist of several moves.
  */
 
-struct move {
-	uint32_t	from		: 6;
-	uint32_t	location	: 6;
-	int32_t		captured	: 7;
-	uint32_t	promotion	: 1;
-	uint32_t			: 12;
-};
-
-#define MAX_MOVES	4
-
 void board_init(board_t board);
 
 /*
@@ -58,18 +48,20 @@ void board_init(board_t board);
 int piece_occupying_square_belonging_to_player(board_t board, int i,
 					       int player);
 
-int piece_moves(board_t board, struct move *moves, int player, int i,
-		int capturing);
+uint64_t piece_moves(board_t board, int player, int i,
+		     int capturing);
 
-void board_available_moves(board_t board, struct move moves[64][MAX_MOVES],
-			   int *num_moves, int player,
-			   int moved_piece_idx);
+void board_available_moves(board_t board, uint64_t moves[64],
+			   int player, int moved_piece_idx);
+
+int is_promotion(int from, int to, int type, int player);
+int captured_piece_index(int from, int to);
 
 /*
  * Performs move and returns whether the player's turn has ended yet.  Can be used
  * destructively by passing the same board twice.
  */
-int perform_move(struct move *move, board_t board, int player, board_t result);
+int perform_move(int from, int to, board_t board, int player, board_t result);
 
 /*
  * Returns winner or -1, given a board and whose turn it is.

@@ -24,6 +24,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdlib.h>
+#include <string.h>
+
 #include "game_checkers.h"
 
 void
@@ -90,31 +93,14 @@ diag_adj_squares(int x, int y)
 
 #define LAST_ROW(player) ((player) == 0 ? 7 : 0)
 
-static void
-move_go_to_square(struct move *move, board_t board, int player, int piece, int i, int j)
+uint64_t
+piece_moves(board_t board, int player, int i, int capturing)
 {
-	move->from = i;
-	move->location = j;
-	move->captured = -1;
-	move->promotion = piece == MAN && j / 8 == LAST_ROW(player);
-}
-
-static void
-move_capture(struct move *move, board_t board, int player, int capturing, int captured,
-	     int i, int j, int k)
-{
-	move_go_to_square(move, board, player, capturing, i, k);
-	move->captured = j;
-}
-
-int
-piece_moves(board_t board, struct move *moves, int player, int i, int capturing)
-{
-	int piece;
+	uint64_t moves = 0;
 	uint64_t squares;
 	int x = i % 8;
 	int y = i / 8;
-	int n = 0;
+	int piece;
 
 	piece = piece_occupying_square_belonging_to_player(board, i, player);
 	if (piece == -1)
@@ -124,8 +110,11 @@ piece_moves(board_t board, struct move *moves, int player, int i, int capturing)
 
 	for (int j = 0; j < 64; j++) {
 		if ((squares >> j) & 1) {
-			int other;
-			if (capturing && (other = piece_occupying_square_belonging_to_player(board, j, !player)) != -1) {
+			if (!capturing && is_square_empty(board, j))
+				moves |= (uint64_t)1 << j;
+			if (capturing &&
+			    piece_occupying_square_belonging_to_player(board, j, !player)
+			    != -1) {
 				int x2 = j % 8;
 				int y2 = j / 8;
 				int x3, y3;
@@ -135,38 +124,31 @@ piece_moves(board_t board, struct move *moves, int player, int i, int capturing)
 				if (y3 < 0 || y3 > 7) continue;
 				if (x3 < 0 || x3 > 7) continue;
 				k = 8 * y3 + x3;
-				if (is_square_empty(board, k)) {
-					move_capture(&moves[n], board, player, piece,
-						     other, i, j, k);
-					n++;
-				}
-			} else if (!capturing && is_square_empty(board, j)) {
-				move_go_to_square(&moves[n], board, player, piece, i, j);
-				n++;
+				if (is_square_empty(board, k))
+					moves |= (uint64_t)1 << k;
 			}
 		}
 	}
-	return n;
+	return moves;
 }
 
 void
-board_available_moves(board_t board, struct move moves[64][MAX_MOVES],
-		      int *num_moves, int player, int moved_piece_idx)
+board_available_moves(board_t board, uint64_t moves[64],
+		      int player, int moved_piece_idx)
 {
 	int can_capture = 0;
 
 	if (moved_piece_idx != -1) {
-		for (int i = 0; i < 64; i++) num_moves[i] = 0;
-		num_moves[moved_piece_idx] =
-			piece_moves(board, moves[moved_piece_idx],
-				    player, moved_piece_idx, 1);
+		memset(moves, 0, 64*sizeof (uint64_t));
+		moves[moved_piece_idx] =
+			piece_moves(board, player, moved_piece_idx, 1);
 		return;
 	}
 
 	/* Available captures */
 	for (int i = 0; i < 64; i++) {
-		num_moves[i] = piece_moves(board, moves[i], player, i, 1);
-		if (num_moves[i] > 0)
+		moves[i] = piece_moves(board, player, i, 1);
+		if (moves[i] > 0)
 			can_capture = 1;
 	}
 
@@ -174,7 +156,23 @@ board_available_moves(board_t board, struct move moves[64][MAX_MOVES],
 		return;
 	/* Available non-captures */
 	for (int i = 0; i < 64; i++)
-		num_moves[i] = piece_moves(board, moves[i], player, i, 0);
+		moves[i] = piece_moves(board, player, i, 0);
+}
+
+int
+is_promotion(int from, int to, int type, int player)
+{
+	return type == MAN && to / 8 == LAST_ROW(player);
+}
+
+int
+captured_piece_index(int from, int to)
+{
+	int dist = abs(to - from);
+	int sign = (to - from)/dist;
+	if (dist == 14) return from + sign*7;
+	if (dist == 18) return from + sign*9;
+	return -1;
 }
 
 /*
@@ -182,26 +180,29 @@ board_available_moves(board_t board, struct move moves[64][MAX_MOVES],
  * destructively by passing the same board twice.
  */
 int
-perform_move(struct move *move, board_t board, int player, board_t result)
+perform_move(int from, int to, board_t board, int player, board_t result)
 {
-	int piece = piece_occupying_square_belonging_to_player(board, move->from, player);
-	struct move further_captures[MAX_MOVES];
+	int piece = piece_occupying_square_belonging_to_player(board, from, player);
+	int captured = captured_piece_index(from, to);
 	uint64_t mask = ~0;
+	int promoted = 0;
 
-	result[player][MAN] = board[player][MAN] & ~((uint64_t)1 << move->from);
-	result[player][KING] = board[player][KING] & ~((uint64_t)1 << move->from);
+	result[player][MAN] = board[player][MAN] & ~((uint64_t)1 << from);
+	result[player][KING] = board[player][KING] & ~((uint64_t)1 << from);
 
-	if (move->promotion) piece = KING;
-	result[player][piece] |= (uint64_t)1 << move->location;
+	if (is_promotion(from, to, piece, player)) {
+		promoted = 1;
+		piece = KING;
+	}
+	result[player][piece] |= (uint64_t)1 << to;
 
-	if (move->captured >= 0)
-		mask = ~((uint64_t)1 << move->captured);
+	if (captured >= 0)
+		mask = ~((uint64_t)1 << captured);
 	result[!player][MAN] = board[!player][MAN] & mask;
 	result[!player][KING] = board[!player][KING] & mask;
 
-	return (move->captured < 0 || move->promotion ||
-		piece_moves(result, further_captures,
-			    player, move->location, 1) == 0);
+	return (captured < 0 || promoted ||
+		piece_moves(result, player, to, 1) == 0);
 }
 
 /*
@@ -210,13 +211,13 @@ perform_move(struct move *move, board_t board, int player, board_t result)
 int
 winner(board_t board, int player)
 {
-	struct move moves[64][MAX_MOVES];
-	int num_moves[64];
+	uint64_t moves[64];
+
 	if (board[0][MAN] == 0 && board[0][KING] == 0) return 1;
 	if (board[1][MAN] == 0 && board[1][KING] == 0) return 0;
-	board_available_moves(board, moves, num_moves, player, -1);
+	board_available_moves(board, moves, player, -1);
 	for (int i = 0; i < 64; i++)
-		if (num_moves[i] > 0)
+		if (moves[i] > 0)
 			return -1;
 	return !player;
 }

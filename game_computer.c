@@ -81,22 +81,24 @@ struct scored_move {
 static struct scored_move
 search(board_t board, int player, int depth, int moved_piece_idx)
 {
-	struct move moves[64][MAX_MOVES];
 	struct scored_move best;
-	int num_moves[64];
+	uint64_t moves[64];
+
 #ifdef __psp__
 	sceKernelRotateThreadReadyQueue(0);
 #endif
-	board_available_moves(board, moves, num_moves, player,
-			      moved_piece_idx);
+	board_available_moves(board, moves, player, moved_piece_idx);
 	best.score = -1e10;
 	for (int i = 0; i < 64; i++) {
-		for (int j = 0; j < num_moves[i]; j++) {
-			struct move *move = &moves[i][j];
+		for (int j = 0; j < 64; j++) {
 			board_t new_board;
 			float score;
 			int ended;
-			ended = perform_move(move, board, player, new_board);
+
+			if (!(moves[i] & ((uint64_t)1 << j))) continue;
+
+			ended = perform_move(i, j, board, player, new_board);
+
 			if (depth == 0) {
 				score = evaluate(new_board, player);
 			} else {
@@ -104,12 +106,14 @@ search(board_t board, int player, int depth, int moved_piece_idx)
 				int next_player = ended ? !player : player;
 				next_move = search(new_board,
 						   next_player, depth - 1,
-						   ended ? -1 : move->location);
+						   ended ? -1 : j);
 				score = ended ? -next_move.score : next_move.score;
 			}
+
 			if (score >= best.score) {
 				best.score = score;
-				best.move = moves[i][j];
+				best.move.from = i;
+				best.move.to = j;
 			}
 		}
 	}

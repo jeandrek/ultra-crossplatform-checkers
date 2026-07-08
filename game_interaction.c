@@ -34,14 +34,12 @@
 #include "menu.h"
 #include "input.h"
 
-struct move board_moves[64][MAX_MOVES];
-int board_num_moves[64];
+uint64_t board_moves[64];
 
 int sel_square;
 int sel_piece_type;
-int sel_piece_moves_len;
-struct move *sel_piece_moves;
-int sel_move_idx;
+uint64_t sel_piece_moves;
+int sel_move;
 int user_player = 0;
 
 static void
@@ -52,7 +50,12 @@ set_sel_square(int i)
 		piece_occupying_square_belonging_to_player(cur_board, i,
 							   user_player);
 	sel_piece_moves = board_moves[i];
-	sel_piece_moves_len = board_num_moves[i];
+	for (int i = 0; i < 64; i++) {
+		if (sel_piece_moves & ((uint64_t)1 << i)) {
+			sel_move = i;
+			break;
+		}
+	}
 }
 
 static void
@@ -76,12 +79,11 @@ game_interaction_init(void)
 	game_display_set_viewpoint(user_player);
 	if (user_player == 0) {
 		cur_mode = SELECT_PIECE;
-		board_available_moves(cur_board, board_moves, board_num_moves,
-				      user_player, -1);
+		board_available_moves(cur_board, board_moves, user_player, -1);
 		set_sel_square(0);
 	} else {
 		cur_mode = WAIT_TURN;
-		sel_piece_moves_len = 0;
+		sel_piece_moves = 0;
 		if (game_type == COMPUTER)
 			game_computer_turn();
 	}
@@ -90,50 +92,47 @@ game_interaction_init(void)
 void
 game_interaction_turn(void)
 {
-	board_available_moves(cur_board, board_moves, board_num_moves,
-			      user_player, -1);
+	board_available_moves(cur_board, board_moves, user_player, -1);
 	set_sel_square(user_player == 0 ? 0 : 63);
 }
 
 static void
 select_piece_at_sel_square(void)
 {
-	if (sel_piece_moves_len > 0) {
+	if (sel_piece_moves > 0)
 		cur_mode = SELECT_MOVE;
-		sel_move_idx = (user_player == 0 ?
-				0 : sel_piece_moves_len - 1);
-	}
 }
 
 static void
 move_piece(void)
 {
-	int location = sel_piece_moves[sel_move_idx].location;
-	int finished = perform_move(&sel_piece_moves[sel_move_idx], cur_board,
+	int finished = perform_move(sel_square, sel_move, cur_board,
 				    user_player, cur_board);
+	int from = sel_square, to = sel_move;
 	game_dirty = 1;
-	game_display_apply_move(&sel_piece_moves[sel_move_idx]);
-	if (game_type == NETWORK)
-		game_net_send_move(&sel_piece_moves[sel_move_idx]);
+	game_display_apply_move(from, to);
+	if (game_type == NETWORK) {
+		struct move move;
+		move.from = from;
+		move.to = to;
+		game_net_send_move(&move);
+	}
 	else if (game_type == COMPUTER)
 		game_computer_turn();
-	sel_move_idx = 0;
 	end_turn = finished;
 	if (finished) {
 		if (game_type != LOCAL_2PLAYER) {
 			anim_done_mode = WAIT_TURN;
-			sel_piece_moves_len = 0;
+			sel_piece_moves = 0;
 		} else {
 			user_player = !user_player;
-			board_available_moves(cur_board, board_moves, board_num_moves,
-					      user_player, -1);
+			board_available_moves(cur_board, board_moves, user_player, -1);
 			set_sel_square(user_player == 0 ? 0 : 63);
 		}
 	} else {
 		anim_done_mode = SELECT_PIECE;
-		board_available_moves(cur_board, board_moves, board_num_moves,
-				      user_player, location);
-		set_sel_square(location);
+		board_available_moves(cur_board, board_moves, user_player, to);
+		set_sel_square(to);
 	}
 	cur_mode = ANIM_MOVE_PIECE;
 }
@@ -171,15 +170,17 @@ game_button_event(int button)
 			cur_mode = SELECT_PIECE;
 			break;
 		case INPUT_ACCEPT:
-			if (sel_piece_moves_len > 0)
+			if (sel_piece_moves > 0)
 				move_piece();
 			break;
 		case INPUT_UP:
 		case INPUT_DOWN:
 		case INPUT_LEFT:
 		case INPUT_RIGHT:
-			if (sel_piece_moves_len > 0)
-				sel_move_idx = (sel_move_idx + 1) % sel_piece_moves_len;
+			if (sel_piece_moves > 0)
+				do
+					sel_move = (sel_move + 1) % 64;
+				while (!(sel_piece_moves & ((uint64_t)1 << sel_move)));
 			break;
 		}
 	}
@@ -217,12 +218,10 @@ game_mouse_up_event(int x, int y)
 		select_piece_at_sel_square();
 	} else if (cur_mode == SELECT_MOVE) {
 		if (idx >= 0) {
-			for (int i = 0; i < sel_piece_moves_len; i++) {
-				if (sel_piece_moves[i].location == idx) {
-					sel_move_idx = i;
-					move_piece();
-					return;
-				}
+			if (sel_piece_moves & ((uint64_t)1 << idx)) {
+				sel_move = idx;
+				move_piece();
+				return;
 			}
 			set_sel_square(idx);
 		}
@@ -243,14 +242,9 @@ game_mouse_move_event(int x, int y)
 
 	if (idx < 0) return;
 
-	if (cur_mode == SELECT_PIECE) {
+	if (cur_mode == SELECT_PIECE)
 		set_sel_square(idx);
-	} else if (cur_mode == SELECT_MOVE) {
-		for (int i = 0; i < sel_piece_moves_len; i++) {
-			if (sel_piece_moves[i].location == idx) {
-				sel_move_idx = i;
-				break;
-			}
-		}
-	}
+	else if (cur_mode == SELECT_MOVE)
+		if (sel_piece_moves & ((uint64_t)1 << idx))
+			sel_move = idx;
 }

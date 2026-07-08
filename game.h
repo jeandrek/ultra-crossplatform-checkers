@@ -62,6 +62,10 @@ extern int menu_button_highlighted;
 
 void game_over(void);
 
+struct move {
+	int	from, to;
+};
+
 struct other_player {
 	int	(*poll_move)(void);
 	struct	move *(*next_move)(void);

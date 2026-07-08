@@ -137,17 +137,18 @@ render_pieces(struct scenegraph *scenegraph)
 
 	if (cur_mode != SELECT_PIECE && cur_mode != SELECT_MOVE) return;
 
-	for (int i = 0; i < sel_piece_moves_len; i++) {
+	for (int i = 0; i < 64; i++) {
 		float x, y, z;
 		int color;
+		if (!((sel_piece_moves >> i) & 1)) continue;
 		if (user_player == 0)
-			color = (cur_mode == SELECT_MOVE && i == sel_move_idx ?
+			color = (cur_mode == SELECT_MOVE && i == sel_move ?
 				 COLOR_PLAYER_0_SEL : COLOR_PLAYER_0);
 		else
-			color = (cur_mode == SELECT_MOVE && i == sel_move_idx ?
+			color = (cur_mode == SELECT_MOVE && i == sel_move ?
 				 COLOR_PLAYER_1_SEL : COLOR_PLAYER_1);
 		color = HALF_ALPHA(color);
-		board_pos_to_world_pos(&x, &y, &z, sel_piece_moves[i].location);
+		board_pos_to_world_pos(&x, &y, &z, i);
 		render_piece(scenegraph, sel_piece_type, x, y, z, color);
 	}
 }
@@ -332,25 +333,27 @@ game_anim_rotate_board(void)
 }
 
 void
-game_display_apply_move(struct move *move)
+game_display_apply_move(int from, int to)
 {
 	struct piece *piece;
+	int captured;
 
-	piece = piece_at_location(move->from);
+	piece = piece_at_location(from);
 
-	piece->location = move->location;
+	piece->location = to;
 
 	anim.piece = piece;
 	anim.x1 = piece->x;
 	anim.y1 = piece->y;
 	anim.z1 = piece->z;
-	board_pos_to_world_pos(&anim.x2, &anim.y2, &anim.z2, move->location);
+	board_pos_to_world_pos(&anim.x2, &anim.y2, &anim.z2, to);
 
-	if (move->promotion)
+	if (is_promotion(from, to, piece->type, piece->player))
 		piece->type = KING;
 
-	if (move->captured >= 0)
-		delete_piece(piece_at_location(move->captured));
+	captured = captured_piece_index(from, to);
+	if (captured >= 0)
+		delete_piece(piece_at_location(captured));
 }
 
 void

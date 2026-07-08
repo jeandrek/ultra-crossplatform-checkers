@@ -31,9 +31,8 @@
 
 extern int sel_square;
 extern int sel_piece_type;
-extern int sel_piece_moves_len;
-extern struct move *sel_piece_moves;
-extern int sel_move_idx;
+extern uint64_t sel_piece_moves;
+extern int sel_move;
 extern int user_player;
 
 void game_interaction_init(void);

@@ -28,7 +28,6 @@
 #define _GAME_NET_H_
 
 #include "game.h"
-#include "game_checkers.h"
 
 struct disc_ent {
 	char		*name;

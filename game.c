@@ -118,9 +118,10 @@ game_update(void)
 			return;
 		}
 
-		finished = perform_move(move, cur_board, !user_player, cur_board);
+		finished = perform_move(move->from, move->to,
+					cur_board, !user_player, cur_board);
 		game_dirty = 1;
-		game_display_apply_move(move);
+		game_display_apply_move(move->from, move->to);
 		cur_mode = ANIM_MOVE_PIECE;
 		anim_done_mode = finished ? SELECT_PIECE : WAIT_TURN;
 		if (finished)

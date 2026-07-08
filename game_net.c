@@ -61,25 +61,6 @@ struct other_player other_player_net = {
 	.next_move = game_net_recv_move
 };
 
-#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-/* LE system */
-struct __attribute__ ((packed)) move_be {
-	uint32_t			: 12;
-	uint32_t	promotion	: 1;
-	int32_t		captured	: 7;
-	uint32_t	location	: 6;
-	uint32_t	from		: 6;
-};
-#else
-struct __attribute__ ((packed)) move_be {
-	uint32_t	from		: 6;
-	uint32_t	location	: 6;
-	int32_t		captured	: 7;
-	uint32_t	promotion	: 1;
-	uint32_t			: 12;
-};
-#endif
-
 static int	game_net_connect_to_client(void);
 static void	game_net_send_header(void);
 static int	game_net_check_header(void);
@@ -468,28 +449,24 @@ struct move *
 game_net_recv_move(void)
 {
 	static struct move move;
-	struct move_be move_be;
+	char data[2];
 	ssize_t val;
 
-	val = recv(conn_sock, (char *)&move_be, sizeof (move_be), 0);
-	if (val == 0 || val == -1)
+	val = recv(conn_sock, data, 2, 0);
+	if (val < 2)
 		return NULL;
-	move.from = move_be.from;
-	move.location = move_be.location;
-	move.captured = move_be.captured;
-	move.promotion = move_be.promotion;
+	move.from = data[0];
+	move.to = data[1];
 	return &move;
 }
 
 void
 game_net_send_move(struct move *move)
 {
-	struct move_be move_be;
-	move_be.from = move->from;
-	move_be.location = move->location;
-	move_be.captured = move->captured;
-	move_be.promotion = move->promotion;
-	send(conn_sock, (char *)&move_be, sizeof (move_be), 0);
+	char data[2];
+	data[0] = move->from;
+	data[1] = move->to;
+	send(conn_sock, data, 2, 0);
 }
 
 void
