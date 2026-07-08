@@ -141,15 +141,14 @@ game_computer_poll_move(void)
 	return move_made;
 }
 
-int
-game_computer_next_move(struct move *move)
+struct move *
+game_computer_next_move(void)
 {
 	if (move_made) {
 		move_made = 0;
-		*move = my_move.move;
-		return 1;
+		return &my_move.move;
 	}
-	return 0;
+	return NULL;
 }
 
 #if defined(_WIN32)

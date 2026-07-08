@@ -465,23 +465,23 @@ game_net_poll_move(void)
 	return select(conn_sock + 1, &fds, NULL, NULL, &timeout);
 }
 
-int
-game_net_recv_move(struct move *move)
+struct move *
+game_net_recv_move(void)
 {
-	struct move move_be;
+	static struct move move;
 	ssize_t val;
 
-	val = recv(conn_sock, (char *)&move_be, sizeof (move_be), 0);
+	val = recv(conn_sock, (char *)&move, sizeof (move), 0);
 	if (val == 0 || val == -1)
-		return 0;
-	move->from = ntohl(move_be.from);
-	move->location = ntohl(move_be.location);
-	move->captured = ntohl(move_be.captured);
-	move->promotion = ntohl(move_be.promotion);
+		return NULL;
+	move.from = ntohl(move.from);
+	move.location = ntohl(move.location);
+	move.captured = ntohl(move.captured);
+	move.promotion = ntohl(move.promotion);
 	for (int i = 0; i < 2; i++)
 		for (int j = 0; j < 2; j++)
-			move->resulting_board[i][j] = ntohll(move_be.resulting_board[i][j]);
-	return 1;
+			move.resulting_board[i][j] = ntohll(move.resulting_board[i][j]);
+	return &move;
 }
 
 void

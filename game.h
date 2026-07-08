@@ -64,7 +64,7 @@ void game_over(void);
 
 struct other_player {
 	int	(*poll_move)(void);
-	int	(*next_move)(struct move *);
+	struct	move *(*next_move)(void);
 };
 
 #endif /* !_GAME_H_ */
