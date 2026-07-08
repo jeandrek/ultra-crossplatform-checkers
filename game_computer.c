@@ -184,7 +184,7 @@ engine_thread(SceSize args, void *arg)
 #else
 #error Not yet supported
 #endif
-		my_move = search(cur_board, game_computer_player, 6, -1);
+		my_move = search(cur_board, game_computer_player, 5, -1);
 		move_made = 1;
 	}
 	return 0;

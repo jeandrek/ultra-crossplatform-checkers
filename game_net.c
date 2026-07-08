@@ -452,7 +452,7 @@ game_net_recv_move(struct move *move)
 	ssize_t val;
 
 	val = recv(conn_sock, data, sizeof (data), 0);
-	if (val < sizeof (data))
+	if (val < (ssize_t)sizeof (data))
 		return 0;
 	move->from = data[0];
 	move->to = data[1];
