@@ -94,6 +94,9 @@ game_update(void)
 {
 	if (cur_mode == ANIM_MOVE_PIECE) {
 		if (!game_anim_move_piece()) {
+			if (end_turn)
+				cur_player = !cur_player;
+
 			if (end_turn && winner(cur_board, cur_player) != -1)
 				game_over();
 			else if (end_turn && game_type == LOCAL_2PLAYER)
@@ -120,12 +123,10 @@ game_update(void)
 		game_display_apply_move(&move);
 		cur_mode = ANIM_MOVE_PIECE;
 		anim_done_mode = finished ? SELECT_PIECE : WAIT_TURN;
-		if (finished) {
-			cur_player = user_player;
+		if (finished)
 			game_interaction_turn();
-		} else if (game_type == COMPUTER) {
+		else if (game_type == COMPUTER)
 			game_computer_turn();
-		}
 		end_turn = finished;
 	}
 }
