@@ -115,6 +115,7 @@ main_menu(void)
 		{.x = 0, .y = -0.2, .data = "Return"}
 	};
 	menu_set_elements(3, main_menu_elems);
+	elems[2].disabled = game_type == NO_GAME;
 	gui_set_rows(3, 1, &elems[0], 1, &elems[1], 1, &elems[2]);
 	gui_set_action_proc(main_menu_action);
 }
@@ -177,7 +178,7 @@ menu_render_items(struct scenegraph *scenegraph)
 {
 	text_size(1);
 	for (int i = 0; i < num_elems; i++) {
-		text_color(button_color(elems[i].row, elems[i].col));
+		text_color(button_color(elems[i].row, elems[i].col, elems[i].disabled));
 		text_draw(scenegraph, elems[i].data, elems[i].x, elems[i].y,
 			  TEXT_CENTRE);
 	}

@@ -55,6 +55,9 @@ static void menu_button_init(void);
 static void
 game_init(void)
 {
+	if (game_type == NO_GAME)
+		game_type = LOCAL_2PLAYER;
+
 	game_dirty = 0;
 	cur_player = 0;
 	board_init(cur_board);
@@ -151,6 +154,7 @@ game_destroy(void)
 	}
 	game_display_destroy();
 	game_dirty = 0;
+	game_type = NO_GAME;
 }
 
 struct state game = {

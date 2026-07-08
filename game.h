@@ -41,6 +41,7 @@ enum mode {
 };
 
 enum type {
+	NO_GAME,
 	LOCAL_2PLAYER,
 	NETWORK,
 	COMPUTER

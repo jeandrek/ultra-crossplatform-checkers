@@ -289,7 +289,7 @@ join_menu_render_items(struct scenegraph *scenegraph)
 	text_color(0xffaaaaaa);
 	text_draw(scenegraph, "Discovered games:", 0, 0.7, TEXT_CENTRE);
 	for (struct join_item *item = join_items; item; item = item->next) {
-		text_color(button_color(item->elem.row, item->elem.col));
+		text_color(button_color(item->elem.row, item->elem.col, 0));
 		text_draw(scenegraph, item->disc_ent->name,
 			  item->elem.x, item->elem.y,
 			  TEXT_CENTRE);

@@ -104,9 +104,9 @@ text_input_render(struct scenegraph *scenegraph)
 	text_draw(scenegraph, text_buffer, 0, 0, TEXT_CENTRE);
 	text_color(0xffaaaaaa);
 	text_draw(scenegraph, text_input_label, 0, 0.2, TEXT_CENTRE);
-	text_color(button_color(1, 0));
+	text_color(button_color(1, 0, 0));
 	text_draw(scenegraph, "OK", -0.2, -0.2, TEXT_CENTRE);
-	text_color(button_color(1, 1));
+	text_color(button_color(1, 1, 0));
 	text_draw(scenegraph, "Cancel", 0.2, -0.2, TEXT_CENTRE);
 }
 

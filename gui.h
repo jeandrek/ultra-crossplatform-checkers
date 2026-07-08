@@ -27,7 +27,7 @@
 #ifndef _GUI_H_
 #define _GUI_H_
 
-uint32_t button_color(int i, int j);
+uint32_t button_color(int i, int j, int disabled);
 void button_bounds(struct scenegraph *scenegraph, int len,
 		   float x, float y, struct rect *bounds);
 
@@ -35,6 +35,7 @@ struct element {
 	float	x, y;
 	struct rect bounds;
 	int	row, col;
+	int	disabled;
 	void	*data;
 };
 

@@ -50,12 +50,12 @@ static int mouse_x, mouse_y;
 static void gui_mouse_focus(int x, int y);
 
 uint32_t
-button_color(int i, int j)
+button_color(int i, int j, int disabled)
 {
 	if (i == gui_focus_row && j == gui_focus_col)
-		return 0xffffffff;
+		return disabled ? 0xff777777 : 0xffffffff;
 	else
-		return 0xffaaaaaa;
+		return disabled ? 0xff444444 : 0xffaaaaaa;
 }
 
 void
@@ -150,7 +150,8 @@ gui_mouse_up_event(int x, int y)
 		for (int j = 0; j < rows[i].len; j++) {
 			struct rect *bounds = &rows[i].elems[j]->bounds;
 			if (point_in_rect(x, y, bounds)) {
-				action(i, j);
+				if (!rows[i].elems[j]->disabled)
+					action(i, j);
 				goto quit;
 			}
 		}
@@ -207,7 +208,8 @@ gui_button_event(int button)
 		gui_focus_col = 0;
 		break;
 	case INPUT_ACCEPT:
-		action(gui_focus_row, gui_focus_col);
+		if (!rows[gui_focus_row].elems[gui_focus_col]->disabled)
+			action(gui_focus_row, gui_focus_col);
 		break;
 	}
 }
