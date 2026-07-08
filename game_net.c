@@ -477,10 +477,6 @@ game_net_recv_move(void)
 	move.from = ntohl(move.from);
 	move.location = ntohl(move.location);
 	move.captured = ntohl(move.captured);
-	move.promotion = ntohl(move.promotion);
-	for (int i = 0; i < 2; i++)
-		for (int j = 0; j < 2; j++)
-			move.resulting_board[i][j] = ntohll(move.resulting_board[i][j]);
 	return &move;
 }
 
@@ -491,10 +487,6 @@ game_net_send_move(struct move *move)
 	move_be.from = htonl(move->from);
 	move_be.location = htonl(move->location);
 	move_be.captured = htonl(move->captured);
-	move_be.promotion = htonl(move->promotion);
-	for (int i = 0; i < 2; i++)
-		for (int j = 0; j < 2; j++)
-			move_be.resulting_board[i][j] = htonll(move->resulting_board[i][j]);
 	send(conn_sock, (char *)&move_be, sizeof (move_be), 0);
 }
 

@@ -92,16 +92,17 @@ search(board_t board, int player, int depth, int moved_piece_idx)
 	best.score = -1e10;
 	for (int i = 0; i < 64; i++) {
 		for (int j = 0; j < num_moves[i]; j++) {
+			struct move *move = &moves[i][j];
+			board_t new_board;
 			float score;
+			int ended;
+			ended = move_resulting_board(move, board, player, new_board);
 			if (depth == 0) {
-				score = evaluate(moves[i][j].resulting_board,
-						 player);
+				score = evaluate(new_board, player);
 			} else {
-				struct move *move = &moves[i][j];
 				struct scored_move next_move;
-				int ended = move_ends_turn(move, player);
 				int next_player = ended ? !player : player;
-				next_move = search(moves[i][j].resulting_board,
+				next_move = search(new_board,
 						   next_player, depth - 1,
 						   ended ? -1 : move->location);
 				score = ended ? -next_move.score : next_move.score;

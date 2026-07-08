@@ -96,20 +96,7 @@ move_go_to_square(struct move *move, board_t board, int player, int piece, int i
 	move->from = i;
 	move->location = j;
 	move->captured = -1;
-	if (piece == MAN && j / 8 == LAST_ROW(player)) {
-		move->promotion = 1;
-		move->resulting_board[player][MAN] =
-			board[player][MAN] ^ (uint64_t)1<<i;
-		move->resulting_board[player][KING] =
-			board[player][KING] | (uint64_t)1<<j;
-	} else {
-		move->promotion = 0;
-		move->resulting_board[player][piece] =
-			(board[player][piece] ^ (uint64_t)1<<i) | (uint64_t)1<<j;
-		move->resulting_board[player][!piece] = board[player][!piece];
-	}
-	move->resulting_board[!player][piece] = board[!player][piece];
-	move->resulting_board[!player][!piece] = board[!player][!piece];
+	move->promotion = piece == MAN && j / 8 == LAST_ROW(player);
 }
 
 static void
@@ -118,7 +105,6 @@ move_capture(struct move *move, board_t board, int player, int capturing, int ca
 {
 	move_go_to_square(move, board, player, capturing, i, k);
 	move->captured = j;
-	move->resulting_board[!player][captured] ^= (uint64_t)1<<j;
 }
 
 int
@@ -192,12 +178,25 @@ board_available_moves(board_t board, struct move moves[64][MAX_MOVES],
 }
 
 int
-move_ends_turn(struct move *move, int player)
+move_resulting_board(struct move *move, board_t board, int player, board_t result)
 {
+	int piece = piece_occupying_square_belonging_to_player(board, move->from, player);
 	struct move further_captures[MAX_MOVES];
+	uint64_t mask = ~0;
+
+	result[player][MAN] = board[player][MAN] & ~((uint64_t)1 << move->from);
+	result[player][KING] = board[player][KING] & ~((uint64_t)1 << move->from);
+
+	if (move->promotion) piece = KING;
+	result[player][piece] |= (uint64_t)1 << move->location;
+
+	if (move->captured >= 0)
+		mask = ~((uint64_t)1 << move->captured);
+	result[!player][MAN] = board[!player][MAN] & mask;
+	result[!player][KING] = board[!player][KING] & mask;
 
 	return (move->captured < 0 || move->promotion ||
-		piece_moves(move->resulting_board, further_captures,
+		piece_moves(result, further_captures,
 			    player, move->location, 1) == 0);
 }
 
@@ -207,15 +206,19 @@ move_ends_turn(struct move *move, int player)
 int
 perform_move(board_t board, struct move *move, int player)
 {
-	board[0][MAN] = move->resulting_board[0][MAN];
-	board[0][KING] = move->resulting_board[0][KING];
-	board[1][MAN] = move->resulting_board[1][MAN];
-	board[1][KING] = move->resulting_board[1][KING];
-	return move_ends_turn(move, player);
+	board_t new_board;
+	int ended;
+
+	ended = move_resulting_board(move, board, player, new_board);
+	board[0][MAN] = new_board[0][MAN];
+	board[0][KING] = new_board[0][KING];
+	board[1][MAN] = new_board[1][MAN];
+	board[1][KING] = new_board[1][KING];
+	return ended;
 }
 
 /*
- * Returns winner or -1, given a board and whose turn it is.
+ * Returns winner or -1, given a board, available moves, and whose turn it is.
  */
 int
 winner(board_t board, int player)

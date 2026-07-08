@@ -63,7 +63,7 @@ void	game_net_disconnect(void);
 extern char game_net_player;
 
 #define PROTOCOL_MAJOR	0
-#define PROTOCOL_MINOR	2
+#define PROTOCOL_MINOR	3
 struct __attribute__ ((packed)) checkers_header {
 	uint8_t	magic[2];
 	uint8_t	major;

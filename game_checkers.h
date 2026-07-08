@@ -41,11 +41,10 @@ typedef uint64_t board_t[2][2];
  */
 
 struct __attribute__ ((packed)) move {
-	int	from;
-	int	location;
-	int	captured;
-	int	promotion;
-	board_t	resulting_board; /* may remove */
+	unsigned int	from		: 6;
+	unsigned int	location	: 6;
+	int		captured	: 7;
+	unsigned int	promotion	: 1;
 };
 
 #define MAX_MOVES	4
@@ -55,15 +54,18 @@ void board_init(board_t board);
 /*
  * Returns piece or -1.
  */
-int piece_occupying_square_belonging_to_player(board_t board, int i, int player);
+int piece_occupying_square_belonging_to_player(board_t board, int i,
+					       int player);
 
-int piece_moves(board_t board, struct move *moves, int player, int i, int capturing);
+int piece_moves(board_t board, struct move *moves, int player, int i,
+		int capturing);
 
 void board_available_moves(board_t board, struct move moves[64][MAX_MOVES],
 			   int *num_moves, int player,
 			   int moved_piece_idx);
 
-int move_ends_turn(struct move *move, int player);
+int move_resulting_board(struct move *move, board_t board, int player,
+			 board_t result);
 
 /*
  * Performs move and returns whether the player's turn has ended yet.
@@ -71,8 +73,10 @@ int move_ends_turn(struct move *move, int player);
 int perform_move(board_t board, struct move *move, int player);
 
 /*
- * Returns winner or -1, given a board and whose turn it is.
+ * Returns winner or -1, given a board, available moves, and whose turn it is.
  */
 int winner(board_t board, int player);
+//struct move moves[64][MAX_MOVES]);
+	   //	   int *num_moves, int player);
 
 #endif /* !_GAME_CHECKERS_H_ */
