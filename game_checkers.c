@@ -215,12 +215,18 @@ perform_move(board_t board, struct move *move, int player)
 }
 
 /*
- * Returns winner or -1.
+ * Returns winner or -1, given a board and whose turn it is.
  */
 int
-winner(board_t board)
+winner(board_t board, int player)
 {
+	struct move moves[64][MAX_MOVES];
+	int num_moves[64];
 	if (board[0][MAN] == 0 && board[0][KING] == 0) return 1;
 	if (board[1][MAN] == 0 && board[1][KING] == 0) return 0;
-	return -1;
+	board_available_moves(board, moves, num_moves, player, -1);
+	for (int i = 0; i < 64; i++)
+		if (num_moves[i] > 0)
+			return -1;
+	return !player;
 }

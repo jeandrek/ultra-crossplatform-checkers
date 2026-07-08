@@ -37,6 +37,7 @@
 board_t cur_board;
 int game_dirty;
 enum type game_type;
+int cur_player;
 enum mode cur_mode;
 enum mode anim_done_mode;
 int end_turn;
@@ -55,6 +56,7 @@ static void
 game_init(void)
 {
 	game_dirty = 0;
+	cur_player = 0;
 	board_init(cur_board);
 	game_display_init();
 #ifndef __psp__
@@ -92,7 +94,7 @@ game_update(void)
 {
 	if (cur_mode == ANIM_MOVE_PIECE) {
 		if (!game_anim_move_piece()) {
-			if (end_turn && winner(cur_board) != -1)
+			if (end_turn && winner(cur_board, cur_player) != -1)
 				game_over();
 			else if (end_turn && game_type == LOCAL_2PLAYER)
 				cur_mode = ANIM_ROTATE_BOARD;
@@ -118,10 +120,12 @@ game_update(void)
 		game_display_apply_move(&move);
 		cur_mode = ANIM_MOVE_PIECE;
 		anim_done_mode = finished ? SELECT_PIECE : WAIT_TURN;
-		if (finished)
+		if (finished) {
+			cur_player = user_player;
 			game_interaction_turn();
-		else if (game_type == COMPUTER)
+		} else if (game_type == COMPUTER) {
 			game_computer_turn();
+		}
 		end_turn = finished;
 	}
 }

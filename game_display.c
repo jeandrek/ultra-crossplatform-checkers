@@ -158,7 +158,7 @@ render_status(struct scenegraph *scenegraph)
 	char *text = NULL;
 
 	if (cur_mode == GAME_OVER)
-		text = winner(cur_board) == 0 ? "Red wins" : "Black wins";
+		text = winner(cur_board, user_player) == 0 ? "Red wins" : "Black wins";
 	else if (cur_mode == LOST_CONNECTION)
 		text = "Lost connection";
 
@@ -169,8 +169,7 @@ render_status(struct scenegraph *scenegraph)
 		text_draw(scenegraph, text, 0, 0, TEXT_CENTRE);
 	} else {
 		float margin = (FONT_HEIGHT/2 + 8) * 2.0/game.sg.height;
-		int player = cur_mode == WAIT_TURN ? !user_player : user_player;
-		text = player == 0 ? "Red to move" : "Black to move";
+		text = cur_player == 0 ? "Red to move" : "Black to move";
 		text_size(1);
 		text_color(0xffaaaaaa);
 		text_draw(scenegraph, text, 0, 1 - margin, TEXT_CENTRE);

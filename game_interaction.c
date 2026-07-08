@@ -121,10 +121,11 @@ move_piece(void)
 	end_turn = finished;
 	if (finished) {
 		if (game_type != LOCAL_2PLAYER) {
+			cur_player = !user_player;
 			anim_done_mode = WAIT_TURN;
 			sel_piece_moves_len = 0;
 		} else {
-			user_player = !user_player;
+			cur_player = user_player = !user_player;
 			board_available_moves(cur_board, board_moves, board_num_moves,
 					      user_player, -1);
 			set_sel_square(user_player == 0 ? 0 : 63);

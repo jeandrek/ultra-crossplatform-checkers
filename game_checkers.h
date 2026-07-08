@@ -71,8 +71,8 @@ int move_ends_turn(struct move *move, int player);
 int perform_move(board_t board, struct move *move, int player);
 
 /*
- * Returns winner or -1.
+ * Returns winner or -1, given a board and whose turn it is.
  */
-int winner(board_t board);
+int winner(board_t board, int player);
 
 #endif /* !_GAME_CHECKERS_H_ */

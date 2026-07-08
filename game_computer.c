@@ -61,6 +61,9 @@ static float
 evaluate(board_t board, int player)
 {
 	float score = 0;
+	int w = winner(board, !player);
+	if (w != -1)
+		return w == player ? 1e10 : -1e10;
 	for (int i = 0; i < 64; i++) {
 		if ((board[player][MAN] >> i) & 1)	score += 1;
 		if ((board[player][KING] >> i) & 1)	score += 2;
@@ -174,7 +177,10 @@ engine_thread(SceSize args, void *arg)
 #else
 #error Not yet supported
 #endif
-		my_move = search(cur_board, game_computer_player, 6, -1);
+		my_move = search(cur_board, game_computer_player, 4, -1);
+#ifdef __unix__
+		printf("move score %f\n", my_move.score);
+#endif
 		move_made = 1;
 	}
 	return 0;

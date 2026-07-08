@@ -50,6 +50,7 @@ extern struct state game;
 extern board_t cur_board;
 extern int game_dirty;
 extern enum type game_type;
+extern int cur_player;
 extern enum mode cur_mode;
 extern enum mode anim_done_mode;
 extern int end_turn;
