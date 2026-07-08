@@ -1,8 +1,8 @@
 # Checkers
 
-This work-in-progress 3D checkers implementation aims to be really portable.
-Person vs. computer does not (yet) exist.  Rendering uses OpenGL (ES) on most
-platforms.
+This 3D checkers implementation aims to be really portable.  You can play
+against another person locally, against the computer, or over the network.
+Rendering uses OpenGL (ES) on most platforms.
 
 ## Installation
 
