@@ -50,10 +50,19 @@ set_sel_square(int i)
 		piece_occupying_square_belonging_to_player(cur_board, i,
 							   user_player);
 	sel_piece_moves = board_moves[i];
-	for (int i = 0; i < 64; i++) {
-		if (sel_piece_moves & ((uint64_t)1 << i)) {
-			sel_move = i;
-			break;
+	if (user_player == 0) {
+		for (int i = 0; i < 64; i++) {
+			if (sel_piece_moves & ((uint64_t)1 << i)) {
+				sel_move = i;
+				break;
+			}
+		}
+	} else {
+		for (int i = 63; i >= 0; i--) {
+			if (sel_piece_moves & ((uint64_t)1 << i)) {
+				sel_move = i;
+				break;
+			}
 		}
 	}
 }
