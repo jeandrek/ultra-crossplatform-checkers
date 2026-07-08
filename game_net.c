@@ -61,24 +61,23 @@ struct other_player other_player_net = {
 	.next_move = game_net_recv_move
 };
 
-#ifndef _WIN32
 #if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 /* LE system */
-static inline uint64_t
-byte_swap_u64(uint64_t x)
-{
-	return ((x & 0xff) << 56 | ((x >> 8) & 0xff) << 48 |
-		((x >> 16) & 0xff) << 40 | ((x >> 24) & 0xff) << 32 |
-		((x >> 32) & 0xff) << 24 | ((x >> 40) & 0xff) << 16 |
-		((x >> 48) & 0xff) << 8  | x >> 56);
-}
-
-#define ntohll(x) byte_swap_u64(x)
-#define htonll(x) byte_swap_u64(x)
+struct __attribute__ ((packed)) move_be {
+	uint32_t			: 12;
+	uint32_t	promotion	: 1;
+	int32_t		captured	: 7;
+	uint32_t	location	: 6;
+	uint32_t	from		: 6;
+};
 #else
-#define ntohll(x) x
-#define htonll(x) x
-#endif
+struct __attribute__ ((packed)) move_be {
+	uint32_t	from		: 6;
+	uint32_t	location	: 6;
+	int32_t		captured	: 7;
+	uint32_t	promotion	: 1;
+	uint32_t			: 12;
+};
 #endif
 
 static int	game_net_connect_to_client(void);
@@ -469,24 +468,27 @@ struct move *
 game_net_recv_move(void)
 {
 	static struct move move;
+	struct move_be move_be;
 	ssize_t val;
 
-	val = recv(conn_sock, (char *)&move, sizeof (move), 0);
+	val = recv(conn_sock, (char *)&move_be, sizeof (move_be), 0);
 	if (val == 0 || val == -1)
 		return NULL;
-	move.from = ntohl(move.from);
-	move.location = ntohl(move.location);
-	move.captured = ntohl(move.captured);
+	move.from = move_be.from;
+	move.location = move_be.location;
+	move.captured = move_be.captured;
+	move.promotion = move_be.promotion;
 	return &move;
 }
 
 void
 game_net_send_move(struct move *move)
 {
-	struct move move_be;
-	move_be.from = htonl(move->from);
-	move_be.location = htonl(move->location);
-	move_be.captured = htonl(move->captured);
+	struct move_be move_be;
+	move_be.from = move->from;
+	move_be.location = move->location;
+	move_be.captured = move->captured;
+	move_be.promotion = move->promotion;
 	send(conn_sock, (char *)&move_be, sizeof (move_be), 0);
 }
 

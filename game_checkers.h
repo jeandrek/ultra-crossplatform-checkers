@@ -40,11 +40,12 @@ typedef uint64_t board_t[2][2];
  * capture; hence a turn may consist of several moves.
  */
 
-struct __attribute__ ((packed)) move {
-	unsigned int	from		: 6;
-	unsigned int	location	: 6;
-	int		captured	: 7;
-	unsigned int	promotion	: 1;
+struct move {
+	uint32_t	from		: 6;
+	uint32_t	location	: 6;
+	int32_t		captured	: 7;
+	uint32_t	promotion	: 1;
+	uint32_t			: 12;
 };
 
 #define MAX_MOVES	4
