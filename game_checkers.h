@@ -71,10 +71,8 @@ void board_available_moves(board_t board, struct move moves[64][MAX_MOVES],
 int perform_move(struct move *move, board_t board, int player, board_t result);
 
 /*
- * Returns winner or -1, given a board, available moves, and whose turn it is.
+ * Returns winner or -1, given a board and whose turn it is.
  */
 int winner(board_t board, int player);
-//struct move moves[64][MAX_MOVES]);
-	   //	   int *num_moves, int player);
 
 #endif /* !_GAME_CHECKERS_H_ */
