@@ -96,7 +96,7 @@ search(board_t board, int player, int depth, int moved_piece_idx)
 			board_t new_board;
 			float score;
 			int ended;
-			ended = move_resulting_board(move, board, player, new_board);
+			ended = perform_move(move, board, player, new_board);
 			if (depth == 0) {
 				score = evaluate(new_board, player);
 			} else {

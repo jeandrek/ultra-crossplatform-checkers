@@ -109,8 +109,8 @@ static void
 move_piece(void)
 {
 	int location = sel_piece_moves[sel_move_idx].location;
-	int finished = perform_move(cur_board, &sel_piece_moves[sel_move_idx],
-				    user_player);
+	int finished = perform_move(&sel_piece_moves[sel_move_idx], cur_board,
+				    user_player, cur_board);
 	game_dirty = 1;
 	game_display_apply_move(&sel_piece_moves[sel_move_idx]);
 	if (game_type == NETWORK)

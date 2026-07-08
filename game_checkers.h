@@ -64,13 +64,11 @@ void board_available_moves(board_t board, struct move moves[64][MAX_MOVES],
 			   int *num_moves, int player,
 			   int moved_piece_idx);
 
-int move_resulting_board(struct move *move, board_t board, int player,
-			 board_t result);
-
 /*
- * Performs move and returns whether the player's turn has ended yet.
+ * Performs move and returns whether the player's turn has ended yet.  Can be used
+ * destructively by passing the same board twice.
  */
-int perform_move(board_t board, struct move *move, int player);
+int perform_move(struct move *move, board_t board, int player, board_t result);
 
 /*
  * Returns winner or -1, given a board, available moves, and whose turn it is.

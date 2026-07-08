@@ -177,8 +177,12 @@ board_available_moves(board_t board, struct move moves[64][MAX_MOVES],
 		num_moves[i] = piece_moves(board, moves[i], player, i, 0);
 }
 
+/*
+ * Performs move and returns whether the player's turn has ended yet.  Can be used
+ * destructively by passing the same board twice.
+ */
 int
-move_resulting_board(struct move *move, board_t board, int player, board_t result)
+perform_move(struct move *move, board_t board, int player, board_t result)
 {
 	int piece = piece_occupying_square_belonging_to_player(board, move->from, player);
 	struct move further_captures[MAX_MOVES];
@@ -198,23 +202,6 @@ move_resulting_board(struct move *move, board_t board, int player, board_t resul
 	return (move->captured < 0 || move->promotion ||
 		piece_moves(result, further_captures,
 			    player, move->location, 1) == 0);
-}
-
-/*
- * Performs move and returns whether the player's turn has ended yet.
- */
-int
-perform_move(board_t board, struct move *move, int player)
-{
-	board_t new_board;
-	int ended;
-
-	ended = move_resulting_board(move, board, player, new_board);
-	board[0][MAN] = new_board[0][MAN];
-	board[0][KING] = new_board[0][KING];
-	board[1][MAN] = new_board[1][MAN];
-	board[1][KING] = new_board[1][KING];
-	return ended;
 }
 
 /*

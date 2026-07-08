@@ -118,7 +118,7 @@ game_update(void)
 			return;
 		}
 
-		finished = perform_move(cur_board, move, !user_player);
+		finished = perform_move(move, cur_board, !user_player, cur_board);
 		game_dirty = 1;
 		game_display_apply_move(move);
 		cur_mode = ANIM_MOVE_PIECE;
