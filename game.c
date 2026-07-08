@@ -41,7 +41,7 @@ int cur_player;
 enum mode cur_mode;
 enum mode anim_done_mode;
 int end_turn;
-char *squares_buffer;
+int8_t *squares_buffer;
 
 /* XXX */
 float menu_button_x, menu_button_y;

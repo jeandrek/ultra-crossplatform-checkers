@@ -54,7 +54,7 @@ extern int cur_player;
 extern enum mode cur_mode;
 extern enum mode anim_done_mode;
 extern int end_turn;
-extern char *squares_buffer;
+extern int8_t *squares_buffer;
 
 extern float menu_button_x, menu_button_y;
 extern struct rect menu_button_bounds;
