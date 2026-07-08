@@ -333,25 +333,25 @@ game_anim_rotate_board(void)
 }
 
 void
-game_display_apply_move(int from, int to)
+game_display_apply_move(struct move move)
 {
 	struct piece *piece;
 	int captured;
 
-	piece = piece_at_location(from);
+	piece = piece_at_location(move.from);
 
-	piece->location = to;
+	piece->location = move.to;
 
 	anim.piece = piece;
 	anim.x1 = piece->x;
 	anim.y1 = piece->y;
 	anim.z1 = piece->z;
-	board_pos_to_world_pos(&anim.x2, &anim.y2, &anim.z2, to);
+	board_pos_to_world_pos(&anim.x2, &anim.y2, &anim.z2, move.to);
 
-	if (is_promotion(from, to, piece->type, piece->player))
+	if (is_promotion(move.from, move.to, piece->type, piece->player))
 		piece->type = KING;
 
-	captured = captured_piece_index(from, to);
+	captured = captured_piece_index(move.from, move.to);
 	if (captured >= 0)
 		delete_piece(piece_at_location(captured));
 }

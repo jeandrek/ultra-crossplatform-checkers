@@ -68,7 +68,7 @@ struct move {
 
 struct other_player {
 	int	(*poll_move)(void);
-	struct	move *(*next_move)(void);
+	int	(*next_move)(struct move *);
 };
 
 #endif /* !_GAME_H_ */

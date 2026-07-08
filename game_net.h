@@ -55,8 +55,8 @@ int	game_net_poll_connected(void);
 void	game_net_stop_connecting(void);
 
 int	game_net_poll_move(void);
-struct	move *game_net_recv_move(void);
-void	game_net_send_move(struct move *move);
+int	game_net_recv_move(struct move *move);
+void	game_net_send_move(struct move move);
 void	game_net_disconnect(void);
 
 extern char game_net_player;

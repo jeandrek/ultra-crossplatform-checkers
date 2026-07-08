@@ -28,14 +28,13 @@
 #define _GAME_COMPUTER_H_
 
 #include "game.h"
-#include "game_checkers.h"
 
 extern int game_computer_player;
 
 void	game_computer_init(void);
 void	game_computer_turn(void);
 int	game_computer_poll_move(void);
-struct	move *game_computer_next_move(void);
+int	game_computer_next_move(struct move *);
 
 extern struct other_player other_player_computer;
 

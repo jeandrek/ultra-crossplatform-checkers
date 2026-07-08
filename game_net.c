@@ -445,28 +445,27 @@ game_net_poll_move(void)
 	return select(conn_sock + 1, &fds, NULL, NULL, &timeout);
 }
 
-struct move *
-game_net_recv_move(void)
+int
+game_net_recv_move(struct move *move)
 {
-	static struct move move;
 	char data[2];
 	ssize_t val;
 
-	val = recv(conn_sock, data, 2, 0);
-	if (val < 2)
-		return NULL;
-	move.from = data[0];
-	move.to = data[1];
-	return &move;
+	val = recv(conn_sock, data, sizeof (data), 0);
+	if (val < sizeof (data))
+		return 0;
+	move->from = data[0];
+	move->to = data[1];
+	return 1;
 }
 
 void
-game_net_send_move(struct move *move)
+game_net_send_move(struct move move)
 {
 	char data[2];
-	data[0] = move->from;
-	data[1] = move->to;
-	send(conn_sock, data, 2, 0);
+	data[0] = move.from;
+	data[1] = move.to;
+	send(conn_sock, data, sizeof (data), 0);
 }
 
 void

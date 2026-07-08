@@ -24,6 +24,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <string.h>
+
 #include "game.h"
 #include "game_checkers.h"
 #include "game_computer.h"
@@ -146,14 +148,15 @@ game_computer_poll_move(void)
 	return move_made;
 }
 
-struct move *
-game_computer_next_move(void)
+int
+game_computer_next_move(struct move *move)
 {
 	if (move_made) {
+		memcpy(move, &my_move.move, sizeof (struct move));
 		move_made = 0;
-		return &my_move.move;
+		return 1;
 	}
-	return NULL;
+	return 0;
 }
 
 #if defined(_WIN32)
@@ -181,10 +184,7 @@ engine_thread(SceSize args, void *arg)
 #else
 #error Not yet supported
 #endif
-		my_move = search(cur_board, game_computer_player, 4, -1);
-#ifdef __unix__
-		printf("move score %f\n", my_move.score);
-#endif
+		my_move = search(cur_board, game_computer_player, 6, -1);
 		move_made = 1;
 	}
 	return 0;

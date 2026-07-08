@@ -106,17 +106,13 @@ select_piece_at_sel_square(void)
 static void
 move_piece(void)
 {
+	struct move move = { .from = sel_square, .to = sel_move };
 	int finished = perform_move(sel_square, sel_move, cur_board,
 				    user_player, cur_board);
-	int from = sel_square, to = sel_move;
 	game_dirty = 1;
-	game_display_apply_move(from, to);
-	if (game_type == NETWORK) {
-		struct move move;
-		move.from = from;
-		move.to = to;
-		game_net_send_move(&move);
-	}
+	game_display_apply_move(move);
+	if (game_type == NETWORK)
+		game_net_send_move(move);
 	else if (game_type == COMPUTER)
 		game_computer_turn();
 	end_turn = finished;
@@ -131,8 +127,8 @@ move_piece(void)
 		}
 	} else {
 		anim_done_mode = SELECT_PIECE;
-		board_available_moves(cur_board, board_moves, user_player, to);
-		set_sel_square(to);
+		board_available_moves(cur_board, board_moves, user_player, move.to);
+		set_sel_square(move.to);
 	}
 	cur_mode = ANIM_MOVE_PIECE;
 }

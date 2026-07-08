@@ -27,9 +27,11 @@
 #ifndef _GAME_DISPLAY_H_
 #define _GAME_DISPLAY_H_
 
+#include "game.h"
+
 void	game_display_load(void);
 void	game_display_init(void);
-void	game_display_apply_move(int from, int to);
+void	game_display_apply_move(struct move);
 void	game_display_set_viewpoint(int player);
 void	game_display_game_over(void);
 void	game_display_destroy(void);

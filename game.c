@@ -108,20 +108,20 @@ game_update(void)
 		if (!game_anim_rotate_board())
 			cur_mode = SELECT_PIECE;
 	} else if (cur_mode == WAIT_TURN && other_player->poll_move()) {
-		struct move *move;
+		struct move move;
 		int finished;
 
-		if ((move = other_player->next_move()) == NULL) {
+		if (!other_player->next_move(&move)) {
 			cur_mode = LOST_CONNECTION;
 			game_display_game_over();
 			game_net_disconnect();
 			return;
 		}
 
-		finished = perform_move(move->from, move->to,
+		finished = perform_move(move.from, move.to,
 					cur_board, !user_player, cur_board);
 		game_dirty = 1;
-		game_display_apply_move(move->from, move->to);
+		game_display_apply_move(move);
 		cur_mode = ANIM_MOVE_PIECE;
 		anim_done_mode = finished ? SELECT_PIECE : WAIT_TURN;
 		if (finished)
