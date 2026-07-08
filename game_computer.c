@@ -70,18 +70,23 @@ evaluate(board_t board, int player)
 	return score;
 }
 
-static struct move
+struct scored_move {
+	float	score;
+	struct	move move;
+};
+
+static struct scored_move
 search(board_t board, int player, int depth, int moved_piece_idx)
 {
 	struct move moves[64][MAX_MOVES];
-	struct move best_move;
-	float best_score = -1e10;
+	struct scored_move best;
 	int num_moves[64];
 #ifdef __psp__
 	sceKernelRotateThreadReadyQueue(0);
 #endif
 	board_available_moves(board, moves, num_moves, player,
 			      moved_piece_idx);
+	best.score = -1e10;
 	for (int i = 0; i < 64; i++) {
 		for (int j = 0; j < num_moves[i]; j++) {
 			float score;
@@ -90,25 +95,24 @@ search(board_t board, int player, int depth, int moved_piece_idx)
 						 player);
 			} else {
 				struct move *move = &moves[i][j];
-				struct move next_move;
+				struct scored_move next_move;
 				int ended = move_ends_turn(move, player);
 				int next_player = ended ? !player : player;
 				next_move = search(moves[i][j].resulting_board,
 						   next_player, depth - 1,
 						   ended ? -1 : move->location);
-				score = evaluate(next_move.resulting_board,
-						 player);
+				score = ended ? -next_move.score : next_move.score;
 			}
-			if (score > best_score) {
-				best_score = score;
-				best_move = moves[i][j];
+			if (score >= best.score) {
+				best.score = score;
+				best.move = moves[i][j];
 			}
 		}
 	}
-	return best_move;
+	return best;
 }
 
-static struct move my_move;
+static struct scored_move my_move;
 static int move_made = 0;
 
 void
@@ -139,7 +143,7 @@ game_computer_next_move(struct move *move)
 {
 	if (move_made) {
 		move_made = 0;
-		*move = my_move;
+		*move = my_move.move;
 		return 1;
 	}
 	return 0;
