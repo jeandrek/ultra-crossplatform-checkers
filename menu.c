@@ -163,14 +163,20 @@ confirm_dlg(void (*yes_action)(void))
 }
 
 void
+menu_bounds(void)
+{
+	for (int i = 0; i < num_elems; i++)
+		button_bounds(&menu.sg, strlen(elems[i].data),
+			      elems[i].x, elems[i].y, &elems[i].bounds);
+}
+
+void
 menu_set_elements(int num, struct element *new_elems)
 {
 	num_elems = num;
 	elems = new_elems;
 	message = NULL;
-	for (int i = 0; i < num_elems; i++)
-		button_bounds(&menu.sg, strlen(elems[i].data),
-			      elems[i].x, elems[i].y, &elems[i].bounds);
+	menu_bounds();
 }
 
 void
@@ -204,6 +210,7 @@ menu_init(void)
 	memset(&menu.sg, 0, sizeof (menu.sg));
 	menu.sg.num_render = sizeof (menu_render_functions)/sizeof (menu_render_functions[0]);
 	menu.sg.render = menu_render_functions;
+	menu.sg.resize = menu_bounds;
 	sg_init_scenegraph(&menu.sg);
 	main_menu();
 }

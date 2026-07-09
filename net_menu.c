@@ -193,6 +193,7 @@ quit_browsing(void)
 	game_net_stop_discovery();
 	menu.update = gui_update;
 	menu.sg.render[0] = menu_render_items;
+	menu.sg.resize = menu_bounds;
 }
 
 static void
@@ -297,6 +298,17 @@ join_menu_render_items(struct scenegraph *scenegraph)
 }
 
 static void
+join_menu_resize(void)
+{
+	menu_bounds();
+	discovered_games_box.width = menu.sg.width/2;
+	discovered_games_box.height = 8*menu.sg.height/10;
+	for (struct join_item *item = join_items; item; item = item->next)
+		button_bounds(&menu.sg, strlen(item->disc_ent->name),
+			      item->elem.x, item->elem.y, &item->elem.bounds);
+}
+
+static void
 join_menu(void)
 {
 	static struct element join_menu_elems[] = {
@@ -312,6 +324,7 @@ join_menu(void)
 	join_items = NULL;
 	menu.update = join_menu_update;
 	menu.sg.render[0] = join_menu_render_items;
+	menu.sg.resize = join_menu_resize;
 	menu_set_elements(2, join_menu_elems);
 	gui_set_rows(2, 1, &elems[0], 1, &elems[1]);
 	gui_set_action_proc(join_menu_action);

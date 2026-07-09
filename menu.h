@@ -32,6 +32,7 @@
 
 void menu_set_elements(int num, struct element *new_elems);
 void menu_render_items(struct scenegraph *scenegraph);
+void menu_bounds(void);
 void message_dlg(char *text, void (*back_action)(void));
 void main_menu(void);
 

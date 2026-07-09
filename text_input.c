@@ -69,6 +69,9 @@ static void (*text_input_accept)(const char *);
 static void (*text_input_cancel)(void);
 static struct sprite cursor;
 static struct state *old_state;
+static struct element text_field;
+static struct element ok_but;
+static struct element cancel_but;
 
 static void
 blink_cursor(void)
@@ -127,13 +130,18 @@ text_input_action(int row, int col)
 }
 
 static void
-text_field_bounds(struct scenegraph *scenegraph, struct rect *bounds)
+text_input_bounds(void)
 {
-	int mid_y = scenegraph->height/2;
-	bounds->left = 0;
-	bounds->top = mid_y - FONT_HEIGHT/2 - 8;
-	bounds->right = scenegraph->width;
-	bounds->bottom = mid_y + FONT_HEIGHT/2 + 8;
+	int mid_y = text_input_screen.sg.height/2;
+	text_field.bounds.left = 0;
+	text_field.bounds.top = mid_y - FONT_HEIGHT/2 - 8;
+	text_field.bounds.right = text_input_screen.sg.width;
+	text_field.bounds.bottom = mid_y + FONT_HEIGHT/2 + 8;
+
+	button_bounds(&text_input_screen.sg, strlen("OK"),
+		      -0.2, -0.2, &ok_but.bounds);
+	button_bounds(&text_input_screen.sg, strlen("Cancel"),
+		      0.2, -0.2, &cancel_but.bounds);
 }
 
 void
@@ -144,13 +152,10 @@ text_input(char *label, void (*accept)(const char *), void (*cancel)(void))
 #elif defined(__ANDROID__)
 	text_input_android(label, accept, cancel);
 #else
-	static struct element text_field;
-	static struct element ok_but;
-	static struct element cancel_but;
-
 	memset(&text_input_screen.sg, 0, sizeof (text_input_screen.sg));
 	text_input_screen.sg.num_render = sizeof (text_input_render_functions)/sizeof (text_input_render_functions[0]);
 	text_input_screen.sg.render = text_input_render_functions;
+	text_input_screen.sg.resize = text_input_bounds;
 	sg_init_scenegraph(&text_input_screen.sg);
 
 	text_len = 0;
@@ -162,11 +167,7 @@ text_input(char *label, void (*accept)(const char *), void (*cancel)(void))
 	sprite_init(&cursor, NULL, 0, 0, 8, 2);
 	cursor.base_color = 0xffffffff;
 
-	text_field_bounds(&text_input_screen.sg, &text_field.bounds);
-	button_bounds(&text_input_screen.sg, strlen("OK"),
-		      -0.2, -0.2, &ok_but.bounds);
-	button_bounds(&text_input_screen.sg, strlen("Cancel"),
-		      0.2, -0.2, &cancel_but.bounds);
+	text_input_bounds();
 	gui_set_rows(2, 1, &text_field, 2, &ok_but, &cancel_but);
 	gui_set_action_proc(text_input_action);
 
