@@ -316,6 +316,6 @@ join_menu(void)
 	gui_set_rows(2, 1, &elems[0], 1, &elems[1]);
 	gui_set_action_proc(join_menu_action);
 	sprite_init(&discovered_games_box, NULL, 0, 0,
-		    sg_width/2, 8*sg_height/10);
+		    menu.sg.width/2, 8*menu.sg.height/10);
 	discovered_games_box.base_color = 0xff101010;
 }

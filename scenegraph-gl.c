@@ -42,13 +42,13 @@
 #include "scenegraph.h"
 #include "texture.h"
 
-int sg_width, sg_height;
+static int width, height;
 
 void
 sg_init(int w, int h)
 {
-	sg_width = w;
-	sg_height = h;
+	width = w;
+	height = h;
 	glEnable(GL_CULL_FACE);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
@@ -56,14 +56,6 @@ sg_init(int w, int h)
 	glEnable(GL_BLEND);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
-}
-
-void
-sg_resize(int w, int h)
-{
-	glViewport(0, 0, w, h);
-	sg_width = w;
-	sg_height = h;
 }
 
 void
@@ -76,6 +68,8 @@ sg_init_scenegraph(struct scenegraph *scenegraph)
 		glEnable(GL_LIGHT0);
 		glEnable(GL_COLOR_MATERIAL);
 	}
+	scenegraph->width = width;
+	scenegraph->height = height;
 }
 
 void
@@ -89,7 +83,7 @@ sg_render(struct scenegraph *scenegraph)
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	if (scenegraph->cam3d_enabled) {
 		float tan_fov_2 = tanf(scenegraph->fov/2.0 * M_PI/180.0);
-		float aspect = (float)sg_width/(float)sg_height;
+		float aspect = (float)width/(float)height;
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		glFrustum(-0.1 * tan_fov_2 * aspect,

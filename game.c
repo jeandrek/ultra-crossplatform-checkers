@@ -79,8 +79,8 @@ game_init(void)
 static void
 menu_button_init(void)
 {
-	float margin = 8 * 2.0/sg_height;
-	menu_button_x = -sg_width/(float)sg_height + margin;
+	float margin = 8 * 2.0/game.sg.height;
+	menu_button_x = -game.sg.width/(float)game.sg.height + margin;
 	menu_button_y = 1 - margin;
 	text_screen_bounds(&game.sg, strlen("Menu"),
 			   menu_button_x, menu_button_y,

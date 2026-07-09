@@ -95,8 +95,8 @@ text_input_update(void)
 static void
 text_input_render(struct scenegraph *scenegraph)
 {
-	cursor.x = (float)FONT_WIDTH * (text_len + 1) / sg_height;
-	cursor.y = -10.0 / sg_height;
+	cursor.x = (float)FONT_WIDTH * (text_len + 1) / scenegraph->height;
+	cursor.y = -10.0 / scenegraph->height;
 	sprite_draw(scenegraph, &cursor);
 
 	text_size(1);
@@ -129,10 +129,10 @@ text_input_action(int row, int col)
 static void
 text_field_bounds(struct scenegraph *scenegraph, struct rect *bounds)
 {
-	int mid_y = sg_height/2;
+	int mid_y = scenegraph->height/2;
 	bounds->left = 0;
 	bounds->top = mid_y - FONT_HEIGHT/2 - 8;
-	bounds->right = sg_width;
+	bounds->right = scenegraph->width;
 	bounds->bottom = mid_y + FONT_HEIGHT/2 + 8;
 }
 
