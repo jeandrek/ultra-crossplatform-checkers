@@ -49,6 +49,7 @@ struct state {
 };
 
 void checkers_init(void);
+void checkers_resize(int w, int h);
 void checkers_update(void);
 void checkers_button_event(int button);
 struct state *checkers_get_state(void);

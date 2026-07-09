@@ -75,7 +75,7 @@ Java_jeandre_checkers_Checkers_resize(JNIEnv *env, jobject obj,
 				      jint width, jint height)
 {
 	enter_android_call(env, obj);
-	sg_resize(width, height);
+	checkers_resize(width, height);
 	leave_android_call();
 }
 

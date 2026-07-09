@@ -39,4 +39,9 @@ int	game_anim_move_piece(void);
 int	game_anim_rotate_board(void);
 void	game_init_squares_buffer(void);
 
+/* Rethink? */
+extern float menu_button_x, menu_button_y;
+extern struct rect menu_button_bounds;
+extern int menu_button_highlighted;
+
 #endif /* !_GAME_DISPLAY_H_ */

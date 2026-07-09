@@ -43,14 +43,7 @@ enum mode anim_done_mode;
 int end_turn;
 int8_t *squares_buffer;
 
-/* XXX */
-float menu_button_x, menu_button_y;
-struct rect menu_button_bounds;
-int menu_button_highlighted;
-
 static struct other_player *other_player = NULL;
-
-static void menu_button_init(void);
 
 static void
 game_init(void)
@@ -70,26 +63,9 @@ game_init(void)
 		game_type = NETWORK;
 	}
 	game_interaction_init();
-	menu_button_init();
 
 	if (game_type == NETWORK)	other_player = &other_player_net;
 	else if (game_type == COMPUTER)	other_player = &other_player_computer;
-}
-
-static void
-menu_button_init(void)
-{
-	float margin = 8 * 2.0/game.sg.height;
-	menu_button_x = -game.sg.width/(float)game.sg.height + margin;
-	menu_button_y = 1 - margin;
-	text_screen_bounds(&game.sg, strlen("Menu"),
-			   menu_button_x, menu_button_y,
-			   TEXT_TOPLEFT, &menu_button_bounds);
-	menu_button_bounds.left -= 8;
-	menu_button_bounds.top -= 8;
-	menu_button_bounds.right += 8;
-	menu_button_bounds.bottom += 8;
-	menu_button_highlighted = 0;
 }
 
 static void

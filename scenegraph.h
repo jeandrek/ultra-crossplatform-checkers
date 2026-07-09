@@ -32,6 +32,7 @@
 
 struct scenegraph {
 	void	(**render)(struct scenegraph *);
+	void	(*resize)(void);
 	size_t	num_render;
 	int	cam3d_enabled;
 	float	fov, near_plane, far_plane;
@@ -64,6 +65,7 @@ void	sg_init(int w, int h);
 void	sg_resize(int w, int h);
 #endif
 void	sg_init_scenegraph(struct scenegraph *scenegraph);
+void	sg_update(struct scenegraph *scenegraph);
 void	sg_render(struct scenegraph *scenegraph);
 void	sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj);
 

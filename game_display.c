@@ -64,6 +64,10 @@ static struct texture texture_board;
 static struct sprite overlay_sprite;
 static struct piece *pieces = NULL;
 
+float menu_button_x, menu_button_y;
+struct rect menu_button_bounds;
+int menu_button_highlighted;
+
 static void
 render_board(struct scenegraph *scenegraph)
 {
@@ -240,6 +244,30 @@ delete_piece(struct piece *piece)
 	free(piece);
 }
 
+static void
+position_menu_button(void)
+{
+	float margin = 8 * 2.0/game.sg.height;
+	menu_button_x = -game.sg.width/(float)game.sg.height + margin;
+	menu_button_y = 1 - margin;
+	text_screen_bounds(&game.sg, strlen("Menu"),
+			   menu_button_x, menu_button_y,
+			   TEXT_TOPLEFT, &menu_button_bounds);
+	menu_button_bounds.left -= 8;
+	menu_button_bounds.top -= 8;
+	menu_button_bounds.right += 8;
+	menu_button_bounds.bottom += 8;
+	menu_button_highlighted = 0;
+}
+
+static void
+resize(void)
+{
+	position_menu_button();
+	free(squares_buffer);
+	game_init_squares_buffer();
+}
+
 void
 game_display_init(void)
 {
@@ -248,6 +276,7 @@ game_display_init(void)
 	memset(&game.sg, 0, sizeof (game.sg));
 	game.sg.num_render = sizeof (render_functions)/sizeof (render_functions[1]);
 	game.sg.render = render_functions;
+	game.sg.resize = resize;
 	game.sg.cam3d_enabled = 1;
 	game.sg.fov = 70.0;
 	game.sg.near_plane = 0.1;
@@ -258,6 +287,8 @@ game_display_init(void)
 	game.sg.light0_z = 0;
 	game.sg.light0_color = 0xffffffff;
 	sg_init_scenegraph(&game.sg);
+
+	position_menu_button();
 
 	pieces = NULL;
 	for (int player = 0; player < 2; player++) {

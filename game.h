@@ -57,10 +57,6 @@ extern enum mode anim_done_mode;
 extern int end_turn;
 extern int8_t *squares_buffer;
 
-extern float menu_button_x, menu_button_y;
-extern struct rect menu_button_bounds;
-extern int menu_button_highlighted;
-
 void game_over(void);
 
 struct move {

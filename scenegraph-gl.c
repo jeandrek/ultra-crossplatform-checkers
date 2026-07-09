@@ -59,6 +59,14 @@ sg_init(int w, int h)
 }
 
 void
+sg_resize(int w, int h)
+{
+	width = w;
+	height = h;
+	glViewport(0, 0, w, h);
+}
+
+void
 sg_init_scenegraph(struct scenegraph *scenegraph)
 {
 	if (scenegraph->light0_enabled) {
@@ -70,6 +78,17 @@ sg_init_scenegraph(struct scenegraph *scenegraph)
 	}
 	scenegraph->width = width;
 	scenegraph->height = height;
+}
+
+void
+sg_update(struct scenegraph *scenegraph)
+{
+	if (scenegraph->width != width || scenegraph->height != height) {
+		scenegraph->width = width;
+		scenegraph->height = height;
+		if (scenegraph->resize != NULL)
+			scenegraph->resize();
+	}
 }
 
 void

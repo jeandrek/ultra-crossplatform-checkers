@@ -43,6 +43,13 @@ checkers_init(void)
 	current_state = &game;
 }
 
+void
+checkers_resize(int w, int h)
+{
+	sg_resize(w, h);
+	sg_update(&current_state->sg);
+}
+
 struct state *
 checkers_get_state(void)
 {
@@ -53,6 +60,7 @@ void
 checkers_switch_state(struct state *new_state)
 {
 	current_state = new_state;
+	sg_update(&current_state->sg);
 }
 
 void

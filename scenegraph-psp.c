@@ -105,6 +105,11 @@ sg_init_scenegraph(struct scenegraph *scenegraph)
 }
 
 void
+sg_update(struct scenegraph *scenegraph)
+{
+}
+
+void
 sg_render(struct scenegraph *scenegraph)
 {
 	ScePspFVector3 translate = {
