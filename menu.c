@@ -45,8 +45,8 @@ static void confirm_dlg(void (*yes_action)(void));
 static void
 new_2player_game(void)
 {
-	game_type = LOCAL_2PLAYER;
 	game.destroy();
+	game_type = LOCAL_2PLAYER;
 	game.init();
 	checkers_switch_state(&game);
 }
@@ -54,9 +54,9 @@ new_2player_game(void)
 static void
 new_computer_game(int player)
 {
+	game.destroy();
 	game_type = COMPUTER;
 	game_computer_player = !player;
-	game.destroy();
 	game.init();
 	checkers_switch_state(&game);
 }

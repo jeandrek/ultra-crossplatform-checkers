@@ -169,7 +169,7 @@ render_status(struct scenegraph *scenegraph)
 		text_color(0xffffffff);
 		text_draw(scenegraph, text, 0, 0, TEXT_CENTRE);
 	} else {
-		float margin = (FONT_HEIGHT/2 + 8) * 2.0/game.sg.height;
+		float margin = (FONT_HEIGHT/2 + 8) * 2.0/sg_height;
 		text = cur_player == 0 ? "Red to move" : "Black to move";
 		text_size(1);
 		text_color(0xffaaaaaa);
@@ -259,6 +259,7 @@ game_display_init(void)
 	game.sg.light0_color = 0xffffffff;
 	sg_init_scenegraph(&game.sg);
 
+	pieces = NULL;
 	for (int player = 0; player < 2; player++) {
 		for (int type = 0; type < NUM_PIECE_TYPES; type++) {
 			for (int i = 0; i < 64; i++) {
@@ -285,7 +286,7 @@ void
 game_display_game_over(void)
 {
 	sprite_init(&overlay_sprite, NULL, 0, 0,
-		    game.sg.width, game.sg.height);
+		    sg_width, sg_height);
 	overlay_sprite.base_color = 0x70000000;
 }
 
@@ -378,14 +379,14 @@ static void
 world_pos_to_screen_pos(float x_w, float y_w, float z_w, int *x_s, int *y_s)
 {
 	float tan_fov_2 = tanf(game.sg.fov/2.0 * M_PI/180.0);
-	float aspect = (float)game.sg.width/(float)game.sg.height;
+	float aspect = (float)sg_width/(float)sg_height;
 	float x_e = x_w;
 	float y_e = (y_w - 1.5) * cos(M_PI/4) - (z_w - 1.5) * sin(M_PI/4);
 	float z_e = (z_w - 1.5) * cos(M_PI/4) + (y_w - 1.5) * sin(M_PI/4);
 	float x_c = x_e * (2*game.sg.near_plane)/(0.2*tan_fov_2*aspect);
 	float y_c = y_e * (2*game.sg.near_plane)/(0.2*tan_fov_2);
-	*x_s = (x_c / -z_e + 1.0f) * game.sg.width/2;
-	*y_s = (-y_c / -z_e + 1.0f) * game.sg.height/2;
+	*x_s = (x_c / -z_e + 1.0f) * sg_width/2;
+	*y_s = (-y_c / -z_e + 1.0f) * sg_height/2;
 	/* glGetFloatv(GL_MODELVIEW_MATRIX, modelview); */
 	/* glGetFloatv(GL_PROJECTION_MATRIX, projection); */
 }
@@ -393,7 +394,7 @@ world_pos_to_screen_pos(float x_w, float y_w, float z_w, int *x_s, int *y_s)
 void
 game_init_squares_buffer(void)
 {
-	size_t len = game.sg.width * game.sg.height * sizeof (int);
+	size_t len = sg_width * sg_height * sizeof (int);
 	squares_buffer = malloc(len);
 	memset(squares_buffer, -1, len);
 	for (int i = 0; i < 64; i++) {
@@ -410,7 +411,7 @@ game_init_squares_buffer(void)
 			int left = x3 + (y - bottom)/(float)(top - bottom) * (x1 - x3);
 			int right = x4 + (y - bottom)/(float)(top - bottom) * (x2 - x4);
 			for (int x = left; x <= right; x++)
-				squares_buffer[y*game.sg.width + x] = i;
+				squares_buffer[y*sg_width + x] = i;
 		}
 	}
 }

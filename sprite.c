@@ -113,7 +113,7 @@ sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 	sceGuDisable(GU_TEXTURE_2D);
 	sceGuEnable(GU_DEPTH_TEST);
 #else
-	float aspect = (float)scenegraph->width / (float)scenegraph->height;
+	float aspect = (float)sg_width / (float)sg_height;
 
 	glDisable(GL_LIGHTING);
 	glDisable(GL_DEPTH_TEST);
@@ -129,8 +129,8 @@ sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 	glPushMatrix();
 	glLoadIdentity();
 	glTranslatef(sprite->x, sprite->y, 0);
-	glScalef(sprite->scale * sprite->width/scenegraph->height,
-		 sprite->scale * sprite->height/scenegraph->height, 1);
+	glScalef(sprite->scale * sprite->width/sg_height,
+		 sprite->scale * sprite->height/sg_height, 1);
 
 	if (sprite->texture != NULL) {
 		glEnable(GL_TEXTURE_2D);

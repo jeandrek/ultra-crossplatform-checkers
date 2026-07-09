@@ -45,15 +45,15 @@
 
 uint32_t __attribute__((aligned(16))) display_list[262144];
 
-static int width, height;
+int sg_width, sg_height;
 
 void
 sg_init(int w, int h)
 {
 	void *draw_buffer, *disp_buffer, *depth_buffer;
 
-	width = w;
-	height = h;
+	sg_width = w;
+	sg_height = h;
 	sceGuInit();
 	sceGuStart(GU_DIRECT, display_list);
 	draw_buffer = guGetStaticVramBuffer(512, 272, GU_PSM_8888);
@@ -68,9 +68,6 @@ void
 sg_init_scenegraph(struct scenegraph *scenegraph)
 {
 	ScePspFVector3 light0_pos;
-
-	scenegraph->width = width;
-	scenegraph->height = height;
 
 	sceGuOffset(2048 - 480/2, 2048 - 272/2);
 	sceGuViewport(2048, 2048, 480, 272);
@@ -118,7 +115,7 @@ sg_render(struct scenegraph *scenegraph)
 		sceGumMatrixMode(GU_PROJECTION);
 		sceGumLoadIdentity();
 		sceGumPerspective(scenegraph->fov,
-				  (float)width/(float)height,
+				  (float)sg_width/(float)sg_height,
 				  scenegraph->near_plane, scenegraph->far_plane);
 		sceGumMatrixMode(GU_VIEW);
 		sceGumLoadIdentity();

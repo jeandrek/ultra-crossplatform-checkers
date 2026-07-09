@@ -77,7 +77,7 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onSurfaceChanged(GL10 gl, int width, int height) {
-				//gl.glViewport(0, 0, width, height);
+				checkers.resize(width, height);
 			}
 
 			@Override
@@ -100,6 +100,12 @@ public class MainActivity extends Activity {
 		super.onStop();
 		view.onPause();
 	}
+
+	/*
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+	}
+	*/
 
 	public static class TextInputDialogFragment extends DialogFragment {
 		private String label;

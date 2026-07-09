@@ -104,7 +104,7 @@ void
 text_draw(struct scenegraph *scenegraph, char *str, float x, float y,
 	  int alignment)
 {
-	float pixel_size = 2.0/scenegraph->height;
+	float pixel_size = 2.0/sg_height;
 	int c;
 
 	switch (alignment) {
@@ -127,10 +127,10 @@ text_draw(struct scenegraph *scenegraph, char *str, float x, float y,
 
 void
 text_screen_bounds(struct scenegraph *scenegraph, size_t len, float x, float y,
-	       int alignment, struct rect *rect)
+		   int alignment, struct rect *rect)
 {
-	int screen_x = scenegraph->width/2 + scenegraph->height/2 * x;
-	int screen_y = scenegraph->height/2 - scenegraph->height/2 * y;
+	int screen_x = sg_width/2 + sg_height/2 * x;
+	int screen_y = sg_height/2 - sg_height/2 * y;
 
 	switch (alignment) {
 	case TEXT_CENTRE:

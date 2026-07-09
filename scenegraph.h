@@ -40,7 +40,6 @@ struct scenegraph {
 	int	light0_enabled;
 	float	light0_x, light0_y, light0_z;
 	uint32_t	light0_color;
-	int	width, height;	/* XXX */
 };
 
 struct rect {
@@ -60,9 +59,14 @@ struct sg_object {
 };
 
 void	sg_init(int w, int h);
+#ifndef __psp__
+void	sg_resize(int w, int h);
+#endif
 void	sg_init_scenegraph(struct scenegraph *scenegraph);
 void	sg_render(struct scenegraph *scenegraph);
 void	sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj);
+
+extern int sg_width, sg_height;
 
 #ifdef __psp__
 extern uint32_t display_list[262144];

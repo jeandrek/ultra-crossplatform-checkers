@@ -71,6 +71,15 @@ Java_jeandre_checkers_Checkers_init(JNIEnv *env, jobject obj,
 }
 
 JNIEXPORT void JNICALL
+Java_jeandre_checkers_Checkers_resize(JNIEnv *env, jobject obj,
+				      jint width, jint height)
+{
+	enter_android_call(env, obj);
+	sg_resize(width, height);
+	leave_android_call();
+}
+
+JNIEXPORT void JNICALL
 Java_jeandre_checkers_Checkers_update(JNIEnv *env, jobject obj)
 {
 	enter_android_call(env, obj);

@@ -196,10 +196,10 @@ mouse_coords_to_square(int x, int y)
 {
 	int idx;
 
-	if (squares_buffer == NULL || x < 0 || x >= game.sg.width
-	    || y < 0 || y >= game.sg.height)
+	if (squares_buffer == NULL || x < 0 || x >= sg_width
+	    || y < 0 || y >= sg_height)
 		return -1;
-	idx = squares_buffer[y * game.sg.width + x];
+	idx = squares_buffer[y * sg_width + x];
 	if (idx < 0)
 		return idx;
 	return user_player == 0 ? idx : 63 - idx;
