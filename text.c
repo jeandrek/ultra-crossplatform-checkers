@@ -65,20 +65,14 @@ text_init(void)
 	}
 }
 
-static float factor = 1.0;
+float text_scale_factor = 1.0;
 static float size = 1.0;
 static uint32_t color = 0xffffffff;
 
 void
-text_scale_factor(float new_factor)
-{
-	factor = new_factor;
-}
-
-void
 text_size(float new_size)
 {
-	size = factor * new_size;
+	size = text_scale_factor * new_size;
 }
 
 void

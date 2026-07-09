@@ -174,7 +174,8 @@ render_status(struct scenegraph *scenegraph)
 		text_color(0xffffffff);
 		text_draw(scenegraph, text, 0, 0, TEXT_CENTRE);
 	} else {
-		float margin = (FONT_HEIGHT/2 + 8) * 2.0/game.sg.height;
+		float margin = (FONT_HEIGHT*text_scale_factor/2 + 8)
+			* 2.0/game.sg.height;
 		text = cur_player == 0 ? "Red to move" : "Black to move";
 		text_size(1);
 		text_color(0xffaaaaaa);
@@ -278,6 +279,10 @@ resize(void)
 	choose_dist();
 	game_display_set_viewpoint(user_player);
 	game_init_squares_buffer();
+	if (cur_mode == GAME_OVER) {
+		overlay_sprite.width = game.sg.width;
+		overlay_sprite.height = game.sg.height;
+	}
 }
 
 void
