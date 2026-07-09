@@ -54,15 +54,15 @@ game_init(void)
 	game_dirty = 0;
 	cur_player = 0;
 	board_init(cur_board);
-	game_display_init();
-#ifndef __psp__
-	game_init_squares_buffer();
-#endif
 	if (game_net_connected()) {
 		game_dirty = 1;
 		game_type = NETWORK;
 	}
 	game_interaction_init();
+	game_display_init();
+#ifndef __psp__
+	game_init_squares_buffer();
+#endif
 
 	if (game_type == NETWORK)	other_player = &other_player_net;
 	else if (game_type == COMPUTER)	other_player = &other_player_computer;

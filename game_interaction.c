@@ -85,7 +85,6 @@ game_interaction_init(void)
 	else
 		user_player = 0;
 
-	game_display_set_viewpoint(user_player);
 	if (user_player == 0) {
 		cur_mode = SELECT_PIECE;
 		board_available_moves(cur_board, board_moves, user_player, -1);

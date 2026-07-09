@@ -63,6 +63,7 @@ struct piece {
 static struct texture texture_board;
 static struct sprite overlay_sprite;
 static struct piece *pieces = NULL;
+static float dist_sqrt2;
 
 float menu_button_x, menu_button_y;
 struct rect menu_button_bounds;
@@ -261,10 +262,21 @@ position_menu_button(void)
 }
 
 static void
+choose_dist(void)
+{
+	float aspect = game.sg.width / (float)game.sg.height;
+	if (aspect < 0.75)	dist_sqrt2 = 2.75;
+	else if (aspect < 1)	dist_sqrt2 = 1.8;
+	else			dist_sqrt2 = 1.5;
+}
+
+static void
 resize(void)
 {
 	position_menu_button();
 	free(squares_buffer);
+	choose_dist();
+	game_display_set_viewpoint(user_player);
 	game_init_squares_buffer();
 }
 
@@ -301,6 +313,9 @@ game_display_init(void)
 			}
 		}
 	}
+
+	choose_dist();
+	game_display_set_viewpoint(user_player);
 }
 
 void
@@ -355,8 +370,8 @@ game_anim_rotate_board(void)
 {
 	anim_ticks++;
 	game.sg.cam_dir_horiz += 1 / 30.0 * M_PI;
-	game.sg.cam_x = 1.5 * sinf(game.sg.cam_dir_horiz);
-	game.sg.cam_z = 1.5 * cosf(game.sg.cam_dir_horiz);
+	game.sg.cam_x = dist_sqrt2 * sinf(game.sg.cam_dir_horiz);
+	game.sg.cam_z = dist_sqrt2 * cosf(game.sg.cam_dir_horiz);
 	if (anim_ticks == 30) {
 		anim_ticks = 0;
 		return 0;
@@ -393,14 +408,14 @@ game_display_set_viewpoint(int player)
 {
 	if (player == 0) {
 		game.sg.cam_x = 0;
-		game.sg.cam_y = 1.5;
-		game.sg.cam_z = 1.5;
+		game.sg.cam_y = dist_sqrt2;
+		game.sg.cam_z = dist_sqrt2;
 		game.sg.cam_dir_horiz = 0;
 		game.sg.cam_dir_vert = -M_PI/4;
 	} else {
 		game.sg.cam_x = 0;
-		game.sg.cam_y = 1.5;
-		game.sg.cam_z = -1.5;
+		game.sg.cam_y = dist_sqrt2;
+		game.sg.cam_z = -dist_sqrt2;
 		game.sg.cam_dir_horiz = M_PI;
 		game.sg.cam_dir_vert = -M_PI/4;
 	}
@@ -412,8 +427,10 @@ world_pos_to_screen_pos(float x_w, float y_w, float z_w, int *x_s, int *y_s)
 	float tan_fov_2 = tanf(game.sg.fov/2.0 * M_PI/180.0);
 	float aspect = (float)game.sg.width/(float)game.sg.height;
 	float x_e = x_w;
-	float y_e = (y_w - 1.5) * cos(M_PI/4) - (z_w - 1.5) * sin(M_PI/4);
-	float z_e = (z_w - 1.5) * cos(M_PI/4) + (y_w - 1.5) * sin(M_PI/4);
+	float y_e = (y_w - dist_sqrt2) * cos(M_PI/4)
+		- (z_w - dist_sqrt2) * sin(M_PI/4);
+	float z_e = (z_w - dist_sqrt2) * cos(M_PI/4)
+		+ (y_w - dist_sqrt2) * sin(M_PI/4);
 	float x_c = x_e * (2*game.sg.near_plane)/(0.2*tan_fov_2*aspect);
 	float y_c = y_e * (2*game.sg.near_plane)/(0.2*tan_fov_2);
 	*x_s = (x_c / -z_e + 1.0f) * game.sg.width/2;
