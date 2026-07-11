@@ -49,7 +49,7 @@
 #include <unistd.h>
 #endif
 
-#ifdef USE_BONJOUR
+#ifdef USE_DNS_SD
 #include <dns_sd.h>
 #endif
 
@@ -69,7 +69,7 @@ static int	server_sock = -1;
 static int	conn_sock = -1;
 static int	conn_sock_state;
 enum {CANT_CONNECT, CONNECTING, WAITING_FOR_HEADER, WAITING_FOR_OPPONENT};
-#ifdef USE_BONJOUR
+#ifdef USE_DNS_SD
 static DNSServiceRef sd_register = NULL;
 static DNSServiceRef sd_browse = NULL;
 static DNSServiceRef sd_resolve = NULL;
@@ -142,7 +142,7 @@ game_net_host(int player)
 	server_sock = sock;
 	game_net_player = player;
 
-#ifdef USE_BONJOUR
+#ifdef USE_DNS_SD
 	DNSServiceErrorType err;
 
 	err = DNSServiceRegister(&sd_register, 0, 0, NULL, "_checkers._tcp",
@@ -198,13 +198,13 @@ void
 game_net_stop_hosting(void)
 {
 	close(server_sock);
-#ifdef USE_BONJOUR
+#ifdef USE_DNS_SD
 	if (sd_register != NULL)
 		DNSServiceRefDeallocate(sd_register);
 #endif
 }
 
-#ifdef USE_BONJOUR
+#ifdef USE_DNS_SD
 static void
 discovery_callback(DNSServiceRef sd_ref, DNSServiceFlags flags,
 		   uint32_t if_idx, DNSServiceErrorType error,
@@ -233,7 +233,7 @@ discovery_callback(DNSServiceRef sd_ref, DNSServiceFlags flags,
 int
 game_net_discover(void)
 {
-#ifdef USE_BONJOUR
+#ifdef USE_DNS_SD
 	DNSServiceErrorType err;
 	err = DNSServiceBrowse(&sd_browse, 0, 0, "_checkers._tcp", NULL,
 			       discovery_callback, NULL);
@@ -246,7 +246,7 @@ game_net_discover(void)
 void
 game_net_discovery_update(void)
 {
-#ifdef USE_BONJOUR
+#ifdef USE_DNS_SD
 	struct timeval timeout = {0, 0};
 	fd_set fds;
 	int sock;
@@ -264,7 +264,7 @@ game_net_discovery_update(void)
 void
 game_net_stop_discovery(void)
 {
-#ifdef USE_BONJOUR
+#ifdef USE_DNS_SD
 	if (sd_browse != NULL)
 		DNSServiceRefDeallocate(sd_browse);
 	sd_browse = NULL;
@@ -280,7 +280,7 @@ free_discovered_game(struct disc_ent *disc_ent)
 	free(disc_ent);
 }
 
-#ifdef USE_BONJOUR
+#ifdef USE_DNS_SD
 static char *resolved_host;
 
 static void
@@ -298,7 +298,7 @@ resolution_callback(DNSServiceRef sd_ref, DNSServiceFlags flags,
 char *
 discovered_game_addr(struct disc_ent *disc_ent)
 {
-#ifdef USE_BONJOUR
+#ifdef USE_DNS_SD
 	DNSServiceErrorType err;
 
 	err = DNSServiceResolve(&sd_resolve, 0, disc_ent->if_idx,
@@ -476,7 +476,7 @@ game_net_disconnect(void)
 	if (server_sock != -1) {
 		close(server_sock);
 		server_sock = -1;
-#ifdef USE_BONJOUR
+#ifdef USE_DNS_SD
 		if (sd_register != NULL)
 			DNSServiceRefDeallocate(sd_register);
 		sd_register = NULL;

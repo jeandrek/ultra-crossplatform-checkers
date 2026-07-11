@@ -15,11 +15,11 @@ or build from source :)
 For POSIX/X11, Windows, and PSP, edit variables if necessary in `Makefile`,
 `Makefile.win`, or `Makefile.psp` respectively, and run `make` or
 `make -f Makefile.<platform>`.  To build with Bonjour enabled, add
-`USE_BONJOUR=1` to the command; you may need to specify its include and library
+`USE_DNS_SD=1` to the command; you may need to specify its include and library
 directories, e.g.
 
 ```
-CFLAGS='-I../bonjour-sdk' LDFLAGS='-L../bonjour-sdk' make -f Makefile.win USE_BONJOUR=1
+CFLAGS='-I../bonjour-sdk' LDFLAGS='-L../bonjour-sdk' make -f Makefile.win USE_DNS_SD=1
 ```
 
 Building for PSP requires [PSPDEV](https://github.com/pspdev/pspdev) and custom
