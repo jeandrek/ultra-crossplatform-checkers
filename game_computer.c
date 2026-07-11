@@ -59,6 +59,12 @@ struct other_player other_player_computer = {
 
 int game_computer_player;
 
+#ifdef __psp__
+#define SEARCH_DEPTH 4
+#else
+#define SEARCH_DEPTH 5
+#endif
+
 static float
 evaluate(board_t board, int player)
 {
@@ -184,7 +190,8 @@ engine_thread(SceSize args, void *arg)
 #else
 #error Not yet supported
 #endif
-		my_move = search(cur_board, game_computer_player, 5, -1);
+		my_move = search(cur_board, game_computer_player,
+				 SEARCH_DEPTH, -1);
 		move_made = 1;
 	}
 	return 0;

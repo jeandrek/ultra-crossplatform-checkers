@@ -46,7 +46,9 @@ checkers_init(void)
 void
 checkers_resize(int w, int h)
 {
+#ifndef __psp__
 	sg_resize(w, h);
+#endif
 	sg_update(&current_state->sg);
 }
 
