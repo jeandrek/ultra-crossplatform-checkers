@@ -80,7 +80,7 @@ init_window(HWND hWnd)
 	ReleaseDC(hWnd, hdc);
 }
 
-LRESULT WINAPI
+static LRESULT WINAPI
 WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg) {

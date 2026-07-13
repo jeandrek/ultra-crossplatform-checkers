@@ -166,7 +166,7 @@ game_computer_next_move(struct move *move)
 }
 
 #if defined(_WIN32)
-static DWORD
+static DWORD WINAPI
 engine_thread(void *arg)
 #elif defined(__unix__) || defined(__APPLE__)
 static void *
