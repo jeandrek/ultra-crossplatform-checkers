@@ -51,13 +51,13 @@ extern struct state game;
 extern board_t cur_board;
 extern int game_dirty;
 extern enum type game_type;
+#define DRAW	2
+extern int game_outcome;
 extern int cur_player;
 extern enum mode cur_mode;
 extern enum mode anim_done_mode;
 extern int end_turn;
 extern int8_t *squares_buffer;
-
-void game_over(void);
 
 struct move {
 	int	from, to;
@@ -67,5 +67,7 @@ struct other_player {
 	int	(*poll_move)(void);
 	int	(*next_move)(struct move *);
 };
+
+int game_play_move(struct move move);
 
 #endif /* !_GAME_H_ */

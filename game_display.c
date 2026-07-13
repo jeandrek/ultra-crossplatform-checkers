@@ -158,13 +158,15 @@ render_pieces(struct scenegraph *scenegraph)
 	}
 }
 
+static const char *game_over_text[] = {"Red wins", "Black wins", "Draw"};
+
 static void
 render_status(struct scenegraph *scenegraph)
 {
 	char *text = NULL;
 
 	if (cur_mode == GAME_OVER)
-		text = winner(cur_board, user_player) == 0 ? "Red wins" : "Black wins";
+		text = game_over_text[game_outcome];
 	else if (cur_mode == LOST_CONNECTION)
 		text = "Lost connection";
 

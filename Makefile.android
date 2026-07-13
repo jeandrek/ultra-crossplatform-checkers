@@ -14,7 +14,7 @@ CC=		$(TOOLCHAIN)/bin/clang
 TARGET=		aarch64-linux-android$(ANDROID_VERSION)
 
 PROGRAM=	checkers.apk
-OBJECTS=	checkers.o game.o game_display.o game_interaction.o game_checkers.o main-android.o menu.o net_menu.o sprite.o scenegraph-gl.o texture.o input.o text.o gui.o text_input.o game_net.o game_computer.o
+OBJECTS=	checkers.o game.o game_display.o game_interaction.o game_checkers.o game_draw.o main-android.o menu.o net_menu.o sprite.o scenegraph-gl.o texture.o input.o text.o gui.o text_input.o game_net.o game_computer.o
 LIBS=		-lEGL -lGLESv1_CM -lm
 CFLAGS=		--target=$(TARGET) -Wall -fPIC
 CFLAGS+=	-DUSE_GL_ES

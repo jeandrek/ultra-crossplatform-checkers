@@ -115,10 +115,7 @@ static void
 move_piece(void)
 {
 	struct move move = { .from = sel_square, .to = sel_move };
-	int finished = perform_move(sel_square, sel_move, cur_board,
-				    user_player, cur_board);
-	game_dirty = 1;
-	game_display_apply_move(move);
+	int finished = game_play_move(move);
 	if (game_type == NETWORK)
 		game_net_send_move(move);
 	else if (game_type == COMPUTER)

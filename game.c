@@ -37,6 +37,7 @@
 board_t cur_board;
 int game_dirty;
 enum type game_type;
+int game_outcome;
 int cur_player;
 enum mode cur_mode;
 enum mode anim_done_mode;
@@ -44,6 +45,8 @@ int end_turn;
 int8_t *squares_buffer;
 
 static struct other_player *other_player = NULL;
+
+static void game_over(int outcome);
 
 static void
 game_init(void)
@@ -68,16 +71,39 @@ game_init(void)
 	else if (game_type == COMPUTER)	other_player = &other_player_computer;
 }
 
+int
+game_play_move(struct move move)
+{
+	int piece = piece_occupying_square_belonging_to_player(cur_board,
+							       move.from,
+							       !user_player);
+	int promotion = is_promotion(move.from, move.to, piece, !user_player);
+	int finished = perform_move(move.from, move.to,
+				    cur_board, cur_player, cur_board);
+
+	if (finished)
+		game_draw_update(promotion,
+				 captured_piece_index(move.from, move.to) >= 0);
+	game_dirty = 1;
+	game_display_apply_move(move);
+	return finished;
+}
+
 static void
 game_update(void)
 {
 	if (cur_mode == ANIM_MOVE_PIECE) {
 		if (!game_anim_move_piece()) {
+			int w;
+
 			if (end_turn)
 				cur_player = !cur_player;
 
-			if (end_turn && winner(cur_board, cur_player) != -1)
-				game_over();
+			w = winner(cur_board, cur_player);
+			if (end_turn && w != -1)
+				game_over(w);
+			else if (end_turn && game_draw_check())
+				game_over(DRAW);
 			else if (end_turn && game_type == LOCAL_2PLAYER)
 				cur_mode = ANIM_ROTATE_BOARD;
 			else
@@ -97,10 +123,7 @@ game_update(void)
 			return;
 		}
 
-		finished = perform_move(move.from, move.to,
-					cur_board, !user_player, cur_board);
-		game_dirty = 1;
-		game_display_apply_move(move);
+		finished = game_play_move(move);
 		cur_mode = ANIM_MOVE_PIECE;
 		anim_done_mode = finished ? SELECT_PIECE : WAIT_TURN;
 		if (finished)
@@ -111,10 +134,11 @@ game_update(void)
 	}
 }
 
-void
-game_over(void)
+static void
+game_over(int outcome)
 {
 	cur_mode = GAME_OVER;
+	game_outcome = outcome;
 	game_display_game_over();
 	if (game_type == NETWORK)
 		game_net_disconnect();
