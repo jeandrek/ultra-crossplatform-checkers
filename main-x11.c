@@ -138,26 +138,29 @@ main()
 	}
 
 	for (;;) {
-		input_handle();
-		checkers_update();
-		glXSwapBuffers(dpy, glxWin);
-		if (!XCheckIfEvent(dpy, &evt, respond_to_event, NULL))
-			continue;
-		switch (evt.type) {
-		case KeyPress:
-			key_press_event(&evt.xkey);
-			break;
-		case KeyRelease:
-			key_release_event(&evt.xkey);
-			break;
-		case MotionNotify:
-			checkers_mouse_move(evt.xbutton.x, evt.xbutton.y);
-			break;
-		case ButtonRelease:
-			checkers_mouse_up(evt.xbutton.x, evt.xbutton.y);
-			break;
-		case ClientMessage:
-			goto quit;
+		if (XCheckIfEvent(dpy, &evt, respond_to_event, NULL)) {
+			switch (evt.type) {
+			case KeyPress:
+				key_press_event(&evt.xkey);
+				break;
+			case KeyRelease:
+				key_release_event(&evt.xkey);
+				break;
+			case MotionNotify:
+				checkers_mouse_move(evt.xbutton.x,
+						    evt.xbutton.y);
+				break;
+			case ButtonRelease:
+				checkers_mouse_up(evt.xbutton.x,
+						  evt.xbutton.y);
+				break;
+			case ClientMessage:
+				goto quit;
+			}
+		} else {
+			input_handle();
+			checkers_update();
+			glXSwapBuffers(dpy, glxWin);
 		}
 	}
 quit:
