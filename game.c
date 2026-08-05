@@ -24,6 +24,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "checkers.h"
@@ -109,6 +110,35 @@ game_update(void)
 			game_computer_turn();
 		end_turn = finished;
 	}
+}
+
+void
+game_load(const char *path)
+{
+	FILE *f;
+
+	game_type = LOCAL_2PLAYER;
+	game_init();
+
+	f = fopen(path, "rb");
+	fread(&cur_player, sizeof (cur_player), 1, f);
+	fread(cur_board, sizeof (cur_board), 1, f);
+	fclose(f);
+
+	user_player = cur_player;
+	game_display_init();
+	game_interaction_turn();
+}
+
+void
+game_save(const char *path)
+{
+	FILE *f = fopen(path, "wb");
+	fwrite(&cur_player, sizeof (cur_player), 1, f);
+	fwrite(cur_board, sizeof (cur_board), 1, f);
+	fclose(f);
+
+	game_dirty = 0;
 }
 
 void

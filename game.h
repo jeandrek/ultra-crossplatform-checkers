@@ -57,7 +57,9 @@ extern enum mode anim_done_mode;
 extern int end_turn;
 extern int8_t *squares_buffer;
 
-void game_over(void);
+void	game_load(const char *path);
+void	game_save(const char *path);
+void	game_over(void);
 
 struct move {
 	int	from, to;

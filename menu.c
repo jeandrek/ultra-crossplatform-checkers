@@ -32,6 +32,7 @@
 #include "game_computer.h"
 #include "scenegraph.h"
 #include "text.h"
+#include "text_input.h"
 #include "gui.h"
 #include "net_menu.h"
 #include "menu.h"
@@ -87,6 +88,33 @@ new_game_menu(void)
 }
 
 static void
+load_game(const char *path)
+{
+	game.destroy();
+	game_load(path);
+	checkers_switch_state(&game);
+}
+
+static void
+save_game(const char *path)
+{
+	game_save(path);
+	checkers_switch_state(&game);
+}
+
+static void
+load_game_menu(void)
+{
+	text_input("Game file path", load_game, main_menu);
+}
+
+static void
+save_game_menu(void)
+{
+	text_input("Game file path", save_game, main_menu);
+}
+
+static void
 main_menu_action(int row, int col)
 {
 	switch (row) {
@@ -101,6 +129,15 @@ main_menu_action(int row, int col)
 		break;
 
 	case 2:
+		if (game_dirty) confirm_dlg(load_game_menu);
+		else load_game_menu();
+		break;
+
+	case 3:
+		save_game_menu();
+		break;
+
+	case 4:
 		checkers_switch_state(&game);
 		break;
 	}
@@ -110,13 +147,19 @@ void
 main_menu(void)
 {
 	static struct element main_menu_elems[] = {
-		{.x = 0, .y = 0.2, .data = "New game~"},
-		{.x = 0, .y = 0, .data = "Network game~"},
-		{.x = 0, .y = -0.2, .data = "Return"}
+		{.x = 0, .y = 0.4, .data = "New game~"},
+		{.x = 0, .y = 0.2, .data = "Network game~"},
+		{.x = 0, .y = 0, .data = "Load~"},
+		{.x = 0, .y = -0.2, .data = "Save~"},
+		{.x = 0, .y = -0.4, .data = "Return"}
 	};
-	menu_set_elements(3, main_menu_elems);
-	elems[2].disabled = game_type == NO_GAME;
-	gui_set_rows(3, 1, &elems[0], 1, &elems[1], 1, &elems[2]);
+	menu_set_elements(5, main_menu_elems);
+	elems[2].disabled =
+		game_type == NO_GAME ||
+		!(cur_mode == SELECT_PIECE || cur_mode == SELECT_MOVE);
+	elems[4].disabled = game_type == NO_GAME;
+	gui_set_rows(5, 1, &elems[0], 1, &elems[1], 1, &elems[2],
+		     1, &elems[3], 1, &elems[4]);
 	gui_set_action_proc(main_menu_action);
 }
 
