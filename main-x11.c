@@ -90,6 +90,7 @@ main()
 	dpy = XOpenDisplay(NULL);
 
 	win_attribs.event_mask = (SubstructureNotifyMask
+				  | StructureNotifyMask
 				  | KeyPressMask
 				  | KeyReleaseMask
 				  | PointerMotionMask
@@ -140,6 +141,10 @@ main()
 	for (;;) {
 		if (XCheckIfEvent(dpy, &evt, respond_to_event, NULL)) {
 			switch (evt.type) {
+			case ConfigureNotify:
+				checkers_resize(evt.xconfigure.width,
+						evt.xconfigure.height);
+				break;
 			case KeyPress:
 				key_press_event(&evt.xkey);
 				break;
