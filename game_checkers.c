@@ -29,13 +29,15 @@
 
 #include "game_checkers.h"
 
+board_t initial_board = {
+	{[MAN] = 0x55aa55, [KING] = 0},
+	{[MAN] = 0xaa55aa0000000000, [KING] = 0}
+};
+
 void
 board_init(board_t board)
 {
-	board[0][MAN] = 0x55aa55;
-	board[1][MAN] = 0xaa55aa0000000000;
-	board[0][KING] = 0;
-	board[1][KING] = 0;
+	memcpy(board, initial_board, sizeof (initial_board));
 }
 
 static int

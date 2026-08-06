@@ -40,7 +40,7 @@ typedef uint64_t board_t[2][2];
  * capture; hence a turn may consist of several moves.
  */
 
-void board_init(board_t board);
+extern board_t initial_board;
 
 /*
  * Returns piece or -1.

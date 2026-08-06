@@ -47,15 +47,15 @@ int8_t *squares_buffer;
 static struct other_player *other_player = NULL;
 
 static void
-game_init(void)
+game_init_with_board_and_player(board_t board, int player)
 {
 	if (game_type == NO_GAME)
 		game_type = LOCAL_2PLAYER;
 
 	game_dirty = 0;
-	cur_player = 0;
+	cur_player = player;
 	end_turn = 1;
-	board_init(cur_board);
+	memcpy(cur_board, board, sizeof (cur_board));
 	if (game_net_connected()) {
 		game_dirty = 1;
 		game_type = NETWORK;
@@ -68,6 +68,12 @@ game_init(void)
 
 	if (game_type == NETWORK)	other_player = &other_player_net;
 	else if (game_type == COMPUTER)	other_player = &other_player_computer;
+}
+
+static void
+game_init(void)
+{
+	game_init_with_board_and_player(initial_board, 0);
 }
 
 static void
@@ -125,22 +131,17 @@ void
 game_load(const char *path)
 {
 	FILE *f = fopen(path, "rb");
-	int p;
+	board_t board;
+	int player;
 
 	fread(&game_type, sizeof (game_type), 1, f);
-	fread(&p, sizeof (p), 1, f);
-	if (game_type == COMPUTER)
-		game_computer_player = !p;
-	game_init();
-	cur_player = user_player = p;
-
-	fread(cur_board, sizeof (cur_board), 1, f);
-
+	fread(&player, sizeof (player), 1, f);
+	fread(board, sizeof (board), 1, f);
 	fclose(f);
 
-	game_display_destroy();
-	game_display_init();
-	game_interaction_turn();
+	if (game_type == COMPUTER)
+		game_computer_player = !player;
+	game_init_with_board_and_player(board, player);
 }
 
 void

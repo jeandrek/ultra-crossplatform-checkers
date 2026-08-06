@@ -83,12 +83,12 @@ game_interaction_init(void)
 	else if (game_type == COMPUTER)
 		user_player = !game_computer_player;
 	else
-		user_player = 0;
+		user_player = cur_player;
 
-	if (user_player == 0) {
+	if (user_player == cur_player) {
 		cur_mode = SELECT_PIECE;
 		board_available_moves(cur_board, board_moves, user_player, -1);
-		set_sel_square(0);
+		set_sel_square(user_player == 0 ? 0 : 63);
 	} else {
 		cur_mode = WAIT_TURN;
 		sel_piece_moves = 0;
