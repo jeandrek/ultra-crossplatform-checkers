@@ -54,6 +54,7 @@ game_init(void)
 
 	game_dirty = 0;
 	cur_player = 0;
+	end_turn = 1;
 	board_init(cur_board);
 	if (game_net_connected()) {
 		game_dirty = 1;
@@ -112,20 +113,32 @@ game_update(void)
 	}
 }
 
+int
+game_can_save(void)
+{
+	return (game_type == LOCAL_2PLAYER || game_type == COMPUTER)
+		&& (cur_mode == SELECT_PIECE || cur_mode == SELECT_MOVE)
+		&& end_turn;
+}
+
 void
 game_load(const char *path)
 {
-	FILE *f;
+	FILE *f = fopen(path, "rb");
+	int p;
 
-	game_type = LOCAL_2PLAYER;
+	fread(&game_type, sizeof (game_type), 1, f);
+	fread(&p, sizeof (p), 1, f);
+	if (game_type == COMPUTER)
+		game_computer_player = !p;
 	game_init();
+	cur_player = user_player = p;
 
-	f = fopen(path, "rb");
-	fread(&cur_player, sizeof (cur_player), 1, f);
 	fread(cur_board, sizeof (cur_board), 1, f);
+
 	fclose(f);
 
-	user_player = cur_player;
+	game_display_destroy();
 	game_display_init();
 	game_interaction_turn();
 }
@@ -134,7 +147,8 @@ void
 game_save(const char *path)
 {
 	FILE *f = fopen(path, "wb");
-	fwrite(&cur_player, sizeof (cur_player), 1, f);
+	fwrite(&game_type, sizeof (game_type), 1, f);
+	fwrite(&user_player, sizeof (user_player), 1, f);
 	fwrite(cur_board, sizeof (cur_board), 1, f);
 	fclose(f);
 

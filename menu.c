@@ -154,9 +154,7 @@ main_menu(void)
 		{.x = 0, .y = -0.4, .data = "Return"}
 	};
 	menu_set_elements(5, main_menu_elems);
-	elems[2].disabled =
-		game_type == NO_GAME ||
-		!(cur_mode == SELECT_PIECE || cur_mode == SELECT_MOVE);
+	elems[3].disabled = !game_can_save();
 	elems[4].disabled = game_type == NO_GAME;
 	gui_set_rows(5, 1, &elems[0], 1, &elems[1], 1, &elems[2],
 		     1, &elems[3], 1, &elems[4]);
