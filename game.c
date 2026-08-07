@@ -24,7 +24,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "checkers.h"
@@ -33,6 +32,7 @@
 #include "game_interaction.h"
 #include "game_net.h"
 #include "game_computer.h"
+#include "game_save.h"
 #include "text.h"
 
 board_t cur_board;
@@ -130,15 +130,10 @@ game_can_save(void)
 void
 game_load(const char *path)
 {
-	FILE *f = fopen(path, "rb");
 	board_t board;
 	int player;
 
-	fread(&game_type, sizeof (game_type), 1, f);
-	fread(&player, sizeof (player), 1, f);
-	fread(board, sizeof (board), 1, f);
-	fclose(f);
-
+	game_save_read(path, &game_type, &player, board);
 	if (game_type == COMPUTER)
 		game_computer_player = !player;
 	game_init_with_board_and_player(board, player);
@@ -147,12 +142,7 @@ game_load(const char *path)
 void
 game_save(const char *path)
 {
-	FILE *f = fopen(path, "wb");
-	fwrite(&game_type, sizeof (game_type), 1, f);
-	fwrite(&user_player, sizeof (user_player), 1, f);
-	fwrite(cur_board, sizeof (cur_board), 1, f);
-	fclose(f);
-
+	game_save_write(path, game_type, cur_player, cur_board);
 	game_dirty = 0;
 }
 
