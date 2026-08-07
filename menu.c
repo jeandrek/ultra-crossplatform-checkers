@@ -30,6 +30,7 @@
 #include "game.h"
 #include "game_checkers.h"
 #include "game_computer.h"
+#include "game_save.h"
 #include "scenegraph.h"
 #include "text.h"
 #include "text_input.h"
@@ -90,16 +91,35 @@ new_game_menu(void)
 static void
 load_game(const char *path)
 {
+	int err;
+
 	game.destroy();
-	game_load(path);
-	checkers_switch_state(&game);
+	switch (err = game_load(path)) {
+	case 0:
+		checkers_switch_state(&game);
+		break;
+	case CANNOT_OPEN_FILE:
+		message_dlg("Cannot open file", main_menu);
+		break;
+	case BAD_MAGIC:
+		message_dlg("Invalid save file", main_menu);
+		break;
+	}
 }
 
 static void
 save_game(const char *path)
 {
-	game_save(path);
-	checkers_switch_state(&game);
+	int err;
+
+	switch (err = game_save(path)) {
+	case 0:
+		checkers_switch_state(&game);
+		break;
+	case CANNOT_OPEN_FILE:
+		message_dlg("Cannot open file", main_menu);
+		break;
+	}
 }
 
 static void

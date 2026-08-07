@@ -127,23 +127,30 @@ game_can_save(void)
 		&& end_turn;
 }
 
-void
+int
 game_load(const char *path)
 {
 	board_t board;
 	int player;
+	int err;
 
-	game_save_read(path, &game_type, &player, board);
+	err = game_save_read(path, &game_type, &player, board);
+	if (err) return err;
 	if (game_type == COMPUTER)
 		game_computer_player = !player;
 	game_init_with_board_and_player(board, player);
+	return 0;
 }
 
-void
+int
 game_save(const char *path)
 {
-	game_save_write(path, game_type, cur_player, cur_board);
+	int err;
+
+	err = game_save_write(path, game_type, cur_player, cur_board);
+	if (err) return err;
 	game_dirty = 0;
+	return 0;
 }
 
 void

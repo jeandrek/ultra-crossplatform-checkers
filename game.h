@@ -58,8 +58,8 @@ extern int end_turn;
 extern int8_t *squares_buffer;
 
 int	game_can_save(void);
-void	game_load(const char *path);
-void	game_save(const char *path);
+int	game_load(const char *path);
+int	game_save(const char *path);
 void	game_over(void);
 
 struct move {

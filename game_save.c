@@ -30,11 +30,16 @@
 #include "game_checkers.h"
 #include "game_save.h"
 
-void
+int
 game_save_write(const char *path, enum type type, int player,
 		board_t board)
 {
 	FILE *f = fopen(path, "wb");
+
+	if (f == NULL)
+		return CANNOT_OPEN_FILE;
+	putc(0xff, f);
+	putc('C', f);
 
 	putc(type, f);
 	putc(player, f);
@@ -42,7 +47,7 @@ game_save_write(const char *path, enum type type, int player,
 	for (int i = 0; i < 2; i++) {
 		for (int j = 0; j < NUM_PIECE_TYPES; j++) {
 			uint64_t b = board[i][j];
-			putc((b >> 56) & 0xff, f);
+			putc(b >> 56, f);
 			putc((b >> 48) & 0xff, f);
 			putc((b >> 40) & 0xff, f);
 			putc((b >> 32) & 0xff, f);
@@ -54,13 +59,19 @@ game_save_write(const char *path, enum type type, int player,
 	}
 
 	fclose(f);
+	return 0;
 }
 
-void
+int
 game_save_read(const char *path, enum type *type, int *player,
 	       board_t board)
 {
 	FILE *f = fopen(path, "rb");
+
+	if (f == NULL)
+		return CANNOT_OPEN_FILE;
+	if (getc(f) != 0xff || getc(f) != 'C')
+		return BAD_MAGIC;
 
 	*type = getc(f);
 	*player = getc(f);
@@ -76,4 +87,5 @@ game_save_read(const char *path, enum type *type, int *player,
 	}
 
 	fclose(f);
+	return 0;
 }

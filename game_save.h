@@ -30,9 +30,12 @@
 #include "game.h"
 #include "game_checkers.h"
 
-void	game_save_write(const char *path, enum type type, int player,
+int	game_save_write(const char *path, enum type type, int player,
 			board_t board);
-void	game_save_read(const char *path, enum type *type, int *player,
+int	game_save_read(const char *path, enum type *type, int *player,
 		       board_t board);
+
+#define CANNOT_OPEN_FILE	1
+#define BAD_MAGIC		2
 
 #endif /* !_GAME_SAVE_H_ */
