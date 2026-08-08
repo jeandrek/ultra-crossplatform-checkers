@@ -99,7 +99,7 @@ host_game(int player)
 		message_dlg(wait_screen_msg, quit_hosting);
 	} else {
 		snprintf(wait_screen_msg, 128,
-			 "Error hosting: %s", strerror(net_err));
+			 "Error hosting: %s", net_strerror(net_err));
 		message_dlg(wait_screen_msg, host_menu);
 	}
 }
@@ -129,7 +129,7 @@ update_connecting_wait_screen(void)
 		checkers_switch_state(&game);
 	} else if (result > 0) {
 		const char *err_msg =
-			result == NETWORK_ERROR ? strerror(net_err)
+			result == NETWORK_ERROR ? net_strerror(net_err)
 			: result == VERSION_MISMATCH ? "version mismatch"
 			: "bad connection";
 		snprintf(error_msg, 128, "Error connecting to %s: %s",

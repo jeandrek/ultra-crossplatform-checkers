@@ -26,6 +26,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #if defined(_WIN32)
 #include <winsock2.h>
@@ -75,6 +76,25 @@ static DNSServiceRef sd_browse = NULL;
 static DNSServiceRef sd_resolve = NULL;
 #endif
 char		game_net_player = -1;
+
+#ifdef _WIN32
+const char *
+net_strerror(int value)
+{
+	static char buf[64];
+
+	/* FormatMessage's strings are too long-winded. */
+	switch (value) {
+	case WSAEADDRINUSE:	return "address in use";
+	case WSAEADDRNOTAVAIL:	return "invalid address";
+	case WSAECONNREFUSED:	return "connection refused";
+	case WSAETIMEDOUT:	return "timed out";
+	default:
+		snprintf(buf, 64, "WSA error %d", value);
+		return buf;
+	}
+}
+#endif
 
 char *
 ip_addr_str(void)
@@ -374,7 +394,7 @@ game_net_poll_connected(int *connected, int *net_err)
 		if (select(conn_sock + 1, NULL, &fds, NULL, &timeout) > 0) {
 #ifndef _WIN32
 			int sock_err;
-			socklen_t len = sizeof (sock_err);
+			socklen_t len = sizeof (int);
 			getsockopt(conn_sock, SOL_SOCKET, SO_ERROR,
 				   (char *)&sock_err, &len);
 			if (sock_err) {
@@ -391,7 +411,10 @@ game_net_poll_connected(int *connected, int *net_err)
 		FD_ZERO(&fds);
 		FD_SET(conn_sock, &fds);
 		if (select(conn_sock + 1, NULL, NULL, &fds, &timeout) > 0) {
-			result = BAD_CONNECTION;
+			socklen_t len = sizeof (int);
+			getsockopt(conn_sock, SOL_SOCKET, SO_ERROR,
+				   (char *)net_err, &len);
+			result = NETWORK_ERROR;
 			goto error;
 		}
 #endif

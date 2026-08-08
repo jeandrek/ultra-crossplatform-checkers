@@ -61,6 +61,13 @@ int	game_net_recv_move(struct move *move);
 void	game_net_send_move(struct move move);
 void	game_net_disconnect(void);
 
+#ifdef _WIN32
+const char	*net_strerror(int value);
+#else
+#include <string.h>
+#define net_strerror	strerror
+#endif
+
 extern char game_net_player;
 
 #define PROTOCOL_MAJOR	0
