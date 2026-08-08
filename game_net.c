@@ -69,7 +69,8 @@ static int	game_net_check_header(void);
 static int	server_sock = -1;
 static int	conn_sock = -1;
 static int	conn_sock_state;
-enum {CANT_CONNECT, CONNECTING, WAITING_FOR_HEADER, WAITING_FOR_OPPONENT};
+enum {CANNOT_CONNECT, CONNECTING, WAITING_FOR_HEADER, WAITING_FOR_OPPONENT};
+static int	conn_error;
 #ifdef USE_DNS_SD
 static DNSServiceRef sd_register = NULL;
 static DNSServiceRef sd_browse = NULL;
@@ -350,7 +351,8 @@ game_net_join(const char *nodename)
 	struct hostent *hostent = gethostbyname(nodename);
 	int result;
 
-	conn_sock_state = CANT_CONNECT;
+	conn_sock_state = CANNOT_CONNECT;
+	conn_error = 0;
 	if (hostent == NULL)
 		return;
 	sa.sin_family = AF_INET;
@@ -367,11 +369,13 @@ game_net_join(const char *nodename)
 	result = connect(conn_sock, (struct sockaddr *)&sa, sizeof (sa));
 #ifdef _WIN32
 	if (result < 0 && WSAGetLastError() != WSAEWOULDBLOCK)
+		conn_error = WSAGetLastError();
 #else
 	if (result < 0 && errno != EINPROGRESS && errno != EWOULDBLOCK)
+		conn_error = errno;
 #endif
-		return;
-	conn_sock_state = CONNECTING;
+	else
+		conn_sock_state = CONNECTING;
 }
 
 int
@@ -383,9 +387,12 @@ game_net_poll_connected(int *connected, int *net_err)
 
 	*connected = 0;
 
-	if (conn_sock_state == CANT_CONNECT) {
-		*net_err = errno;
-		return NETWORK_ERROR;
+	if (conn_sock_state == CANNOT_CONNECT) {
+		if (conn_error) {
+			*net_err = conn_error;
+			return NETWORK_ERROR;
+		}
+		return CANNOT_RESOLVE_NAME;
 	}
 
 	FD_ZERO(&fds);

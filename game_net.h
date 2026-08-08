@@ -81,7 +81,8 @@ struct __attribute__ ((packed)) checkers_header {
 extern struct other_player other_player_net;
 
 #define NETWORK_ERROR		1
-#define BAD_CONNECTION		2
-#define VERSION_MISMATCH	3
+#define CANNOT_RESOLVE_NAME	2
+#define BAD_CONNECTION		3
+#define VERSION_MISMATCH	4
 
 #endif /* !_GAME_NET_H_ */

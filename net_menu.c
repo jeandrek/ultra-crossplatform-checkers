@@ -130,6 +130,7 @@ update_connecting_wait_screen(void)
 	} else if (result > 0) {
 		const char *err_msg =
 			result == NETWORK_ERROR ? net_strerror(net_err)
+			: result == CANNOT_RESOLVE_NAME ? "cannot resolve name"
 			: result == VERSION_MISMATCH ? "version mismatch"
 			: "bad connection";
 		snprintf(error_msg, 128, "Error connecting to %s: %s",
