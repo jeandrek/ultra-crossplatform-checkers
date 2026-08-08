@@ -67,7 +67,7 @@ key_release_event(XKeyEvent *evt)
 }
 
 int
-main()
+main(int argc, char *argv[])
 {
 	int glx_attribs[] = {
 		GLX_RED_SIZE, 8, GLX_GREEN_SIZE, 8, GLX_BLUE_SIZE, 8,
@@ -123,7 +123,7 @@ main()
 
 	sg_init(800, 600);
 
-	checkers_init();
+	checkers_init(argc, argv);
 
 	XkbSetDetectableAutoRepeat(dpy, True, NULL);
 

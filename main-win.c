@@ -76,7 +76,7 @@ init_window(HWND hWnd)
 		wglSwapIntervalEXT(1);
 	}
 	sg_init(800, 600);
-	checkers_init();
+	checkers_init(__argc, __argv);
 	ReleaseDC(hWnd, hdc);
 }
 

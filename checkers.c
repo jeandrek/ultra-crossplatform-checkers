@@ -33,12 +33,20 @@
 static struct state *current_state = NULL;
 
 void
-checkers_init(void)
+checkers_init(int argc, char *argv[])
 {
+	char *path = NULL;
+
+	if (argc >= 2)
+		path = argv[1];
+
 	game_computer_init();
 	text_init();
 	game.load();
-	game.init();
+	if (path)
+		game_load(path);
+	else
+		game.init();
 	menu.init();
 	current_state = &game;
 }

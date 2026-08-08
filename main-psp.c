@@ -69,7 +69,7 @@ main(void)
 	sceCtrlSetSamplingCycle(0);
 
 	sg_init(480, 272);
-	checkers_init();
+	checkers_init(0, NULL);
 
 	for (;;) {
 		input_handle();
