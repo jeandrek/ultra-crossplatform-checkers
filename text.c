@@ -95,7 +95,7 @@ draw_glyph(struct scenegraph *scenegraph, struct glyph *g, float x, float y)
 }
 
 void
-text_draw(struct scenegraph *scenegraph, char *str, float x, float y,
+text_draw(struct scenegraph *scenegraph, const char *str, float x, float y,
 	  int alignment)
 {
 	float pixel_size = 2.0/scenegraph->height;

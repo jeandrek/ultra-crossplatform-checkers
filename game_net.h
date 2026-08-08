@@ -41,7 +41,8 @@ char	*ip_addr_str(void);
 
 int	game_net_connected(void);
 
-int	game_net_host(int player);
+/* Returns 0 on success or an error. */
+int	game_net_host(int player, int *net_err);
 int	game_net_poll_connections(void);
 void	game_net_stop_hosting(void);
 
@@ -51,7 +52,8 @@ void	game_net_stop_discovery(void);
 void	free_discovered_game(struct disc_ent *disc_ent);
 char	*discovered_game_addr(struct disc_ent *disc_ent);
 void	game_net_join(const char *nodename);
-int	game_net_poll_connected(void);
+/* Returns 0 or an error. */
+int	game_net_poll_connected(int *connected, int *net_err);
 void	game_net_stop_connecting(void);
 
 int	game_net_poll_move(void);
@@ -70,5 +72,9 @@ struct __attribute__ ((packed)) checkers_header {
 };
 
 extern struct other_player other_player_net;
+
+#define NETWORK_ERROR		1
+#define BAD_CONNECTION		2
+#define VERSION_MISMATCH	3
 
 #endif /* !_GAME_NET_H_ */

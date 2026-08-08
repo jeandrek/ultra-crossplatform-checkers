@@ -35,7 +35,7 @@ enum {
 void text_init(void);
 void text_size(float new_size);
 void text_color(uint32_t new_color);
-void text_draw(struct scenegraph *scenegraph, char *s, float x, float y,
+void text_draw(struct scenegraph *scenegraph, const char *s, float x, float y,
 	       int alignment);
 void text_screen_bounds(struct scenegraph *scenegraph, size_t len, float x, float y,
 			int alignment, struct rect *rect);

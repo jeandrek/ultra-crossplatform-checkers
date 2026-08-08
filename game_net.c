@@ -122,7 +122,7 @@ game_net_connected(void)
 }
 
 int
-game_net_host(int player)
+game_net_host(int player, int *net_err)
 {
 	struct sockaddr_in sa;
 	int reuse;
@@ -136,8 +136,15 @@ game_net_host(int player)
 	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
 		   (char *)&reuse, sizeof (reuse));
 
-	if (bind(sock, (struct sockaddr *)&sa, sizeof (sa)) < 0)
-		return 0;
+	if (bind(sock, (struct sockaddr *)&sa, sizeof (sa)) < 0) {
+#ifdef _WIN32
+		*net_err = WSAGetLastError();
+#else
+		*net_err = errno;
+#endif
+		return NETWORK_ERROR;
+	}
+
 	listen(sock, 1);
 	server_sock = sock;
 	game_net_player = player;
@@ -152,7 +159,7 @@ game_net_host(int player)
 		DNSServiceProcessResult(sd_register);
 #endif
 
-	return 1;
+	return 0;
 }
 
 /*
@@ -183,7 +190,7 @@ game_net_connect_to_client(void)
 {
 	conn_sock = accept(server_sock, NULL, NULL);
 	game_net_send_header();
-	if (!game_net_check_header())
+	if (game_net_check_header())
 		goto bad_conn;
 	send(conn_sock, &game_net_player, 1, 0);
 	return 1;
@@ -348,25 +355,33 @@ game_net_join(const char *nodename)
 }
 
 int
-game_net_poll_connected(void)
+game_net_poll_connected(int *connected, int *net_err)
 {
 	struct timeval timeout = {0, 0};
+	int result;
 	fd_set fds;
 
-	if (conn_sock_state == CANT_CONNECT)
-		return -1;
+	*connected = 0;
+
+	if (conn_sock_state == CANT_CONNECT) {
+		*net_err = errno;
+		return NETWORK_ERROR;
+	}
 
 	FD_ZERO(&fds);
 	FD_SET(conn_sock, &fds);
 	if (conn_sock_state == CONNECTING) {
 		if (select(conn_sock + 1, NULL, &fds, NULL, &timeout) > 0) {
 #ifndef _WIN32
-			int err;
-			socklen_t len = sizeof (err);
+			int sock_err;
+			socklen_t len = sizeof (sock_err);
 			getsockopt(conn_sock, SOL_SOCKET, SO_ERROR,
-				   (char *)&err, &len);
-			if (err)
-				goto bad_conn;
+				   (char *)&sock_err, &len);
+			if (sock_err) {
+				*net_err = sock_err;
+				result = NETWORK_ERROR;
+				goto error;
+			}
 #endif
 			conn_sock_state = WAITING_FOR_HEADER;
 			game_net_send_header();
@@ -375,30 +390,37 @@ game_net_poll_connected(void)
 #ifdef _WIN32
 		FD_ZERO(&fds);
 		FD_SET(conn_sock, &fds);
-		if (select(conn_sock + 1, NULL, NULL, &fds, &timeout) > 0)
-			goto bad_conn;
+		if (select(conn_sock + 1, NULL, NULL, &fds, &timeout) > 0) {
+			result = BAD_CONNECTION;
+			goto error;
+		}
 #endif
 	} else if (conn_sock_state == WAITING_FOR_HEADER) {
 		if (select(conn_sock + 1, &fds, NULL, NULL, &timeout) > 0) {
-			if (!game_net_check_header())
-				goto bad_conn;
+			result = game_net_check_header();
+			if (result)
+				goto error;
 			conn_sock_state = WAITING_FOR_OPPONENT;
 			return 0;
 		}
 	} else if (conn_sock_state == WAITING_FOR_OPPONENT) {
 		char opponent;
 		if (select(conn_sock + 1, &fds, NULL, NULL, &timeout) > 0) {
-			if (recv(conn_sock, &opponent, 1, 0) < 1)
-				goto bad_conn;
+			if (recv(conn_sock, &opponent, 1, 0) < 1) {
+				result = BAD_CONNECTION;
+				goto error;
+			}
 			game_net_player = !opponent;
-			return 1;
+			*connected = 1;
+			return 0;
 		}
 	}
 	return 0;
-bad_conn:
+
+error:
 	close(conn_sock);
 	conn_sock = -1;
-	return -1;
+	return result;
 }
 
 void
@@ -427,12 +449,12 @@ game_net_check_header(void)
 
 	if (recv(conn_sock, (char *)&header, sizeof (header), 0)
 	    < sizeof (header))
-		return 0;
-	if (header.magic[0] != 0xff || header.magic[1] != 'C'
-	    || header.major != PROTOCOL_MAJOR
-	    || header.minor != PROTOCOL_MINOR)
-		return 0;
-	return 1;
+		return BAD_CONNECTION;
+	if (header.magic[0] != 0xff || header.magic[1] != 'C')
+		return BAD_CONNECTION;
+	if (header.major != PROTOCOL_MAJOR || header.minor != PROTOCOL_MINOR)
+		return VERSION_MISMATCH;
+	return 0;
 }
 
 int

@@ -30,8 +30,11 @@
 #include "game.h"
 #include "game_checkers.h"
 
+/* Save a game to file.  Returns 0 on success or an error. */
 int	game_save_write(const char *path, enum type type, int player,
 			board_t board);
+
+/* Load a game from file.  Returns 0 on success or an error. */
 int	game_save_read(const char *path, enum type *type, int *player,
 		       board_t board);
 

@@ -24,6 +24,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -87,16 +88,19 @@ static void
 host_game(int player)
 {
 	static char wait_screen_msg[128];
+	int net_err;
 
 	game.destroy();
-	if (game_net_host(player)) {
+	if (game_net_host(player, &net_err) == 0) {
 		snprintf(wait_screen_msg, 128,
 			 "Waiting for connection~  IP address: %s",
 			 ip_addr_str());
 		menu.update = update_hosting_wait_screen;
 		message_dlg(wait_screen_msg, quit_hosting);
 	} else {
-		message_dlg("Error hosting", host_menu);
+		snprintf(wait_screen_msg, 128,
+			 "Error hosting: %s", strerror(net_err));
+		message_dlg(wait_screen_msg, host_menu);
 	}
 }
 
@@ -113,18 +117,23 @@ static char *join_game_addr;
 static void
 update_connecting_wait_screen(void)
 {
+	int result, connected, net_err;
 	static char error_msg[128];
-	int result;
 
 	gui_update();
-	if ((result = game_net_poll_connected()) > 0) {
+	result = game_net_poll_connected(&connected, &net_err);
+	if (connected) {
 		free(join_game_addr);
 		menu.update = gui_update;
 		game.init();
 		checkers_switch_state(&game);
-	} else if (result < 0) {
-		snprintf(error_msg, 128, "Error connecting to %s",
-			 join_game_addr);
+	} else if (result > 0) {
+		const char *err_msg =
+			result == NETWORK_ERROR ? strerror(net_err)
+			: result == VERSION_MISMATCH ? "version mismatch"
+			: "bad connection";
+		snprintf(error_msg, 128, "Error connecting to %s: %s",
+			 join_game_addr, err_msg);
 		free(join_game_addr);
 		menu.update = gui_update;
 		message_dlg(error_msg, join_menu);

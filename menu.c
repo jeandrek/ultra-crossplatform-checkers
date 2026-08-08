@@ -40,7 +40,7 @@
 
 struct element *elems;
 static int num_elems;
-static char *message = NULL;
+static const char *message = NULL;
 
 static void confirm_dlg(void (*yes_action)(void));
 
@@ -91,34 +91,28 @@ new_game_menu(void)
 static void
 load_game(const char *path)
 {
-	int err;
+	int result;
 
 	game.destroy();
-	switch (err = game_load(path)) {
-	case 0:
+	if ((result = game_load(path)) == 0) {
 		checkers_switch_state(&game);
-		break;
-	case CANNOT_OPEN_FILE:
-		message_dlg("Cannot open file", main_menu);
-		break;
-	case BAD_MAGIC:
-		message_dlg("Invalid save file", main_menu);
-		break;
+	} else {
+		const char *err_msg =
+			result == CANNOT_OPEN_FILE ? "Cannot open file" :
+			"Invalid save file";
+		message_dlg(err_msg, main_menu);
 	}
 }
 
 static void
 save_game(const char *path)
 {
-	int err;
+	int result;
 
-	switch (err = game_save(path)) {
-	case 0:
+	if ((result = game_save(path)) == 0) {
 		checkers_switch_state(&game);
-		break;
-	case CANNOT_OPEN_FILE:
+	} else {
 		message_dlg("Cannot open file", main_menu);
-		break;
 	}
 }
 
@@ -186,7 +180,7 @@ static void (*message_dlg_back_action)(void);
 static void message_dlg_action(int row, int col) {message_dlg_back_action();}
 
 void
-message_dlg(char *text, void (*back_action)(void))
+message_dlg(const char *text, void (*back_action)(void))
 {
 	static struct element message_dlg_elems[] = {
 		{.x = 0, .y = -0.1, .data = "Back"}
