@@ -26,8 +26,11 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "checkers.h"
+
 int
 main(int argc, char *argv[])
 {
+    checkers_process_args(argc, argv);
     return NSApplicationMain(argc, (const char **)argv);
 }

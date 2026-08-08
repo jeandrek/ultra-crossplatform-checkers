@@ -31,20 +31,23 @@
 #include "text.h"
 
 static struct state *current_state = NULL;
+static char *filepath = NULL;
 
 void
-checkers_init(int argc, char *argv[])
+checkers_process_args(int argc, char *argv[])
 {
-	char *path = NULL;
-
 	if (argc >= 2)
-		path = argv[1];
+		filepath = argv[1];
+}
 
+void
+checkers_init(void)
+{
 	game_computer_init();
 	text_init();
 	game.load();
-	if (path)
-		game_load(path);
+	if (filepath)
+		game_load(filepath);
 	else
 		game.init();
 	menu.init();

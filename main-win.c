@@ -76,7 +76,7 @@ init_window(HWND hWnd)
 		wglSwapIntervalEXT(1);
 	}
 	sg_init(800, 600);
-	checkers_init(__argc, __argv);
+	checkers_init();
 	ReleaseDC(hWnd, hdc);
 }
 
@@ -118,6 +118,8 @@ WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 	HWND hWnd;
 	MSG msg;
 	WSADATA wsadata;
+
+	checkers_process_args(__argc, __argv);
 
 	WSAStartup(0x0202, &wsadata);
 

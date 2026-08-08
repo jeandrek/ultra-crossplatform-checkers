@@ -87,6 +87,8 @@ main(int argc, char *argv[])
 	Window win;
 	XEvent evt;
 
+	checkers_process_args(argc, argv);
+
 	dpy = XOpenDisplay(NULL);
 
 	win_attribs.event_mask = (SubstructureNotifyMask
@@ -123,7 +125,7 @@ main(int argc, char *argv[])
 
 	sg_init(800, 600);
 
-	checkers_init(argc, argv);
+	checkers_init();
 
 	XkbSetDetectableAutoRepeat(dpy, True, NULL);
 

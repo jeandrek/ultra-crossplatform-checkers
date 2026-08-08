@@ -48,7 +48,8 @@ struct state {
 	struct scenegraph sg;
 };
 
-void checkers_init(int argc, char *argv[]);
+void checkers_process_args(int argc, char *argv[]);
+void checkers_init(void);
 void checkers_resize(int w, int h);
 void checkers_update(void);
 void checkers_button_event(int button);

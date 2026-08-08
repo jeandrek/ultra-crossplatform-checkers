@@ -65,7 +65,7 @@ Java_jeandre_checkers_Checkers_init(JNIEnv *env, jobject obj,
 {
 	enter_android_call(env, obj);
 	sg_init(width, height);
-	checkers_init(0, NULL);
+	checkers_init();
 	text_scale_factor = 2.0;
 	leave_android_call();
 }
