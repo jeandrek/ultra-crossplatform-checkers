@@ -24,18 +24,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _GAME_SAVE_H_
-#define _GAME_SAVE_H_
+#include "error.h"
 
-#include "game.h"
-#include "game_checkers.h"
-
-/* Save a game to file.  Returns 0 on success or an error. */
-int	game_save_write(const char *path, enum type type, int player,
-			board_t board);
-
-/* Load a game from file.  Returns 0 on success or an error. */
-int	game_save_read(const char *path, enum type *type, int *player,
-		       board_t board);
-
-#endif /* !_GAME_SAVE_H_ */
+const char *error_msgs[] = {
+	[CANNOT_OPEN_FILE] = "Cannot open file",
+	[BAD_MAGIC] = "Invalid save file",
+	[NETWORK_ERROR] = "Network error",
+	[CANNOT_RESOLVE_NAME] = "Cannot resolve name",
+	[BAD_CONNECTION] = "Bad connection",
+	[VERSION_MISMATCH] = "Version mismatch"
+};

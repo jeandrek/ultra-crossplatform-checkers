@@ -35,6 +35,7 @@
 #include "text.h"
 #include "text_input.h"
 #include "gui.h"
+#include "error.h"
 #include "net_menu.h"
 #include "menu.h"
 
@@ -94,14 +95,10 @@ load_game(const char *path)
 	int result;
 
 	game.destroy();
-	if ((result = game_load(path)) == 0) {
+	if ((result = game_load(path)) == 0)
 		checkers_switch_state(&game);
-	} else {
-		const char *err_msg =
-			result == CANNOT_OPEN_FILE ? "Cannot open file" :
-			"Invalid save file";
-		message_dlg(err_msg, main_menu);
-	}
+	else
+		message_dlg(error_msgs[result], main_menu);
 }
 
 static void
@@ -109,11 +106,10 @@ save_game(const char *path)
 {
 	int result;
 
-	if ((result = game_save(path)) == 0) {
+	if ((result = game_save(path)) == 0)
 		checkers_switch_state(&game);
-	} else {
-		message_dlg("Cannot open file", main_menu);
-	}
+	else
+		message_dlg(error_msgs[result], main_menu);
 }
 
 static void

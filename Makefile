@@ -2,7 +2,7 @@ PREFIX=		/usr/local
 DATADIR=	$(PREFIX)/share/games/checkers
 
 PROGRAM=	checkers
-OBJECTS=	checkers.o game.o game_display.o game_interaction.o game_checkers.o menu.o net_menu.o main-x11.o sprite.o scenegraph-gl.o texture.o input.o text.o gui.o text_input.o game_net.o game_computer.o game_save.o
+OBJECTS=	checkers.o game.o game_display.o game_interaction.o game_checkers.o menu.o net_menu.o main-x11.o sprite.o scenegraph-gl.o texture.o input.o text.o gui.o text_input.o game_net.o game_computer.o game_save.o error.o
 CFLAGS+=	-Wall -O2 -g -DDATADIR="\"$(DATADIR)\"" $(CFLAGS_DNS_SD$(USE_DNS_SD))
 CFLAGS_DNS_SD1=-DUSE_DNS_SD
 CFLAGS+=	-DUSE_X11

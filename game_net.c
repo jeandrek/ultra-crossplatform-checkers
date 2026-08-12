@@ -54,6 +54,7 @@
 #include <dns_sd.h>
 #endif
 
+#include "error.h"
 #include "net_menu.h"
 #include "game_net.h"
 

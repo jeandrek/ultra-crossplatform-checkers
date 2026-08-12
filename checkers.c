@@ -29,6 +29,7 @@
 #include "game_computer.h"
 #include "menu.h"
 #include "text.h"
+#include "error.h"
 
 static struct state *current_state = NULL;
 static char *filepath = NULL;
@@ -46,11 +47,17 @@ checkers_init(void)
 	game_computer_init();
 	text_init();
 	game.load();
-	if (filepath)
-		game_load(filepath);
-	else
-		game.init();
 	menu.init();
+	if (filepath) {
+		int result = game_load(filepath);
+		if (result) {
+			message_dlg(error_msgs[result], main_menu);
+			current_state = &menu;
+			return;
+		}
+	} else {
+		game.init();
+	}
 	current_state = &game;
 }
 

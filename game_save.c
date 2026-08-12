@@ -26,6 +26,8 @@
 
 #include <stdint.h>
 #include <stdio.h>
+
+#include "error.h"
 #include "game.h"
 #include "game_checkers.h"
 #include "game_save.h"

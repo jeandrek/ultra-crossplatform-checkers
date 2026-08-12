@@ -36,6 +36,7 @@
 #include "gui.h"
 #include "text_input.h"
 #include "sprite.h"
+#include "error.h"
 #include "menu.h"
 #include "net_menu.h"
 
@@ -129,10 +130,9 @@ update_connecting_wait_screen(void)
 		checkers_switch_state(&game);
 	} else if (result > 0) {
 		const char *err_msg =
-			result == NETWORK_ERROR ? net_strerror(net_err)
-			: result == CANNOT_RESOLVE_NAME ? "cannot resolve name"
-			: result == VERSION_MISMATCH ? "version mismatch"
-			: "bad connection";
+			result == NETWORK_ERROR
+			? net_strerror(net_err)
+			: error_msgs[result];
 		snprintf(error_msg, 128, "Error connecting to %s: %s",
 			 join_game_addr, err_msg);
 		free(join_game_addr);
