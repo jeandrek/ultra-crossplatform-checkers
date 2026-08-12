@@ -24,11 +24,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifdef __unix__
+#include <sys/stat.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include <stdint.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 #ifdef __ANDROID__
 #include <jni.h>
@@ -100,10 +108,10 @@ void
 texture_init_from_file(struct texture *texture, int width, int height,
 		       char *name)
 {
-#ifdef __APPLE__
+	char path[128];
+#if defined(__APPLE__)
 	CFBundleRef bundle;
 	CFURLRef url;
-	char path[128];
 
 	bundle = CFBundleGetMainBundle();
 	url = CFBundleCopyResourceURL(bundle,
@@ -113,8 +121,21 @@ texture_init_from_file(struct texture *texture, int width, int height,
 		exit(1);
 	CFURLGetFileSystemRepresentation(url, 1, path, 128);
 	CFRelease(url);
-#else
-	char *path = name;
+#elif defined(__unix__)
+	struct stat s;
+
+	snprintf(path, 128, DATADIR "/%s", name);
+	if (stat(path, &s) != 0)
+		strcpy(path, name);
+#elif defined(_WIN32)
+	int i;
+
+	GetModuleFileName(NULL, path, 128);
+	for (i = strlen(path) - 1; path[i] != '\\'; i--)
+		;
+	snprintf(path + i, 128 - i, "\\%s", name);
+#elif defined(__psp__)
+	strcpy(path, name);
 #endif
 
 	size_t size = 4*width*height;
