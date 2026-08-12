@@ -144,6 +144,16 @@ texture_init_from_file(struct texture *texture, int width, int height,
 	texture_data_from_asset(path, buf);
 #else
 	FILE *f = fopen(path, "rb");
+
+	if (f == NULL) {
+#if defined(__unix__) || defined(__APPLE__)
+		perror("checkers: cannot open file");
+		fprintf(stderr,
+			"Make sure assets are in " DATADIR
+			" or your working directory.\n");
+#endif
+		exit(1);
+	}
 	fread(buf, size, 1, f);
 	fclose(f);
 #endif
