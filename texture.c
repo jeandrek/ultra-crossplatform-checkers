@@ -28,6 +28,7 @@
 #include <sys/stat.h>
 #endif
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -108,10 +109,10 @@ void
 texture_init_from_file(struct texture *texture, int width, int height,
 		       char *name)
 {
-	char path[128];
 #if defined(__APPLE__)
 	CFBundleRef bundle;
 	CFURLRef url;
+	char path[128];
 
 	bundle = CFBundleGetMainBundle();
 	url = CFBundleCopyResourceURL(bundle,
@@ -119,15 +120,17 @@ texture_init_from_file(struct texture *texture, int width, int height,
 				      NULL, CFSTR("textures"));
 	if (url == NULL)
 		exit(1);
-	CFURLGetFileSystemRepresentation(url, 1, path, 128);
+	CFURLGetFileSystemRepresentation(url, 1, (uint8_t *)path, 128);
 	CFRelease(url);
-#elif defined(__unix__)
+#elif defined(__unix__) && !defined(__ANDROID__)
+	char path[128];
 	struct stat s;
 
 	snprintf(path, 128, DATADIR "/%s", name);
 	if (stat(path, &s) != 0)
 		strcpy(path, name);
 #elif defined(_WIN32)
+	char path[128];
 	int i;
 
 	GetModuleFileName(NULL, path, 128);
@@ -135,18 +138,18 @@ texture_init_from_file(struct texture *texture, int width, int height,
 		;
 	snprintf(path + i, 128 - i, "\\%s", name);
 #elif defined(__psp__)
-	strcpy(path, name);
+	char *path = name;
 #endif
 
 	size_t size = 4*width*height;
 	char *buf = malloc(size);
 #ifdef __ANDROID__
-	texture_data_from_asset(path, buf);
+	texture_data_from_asset(name, buf);
 #else
 	FILE *f = fopen(path, "rb");
 
 	if (f == NULL) {
-#if defined(__unix__) || defined(__APPLE__)
+#if defined(__unix__)
 		perror("checkers: cannot open file");
 		fprintf(stderr,
 			"Make sure assets are in " DATADIR

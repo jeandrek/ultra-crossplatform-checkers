@@ -5,7 +5,8 @@ CFLAGS=	-Wall -O2 -std=gnu99 $(CFLAGS_DNS_SD$(USE_DNS_SD))
 CFLAGS_DNS_SD=	-DUSE_DNS_SD
 
 Checkers.app: $(PROGRAM)
-	mkdir -p $@/Contents/{MacOS,Resources}
+	mkdir -p $@/Contents/MacOS
+	mkdir -p $@/Contents/Resources
 	cp cocoa/Info.plist $@/Contents
 	cp -r cocoa/English.lproj assets/textures $@/Contents/Resources
 	cp $< $@/Contents/MacOS
