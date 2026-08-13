@@ -67,8 +67,6 @@ sg_init(int w, int h)
 void
 sg_init_scenegraph(struct scenegraph *scenegraph)
 {
-	ScePspFVector3 light0_pos;
-
 	scenegraph->width = width;
 	scenegraph->height = height;
 
@@ -86,19 +84,6 @@ sg_init_scenegraph(struct scenegraph *scenegraph)
 	sceGuBlendFunc(GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
 	sceGuEnable(GU_BLEND);
 
-	if (scenegraph->light0_enabled) {
-		sceGuEnable(GU_LIGHTING);
-		sceGuEnable(GU_LIGHT0);
-		light0_pos.x = scenegraph->light0_x;
-		light0_pos.y = scenegraph->light0_y;
-		light0_pos.z = scenegraph->light0_z;
-		sceGuLight(0, GU_POINTLIGHT, GU_DIFFUSE_AND_SPECULAR,
-			   &light0_pos);
-		sceGuLightColor(0, GU_DIFFUSE, scenegraph->light0_color);
-		sceGuLightAtt(0, 1, 0, 0);
-		sceGuAmbient(GU_COLOR(0.1, 0.1, 0.1, 1));
-		sceGuSpecular(1);
-	}
 	sceGuFinish();
 	sceGuSync(0, 0);
 	sceGuDisplay(1);
@@ -131,6 +116,20 @@ sg_render(struct scenegraph *scenegraph)
 		sceGumRotateY(-scenegraph->cam_dir_horiz);
 		sceGumMatrixMode(GU_MODEL);
 		sceGumLoadIdentity();
+	}
+	if (scenegraph->light0_enabled) {
+		ScePspFVector3 light0_pos;
+		sceGuEnable(GU_LIGHTING);
+		sceGuEnable(GU_LIGHT0);
+		light0_pos.x = scenegraph->light0_x;
+		light0_pos.y = scenegraph->light0_y;
+		light0_pos.z = scenegraph->light0_z;
+		sceGuLight(0, GU_POINTLIGHT, GU_DIFFUSE_AND_SPECULAR,
+			   &light0_pos);
+		sceGuLightColor(0, GU_DIFFUSE, scenegraph->light0_color);
+		sceGuLightAtt(0, 1, 0, 0);
+		sceGuAmbient(GU_COLOR(0.1, 0.1, 0.1, 1));
+		sceGuSpecular(1);
 	}
 	sceGumTranslate(&translate);
 	for (int i = 0; i < scenegraph->num_render; i++) {

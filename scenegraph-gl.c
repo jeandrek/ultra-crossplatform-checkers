@@ -69,13 +69,6 @@ sg_resize(int w, int h)
 void
 sg_init_scenegraph(struct scenegraph *scenegraph)
 {
-	if (scenegraph->light0_enabled) {
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		glEnable(GL_LIGHTING);
-		glEnable(GL_LIGHT0);
-		glEnable(GL_COLOR_MATERIAL);
-	}
 	scenegraph->width = width;
 	scenegraph->height = height;
 }
@@ -94,10 +87,6 @@ sg_update(struct scenegraph *scenegraph)
 void
 sg_render(struct scenegraph *scenegraph)
 {
-	GLfloat light_pos[] = {
-		scenegraph->light0_x, scenegraph->light0_y,
-		scenegraph->light0_z, 1
-	};
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	if (scenegraph->cam3d_enabled) {
@@ -113,11 +102,20 @@ sg_render(struct scenegraph *scenegraph)
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 	}
+	if (scenegraph->light0_enabled) {
+		GLfloat light_pos[] = {
+			scenegraph->light0_x, scenegraph->light0_y,
+			scenegraph->light0_z, 1
+		};
+		glEnable(GL_LIGHTING);
+		glEnable(GL_LIGHT0);
+		glEnable(GL_COLOR_MATERIAL);
+		glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+	}
 	glRotatef(-scenegraph->cam_dir_vert * 180/M_PI, 1, 0, 0);
 	glRotatef(-scenegraph->cam_dir_horiz * 180/M_PI, 0, 1, 0);
 	glTranslatef(-scenegraph->cam_x, -scenegraph->cam_y,
 		     -scenegraph->cam_z);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
 	for (size_t i = 0; i < scenegraph->num_render; i++) {
 		scenegraph->render[i](scenegraph);
 	}
