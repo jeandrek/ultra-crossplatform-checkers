@@ -38,6 +38,8 @@
 #include "text_input.h"
 #include "game_computer.h"
 
+HWND checkers_hwnd;
+
 static PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 
 static HGLRC hglrc;
@@ -142,6 +144,7 @@ WinMain(HINSTANCE hInst, HINSTANCE hPrevInst,
 			      NULL, NULL, hInst, NULL);
 	if (hWnd == NULL)
 		return 1;
+	checkers_hwnd = hWnd;
 	ShowWindow(hWnd, nCmdShow);
 
 	if (!vsync) ticks = timeGetTime();

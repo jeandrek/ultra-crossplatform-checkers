@@ -34,8 +34,9 @@
 #include "scenegraph.h"
 #include "text.h"
 #include "text_input.h"
-#include "gui.h"
 #include "error.h"
+#include "select_file.h"
+#include "gui.h"
 #include "net_menu.h"
 #include "menu.h"
 
@@ -89,8 +90,9 @@ new_game_menu(void)
 	gui_set_action_proc(new_game_menu_action);
 }
 
+#ifdef FILE_SELECTION
 static void
-load_game(const char *path)
+file_selected_load_game(const char *path)
 {
 	int result;
 
@@ -102,7 +104,13 @@ load_game(const char *path)
 }
 
 static void
-save_game(const char *path)
+load_game_menu(void)
+{
+	select_file(0, file_selected_load_game, main_menu);
+}
+
+static void
+file_selected_save_game(const char *path)
 {
 	int result;
 
@@ -113,16 +121,46 @@ save_game(const char *path)
 }
 
 static void
+save_game_menu(void)
+{
+	select_file(1, file_selected_save_game, main_menu);
+}
+#else
+static struct game_save save_buffer;
+
+static void
 load_game_menu(void)
 {
-	text_input("Game file path", load_game, main_menu);
+	int result;
+
+	if (!select_save(0, &save_buffer)) {
+		main_menu();
+		return;
+	}
+	game.destroy();
+	if ((result = game_load_from_buffer(&save_buffer)) != 0) {
+		message_dlg(error_msgs[result], main_menu);
+		return;
+	}
+	checkers_switch_state(&game);
 }
 
 static void
 save_game_menu(void)
 {
-	text_input("Game file path", save_game, main_menu);
+	int result;
+
+	if ((result = game_save_to_buffer(&save_buffer)) != 0) {
+		message_dlg(error_msgs[result], main_menu);
+		return;
+	}
+	if (!select_save(1, &save_buffer)) {
+		main_menu();
+		return;
+	}
+	checkers_switch_state(&game);
 }
+#endif
 
 static void
 main_menu_action(int row, int col)

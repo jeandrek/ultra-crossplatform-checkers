@@ -24,16 +24,19 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "checkers.h"
+#include "error.h"
+#include "text.h"
 #include "game.h"
 #include "game_display.h"
 #include "game_interaction.h"
 #include "game_net.h"
 #include "game_computer.h"
 #include "game_save.h"
-#include "text.h"
 
 board_t cur_board;
 int game_dirty;
@@ -128,14 +131,14 @@ game_can_save(void)
 }
 
 int
-game_load(const char *path)
+game_load_from_buffer(struct game_save *buf)
 {
 	board_t board;
 	int player;
-	int err;
+	int result;
 
-	err = game_save_read(path, &game_type, &player, board);
-	if (err) return err;
+	result = game_save_load_values(buf, &game_type, &player, board);
+	if (result) return result;
 	if (game_type == COMPUTER)
 		game_computer_player = !player;
 	game_init_with_board_and_player(board, player);
@@ -143,13 +146,54 @@ game_load(const char *path)
 }
 
 int
+game_save_to_buffer(struct game_save *buf)
+{
+	int result;
+
+	result = game_save_store_values(buf, game_type, cur_player, cur_board);
+	if (result) return result;
+	game_dirty = 0;
+	return 0;
+}
+
+int
+game_load(const char *path)
+{
+	FILE *f = fopen(path, "rb");
+	struct game_save *buf;
+	int result;
+
+	if (f == NULL)
+		return CANNOT_OPEN_FILE;
+	buf = malloc(sizeof (*buf));
+	fread(buf, sizeof (*buf), 1, f);
+	fclose(f);
+	if ((result = game_load_from_buffer(buf)) != 0) {
+		free(buf);
+		return result;
+	}
+	free(buf);
+	return 0;
+}
+
+int
 game_save(const char *path)
 {
-	int err;
+	FILE *f = fopen(path, "wb");
+	struct game_save *buf;
+	int result;
 
-	err = game_save_write(path, game_type, cur_player, cur_board);
-	if (err) return err;
-	game_dirty = 0;
+	if (f == NULL)
+		return CANNOT_OPEN_FILE;
+	buf = malloc(sizeof (*buf));
+	if ((result = game_save_to_buffer(buf)) != 0) {
+		fclose(f);
+		free(buf);
+		return result;
+	}
+	fwrite(buf, sizeof (*buf), 1, f);
+	fclose(f);
+	free(buf);
 	return 0;
 }
 

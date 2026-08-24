@@ -24,55 +24,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _GAME_H_
-#define _GAME_H_
+#ifndef _SELECT_FILE_H_
+#define _SELECT_FILE_H_
 
-#include "checkers.h"
-#include "game_checkers.h"
-
-enum mode {
-	SELECT_PIECE,
-	SELECT_MOVE,
-	ANIM_ROTATE_BOARD,
-	ANIM_MOVE_PIECE,
-	WAIT_TURN,
-	GAME_OVER,
-	LOST_CONNECTION
-};
-
-enum type {
-	NO_GAME,
-	LOCAL_2PLAYER,
-	NETWORK,
-	COMPUTER
-};
-
-extern struct state game;
-extern board_t cur_board;
-extern int game_dirty;
-extern enum type game_type;
-extern int cur_player;
-extern enum mode cur_mode;
-extern enum mode anim_done_mode;
-extern int end_turn;
-extern int8_t *squares_buffer;
-
-struct move {
-	int	from, to;
-};
-
-struct other_player {
-	int	(*poll_move)(void);
-	int	(*next_move)(struct move *);
-};
+#ifdef __psp__
 
 #include "game_save.h"
 
-int	game_can_save(void);
-int	game_save_to_buffer(struct game_save *buf);
-int	game_load_from_buffer(struct game_save *buf);
-int	game_load(const char *path);
-int	game_save(const char *path);
-void	game_over(void);
+/* Select and read or write a save file. */
+int select_save(int saving, struct game_save *buf);
 
-#endif /* !_GAME_H_ */
+#else
+#define FILE_SELECTION
+
+/* Obtain a file path from the user. */
+void select_file(int saving,
+		 void (*accept)(const char *),
+		 void (*cancel)(void));
+#endif
+
+#endif /* !_SELECT_FILE_H_ */

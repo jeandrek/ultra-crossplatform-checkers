@@ -27,15 +27,30 @@
 #ifndef _GAME_SAVE_H_
 #define _GAME_SAVE_H_
 
-#include "game.h"
+#include <stdint.h>
+
 #include "game_checkers.h"
 
-/* Save a game to file.  Returns 0 on success or an error. */
-int	game_save_write(const char *path, enum type type, int player,
-			board_t board);
+struct game_save {
+	uint8_t	magic[2];
+	uint8_t	type;
+	uint8_t	player;
+	uint8_t	board[2*NUM_PIECE_TYPES*8];
+};
 
-/* Load a game from file.  Returns 0 on success or an error. */
-int	game_save_read(const char *path, enum type *type, int *player,
-		       board_t board);
+#define GAME_SAVE_SIZE	sizeof (struct game_save)
+
+#include "game.h"
+
+/* Returns an error value. */
+int	game_save_store_values(struct game_save *save, enum type type,
+			       int player, board_t board);
+
+/* Returns an error value. */
+int	game_save_load_values(struct game_save *save, enum type *type,
+			      int *player, board_t board);
+
+void	game_save_description(struct game_save *save, char *desc,
+			      size_t desc_size);
 
 #endif /* !_GAME_SAVE_H_ */

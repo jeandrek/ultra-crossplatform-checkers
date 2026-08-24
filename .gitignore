@@ -3,6 +3,7 @@
 *.SFO
 *.o
 *.elf
+*.prx
 *.exe
 *.apk
 *.dex

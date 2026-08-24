@@ -33,61 +33,62 @@
 #include "game_save.h"
 
 int
-game_save_write(const char *path, enum type type, int player,
-		board_t board)
+game_save_store_values(struct game_save *save, enum type type, int player,
+		       board_t board)
 {
-	FILE *f = fopen(path, "wb");
 
-	if (f == NULL)
-		return CANNOT_OPEN_FILE;
-	putc(0xff, f);
-	putc('C', f);
+	save->magic[0] = 0xff;
+	save->magic[1] = 'C';
 
-	putc(type, f);
-	putc(player, f);
+	save->type = type;
+	save->player = player;
 
 	for (int i = 0; i < 2; i++) {
 		for (int j = 0; j < NUM_PIECE_TYPES; j++) {
 			uint64_t b = board[i][j];
-			putc(b >> 56, f);
-			putc((b >> 48) & 0xff, f);
-			putc((b >> 40) & 0xff, f);
-			putc((b >> 32) & 0xff, f);
-			putc((b >> 24) & 0xff, f);
-			putc((b >> 16) & 0xff, f);
-			putc((b >> 8) & 0xff, f);
-			putc(b & 0xff, f);
+			for (int k = 0; k < 8; k++) {
+				save->board[16*i + 8*j + 7 - k] = b & 0xff;
+				b >>= 8;
+			}
 		}
 	}
-
-	fclose(f);
 	return 0;
 }
 
 int
-game_save_read(const char *path, enum type *type, int *player,
-	       board_t board)
+game_save_load_values(struct game_save *save, enum type *type, int *player,
+		      board_t board)
 {
-	FILE *f = fopen(path, "rb");
-
-	if (f == NULL)
-		return CANNOT_OPEN_FILE;
-	if (getc(f) != 0xff || getc(f) != 'C')
+	if (save->magic[0] != 0xff || save->magic[1] != 'C')
 		return BAD_MAGIC;
 
-	*type = getc(f);
-	*player = getc(f);
+	*type = save->type;
+	*player = save->player;
 
 	for (int i = 0; i < 2; i++) {
 		for (int j = 0; j < NUM_PIECE_TYPES; j++) {
 			board[i][j] = 0;
 			for (int k = 0; k < 8; k++) {
 				board[i][j] <<= 8;
-				board[i][j] |= getc(f);
+				board[i][j] |= save->board[16*i + 8*j + k];
 			}
 		}
 	}
-
-	fclose(f);
 	return 0;
+}
+
+void
+game_save_description(struct game_save *save, char *desc,
+		      size_t desc_size)
+{
+	enum type type = save->type;
+	int player = save->player;
+
+	snprintf(desc, desc_size,
+		 "%s\n"
+		 "%s to move",
+		 type == LOCAL_2PLAYER ? "Player vs. player" :
+		 player == 0 ? "Player (red) vs. computer" :
+		 "Player (black) vs. computer",
+		 player == 0 ? "Red" : "Black");
 }

@@ -58,6 +58,12 @@ void checkers_switch_state(struct state *new_state);
 void checkers_mouse_up(int x, int y);
 void checkers_mouse_move(int x, int y);
 
+#ifdef _WIN32
+#include <windows.h>
+
+extern HWND checkers_hwnd;
+#endif
+
 #ifdef __ANDROID__
 #include <jni.h>
 
