@@ -112,4 +112,8 @@ static int8_t keycode_buttons[128];
 	checkers_update();
 	[[self openGLContext] flushBuffer];
 }
+
+-(void)reshape {
+	checkers_resize([self bounds].size.width, [self bounds].size.height);
+}
 @end

@@ -1,5 +1,6 @@
 {
     IBClasses = (
+        {CLASS = ApplicationDelegate; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {CLASS = CheckersView; LANGUAGE = ObjC; SUPERCLASS = NSOpenGLView; }, 
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
     ); 

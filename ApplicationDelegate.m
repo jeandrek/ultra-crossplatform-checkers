@@ -24,95 +24,26 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <string.h>
+#import "checkers.h"
+#import "game.h"
+#import "menu.h"
+#import "error.h"
+#import "ApplicationDelegate.h"
 
-#include "checkers.h"
-#include "game.h"
-#include "game_computer.h"
-#include "menu.h"
-#include "text.h"
-#include "error.h"
+@implementation ApplicationDelegate
 
-static struct state *current_state = NULL;
-const char *initial_filepath = NULL;
-
-void
-checkers_process_args(int argc, char *argv[])
-{
-	for (int i = 1; i < argc; i++) {
-#ifdef __APPLE__
-		if (!strncmp(argv[i], "-psn_", 5))
-			continue;
-#endif
-		initial_filepath = argv[i];
-		break;
-	}
-}
-
-void
-checkers_init(void)
-{
-	game_computer_init();
-	text_init();
-	game.load();
-	menu.init();
-	if (initial_filepath) {
-		int result = game_load(initial_filepath);
+-(void)application:(NSApplication *)application openFile:(NSString *)filename {
+	if (checkers_get_state() == NULL) {
+		initial_filepath = [filename UTF8String];
+	} else {
+		int result;
+		game.destroy();
+		result = game_load([filename UTF8String]);
 		if (result) {
 			message_dlg(error_msgs[result], main_menu);
-			current_state = &menu;
-			return;
+			checkers_switch_state(&menu);
 		}
-	} else {
-		game.init();
 	}
-	current_state = &game;
 }
 
-void
-checkers_resize(int w, int h)
-{
-#ifndef __psp__
-	sg_resize(w, h);
-#endif
-	sg_update(&current_state->sg);
-}
-
-struct state *
-checkers_get_state(void)
-{
-	return current_state;
-}
-
-void
-checkers_switch_state(struct state *new_state)
-{
-	current_state = new_state;
-	sg_update(&current_state->sg);
-}
-
-void
-checkers_update(void)
-{
-	current_state->update();
-	sg_render(&current_state->sg);
-}
-
-void
-checkers_button_event(int button)
-{
-	current_state->button_event(button);
-}
-
-void
-checkers_mouse_up(int x, int y)
-{
-	current_state->mouse_up_event(x, y);
-}
-
-void
-checkers_mouse_move(int x, int y)
-{
-	if (current_state->mouse_move_event != NULL)
-		current_state->mouse_move_event(x, y);
-}
+@end

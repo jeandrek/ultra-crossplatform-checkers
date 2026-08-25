@@ -24,59 +24,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _CHECKERS_H_
-#define _CHECKERS_H_
+#import <Cocoa/Cocoa.h>
 
-#if defined(__ANDROID__)
-#define TEXTURES_DIR	"textures/"
-#elif defined(__APPLE__)
-#define TEXTURES_DIR	""
-#else
-#define TEXTURES_DIR	"assets/textures/"
-#endif
+@interface ApplicationDelegate : NSObject
+{
+}
 
-#include "scenegraph.h"
-
-struct state {
-	void (*load)(void);
-	void (*init)(void);
-	void (*destroy)(void);
-	void (*update)(void);
-	void (*button_event)(int);
-	void (*mouse_up_event)(int, int);
-	void (*mouse_move_event)(int, int);
-	struct scenegraph sg;
-};
-
-void checkers_process_args(int argc, char *argv[]);
-void checkers_init(void);
-void checkers_resize(int w, int h);
-void checkers_update(void);
-void checkers_button_event(int button);
-struct state *checkers_get_state(void);
-void checkers_switch_state(struct state *new_state);
-void checkers_mouse_up(int x, int y);
-void checkers_mouse_move(int x, int y);
-
-#ifdef _WIN32
-#include <windows.h>
-
-extern HWND checkers_hwnd;
-#endif
-
-#ifdef __ANDROID__
-#include <jni.h>
-
-/* The current JNIEnv to use, whether for the UI thread or GLSurfaceView's
-   rendering thread. */
-extern JNIEnv *checkers_jnienv;
-/* jeandre.checkers.Checkers instance */
-extern jobject checkers_java;
-
-void enter_android_call(JNIEnv *env, jobject *checkers);
-void leave_android_call(void);
-#endif
-
-extern const char *initial_filepath;
-
-#endif /* !_CHECKERS_H_ */
+@end
