@@ -55,8 +55,14 @@ select_file(int saving,
 
 	ofn.lStructSize = sizeof (ofn);
 	ofn.hwndOwner = checkers_hwnd;
+	ofn.lpstrFilter =
+		"Checkers saves (*.checkers)\0*.checkers\0"
+		"All files (*.*)\0*.*\0\0";
 	ofn.lpstrFile = path;
 	ofn.nMaxFile = sizeof (path);
+	ofn.lpstrDefExt = "checkers";
+	if (saving)
+		ofn.Flags = OFN_OVERWRITEPROMPT;
 	path[0] = 0;
 
 	if ((saving ? GetSaveFileName : GetOpenFileName)(&ofn))
