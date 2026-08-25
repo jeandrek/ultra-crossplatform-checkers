@@ -38,8 +38,6 @@ struct game_save {
 	uint8_t	board[2*NUM_PIECE_TYPES*8];
 };
 
-#define GAME_SAVE_SIZE	sizeof (struct game_save)
-
 #include "game.h"
 
 /* Returns an error value. */
