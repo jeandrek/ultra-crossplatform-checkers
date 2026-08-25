@@ -31,7 +31,7 @@ import java.io.*;
 class Checkers {
 	private MainActivity activity;
 
-	public native void init(int width, int height);
+	public native void init(int width, int height, String externalFilesDir);
 	public native void resize(int width, int height);
 	public native void update();
 	public native void inputEvent(int button);

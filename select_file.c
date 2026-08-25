@@ -38,10 +38,38 @@
 #include "menu.h"
 #endif
 
+#ifdef __ANDROID__
+#include <stdio.h>
+#include <string.h>
+#include <dirent.h>
+#include <ctype.h>
+#endif
+
 #include "checkers.h"
 #include "game_save.h"
+#include "menu.h"
 #include "text_input.h"
 #include "select_file.h"
+
+#ifdef __ANDROID__
+char save_file_dir[192];
+
+static void (*select_file_accept)(const char *);
+static void (*select_file_cancel)(void);
+
+static void
+select_file_action(int row, int col)
+{
+	static char path[256];
+
+	if (row == 5) {
+		select_file_cancel();
+		return;
+	}
+	snprintf(path, 256, "%s/save%d.checkers", save_file_dir, row + 1);
+	select_file_accept(path);
+}
+#endif
 
 #ifndef __psp__
 void
@@ -69,6 +97,38 @@ select_file(int saving,
 		accept(path);
 	else
 		cancel();
+#elif defined(__ANDROID__)
+	static struct element select_file_elems[] = {
+		{.x = 0, .y = 0.5, .data = "Empty"},
+		{.x = 0, .y = 0.3, .data = "Empty"},
+		{.x = 0, .y = 0.1, .data = "Empty"},
+		{.x = 0, .y = -0.1, .data = "Empty"},
+		{.x = 0, .y = -0.3, .data = "Empty"},
+		{.x = 0, .y = -0.5, .data = "Back"}
+	};
+	static char *save_labels[] = {
+		"Save 1", "Save 2", "Save 3", "Save 4", "Save 5"
+	};
+	DIR *dir = opendir(save_file_dir);
+	struct dirent *ent;
+	for (int i = 0; i < 5; i++)
+		select_file_elems[i].disabled = !saving;
+	while ((ent = readdir(dir)) != NULL) {
+		if (!strncmp(ent->d_name, "save", 4) &&
+		    ent->d_name[4] >= '1' && ent->d_name[4] <= '5' &&
+		    !strcmp(ent->d_name + 5, ".checkers")) {
+			int i = ent->d_name[4] - '1';
+			select_file_elems[i].data = save_labels[i];
+			select_file_elems[i].disabled = 0;
+		}
+	}
+	closedir(dir);
+	select_file_accept = accept;
+	select_file_cancel = cancel;
+	menu_set_elements(6, select_file_elems);
+	gui_set_rows(6, 1, &elems[0], 1, &elems[1], 1, &elems[2], 1, &elems[3],
+		     1, &elems[4], 1, &elems[5]);
+	gui_set_action_proc(select_file_action);
 #else
 	text_input("Game file path", accept, cancel);
 #endif
