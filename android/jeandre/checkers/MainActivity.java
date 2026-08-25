@@ -68,11 +68,15 @@ public class MainActivity extends Activity {
 				return false;
 			}
 		});
+		String externalFilesDir =
+			getApplicationContext().getExternalFilesDir(null)
+				.getPath();
 		view.setRenderer(new GLSurfaceView.Renderer() {
 			@Override
 			public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 				checkers.init(view.getWidth(),
-					      view.getHeight());
+					      view.getHeight(),
+					      externalFilesDir);
 			}
 
 			@Override

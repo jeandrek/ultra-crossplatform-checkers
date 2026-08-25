@@ -41,6 +41,11 @@ int select_save(int saving, struct game_save *buf);
 void select_file(int saving,
 		 void (*accept)(const char *),
 		 void (*cancel)(void));
+
+#ifdef __ANDROID__
+extern char save_file_dir[192];
+#endif
+
 #endif
 
 #endif /* !_SELECT_FILE_H_ */

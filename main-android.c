@@ -29,6 +29,7 @@
  */
 
 #include <jni.h>
+#include <string.h>
 #include <pthread.h>
 #include <GLES/gl.h>
 
@@ -36,6 +37,7 @@
 #include "scenegraph.h"
 #include "text.h"
 #include "game_computer.h"
+#include "select_file.h"
 
 /* JNIEnv for GLSurfaceView's rendering thread */
 JNIEnv *checkers_jnienv;
@@ -61,12 +63,17 @@ leave_android_call(void)
 
 JNIEXPORT void JNICALL
 Java_jeandre_checkers_Checkers_init(JNIEnv *env, jobject obj,
-				    jint width, jint height)
+				    jint width, jint height,
+				    jstring external_files_dir)
 {
 	enter_android_call(env, obj);
 	sg_init(width, height);
 	checkers_init();
 	text_scale_factor = 2.0;
+	const char *str = (*env)->GetStringUTFChars(env, external_files_dir,
+						    NULL);
+	strcpy(save_file_dir, str);
+	(*env)->ReleaseStringUTFChars(env, external_files_dir, str);
 	leave_android_call();
 }
 
