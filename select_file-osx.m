@@ -37,6 +37,11 @@ select_file(int saving,
 		[saving ? [NSSavePanel savePanel] : [NSOpenPanel openPanel]
 			retain];
 
+	if (saving) {
+		[panel setRequiredFileType:@"checkers"];
+		[panel setAllowsOtherFileTypes:YES];
+	}
+
 	if ([panel runModal] == NSFileHandlingPanelOKButton)
 		accept([[[panel URL] path] UTF8String]);
 	else
