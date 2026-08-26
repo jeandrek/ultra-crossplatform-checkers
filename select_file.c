@@ -47,7 +47,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <dirent.h>
-#include <ctype.h>
 
 #include "menu.h"
 #endif
