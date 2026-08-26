@@ -38,22 +38,21 @@
 #include "menu.h"
 #endif
 
-#ifdef __ANDROID__
+#include "checkers.h"
+#include "game_save.h"
+#include "text_input.h"
+#include "select_file.h"
+
+#ifdef MOBILE_SAVE_SLOTS
 #include <stdio.h>
 #include <string.h>
 #include <dirent.h>
 #include <ctype.h>
+
+#include "menu.h"
 #endif
 
-#include "checkers.h"
-#include "game_save.h"
-#include "menu.h"
-#include "text_input.h"
-#include "select_file.h"
-
-#ifdef __ANDROID__
-char save_file_dir[192];
-
+#ifdef MOBILE_SAVE_SLOTS
 static void (*select_file_accept)(const char *);
 static void (*select_file_cancel)(void);
 
@@ -97,7 +96,7 @@ select_file(int saving,
 		accept(path);
 	else
 		cancel();
-#elif defined(__ANDROID__)
+#elif defined(MOBILE_SAVE_SLOTS)
 	static struct element select_file_elems[] = {
 		{.x = 0, .y = 0.5, .data = "Empty"},
 		{.x = 0, .y = 0.3, .data = "Empty"},

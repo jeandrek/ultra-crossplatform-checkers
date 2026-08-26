@@ -73,6 +73,8 @@ extern JNIEnv *checkers_jnienv;
 /* jeandre.checkers.Checkers instance */
 extern jobject checkers_java;
 
+extern const char *save_file_dir;
+
 void enter_android_call(JNIEnv *env, jobject *checkers);
 void leave_android_call(void);
 #endif

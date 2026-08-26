@@ -43,7 +43,7 @@ void select_file(int saving,
 		 void (*cancel)(void));
 
 #ifdef __ANDROID__
-extern char save_file_dir[192];
+#define MOBILE_SAVE_SLOTS
 #endif
 
 #endif

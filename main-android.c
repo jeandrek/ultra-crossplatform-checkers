@@ -44,6 +44,8 @@ JNIEnv *checkers_jnienv;
 /* jeandre.checkers.Checkers instance */
 jobject checkers_java;
 
+const char *save_file_dir;
+
 /* Big lock */
 static pthread_mutex_t checkers_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -66,14 +68,15 @@ Java_jeandre_checkers_Checkers_init(JNIEnv *env, jobject obj,
 				    jint width, jint height,
 				    jstring external_files_dir)
 {
+	const char *path;
+
 	enter_android_call(env, obj);
 	sg_init(width, height);
 	checkers_init();
 	text_scale_factor = 2.0;
-	const char *str = (*env)->GetStringUTFChars(env, external_files_dir,
-						    NULL);
-	strcpy(save_file_dir, str);
-	(*env)->ReleaseStringUTFChars(env, external_files_dir, str);
+	path = (*env)->GetStringUTFChars(env, external_files_dir, NULL);
+	save_file_dir = strdup(path);
+	(*env)->ReleaseStringUTFChars(env, external_files_dir, path);
 	leave_android_call();
 }
 
