@@ -37,6 +37,7 @@
 #include "game_net.h"
 #include "game_computer.h"
 #include "game_save.h"
+#include "select_file.h"
 
 board_t cur_board;
 int game_dirty;
@@ -89,10 +90,20 @@ game_update(void)
 
 			if (end_turn && winner(cur_board, cur_player) != -1)
 				game_over();
-			else if (end_turn && game_type == LOCAL_2PLAYER)
+			else {if (end_turn && game_type == LOCAL_2PLAYER)
 				cur_mode = ANIM_ROTATE_BOARD;
 			else
 				cur_mode = anim_done_mode;
+#ifdef __ANDROID__
+				if (end_turn && cur_player == user_player) {
+					char path0[256], path1[256];
+					snprintf(path0, 256, "%s/autosave.checkers", save_file_dir);
+					snprintf(path1, 256, "%s/autosave1.checkers", save_file_dir);
+					renameat(-1, path0, -1, path1);
+					game_save(path0);
+				}
+#endif
+			}
 		}
 	} else if (cur_mode == ANIM_ROTATE_BOARD) {
 		if (!game_anim_rotate_board())

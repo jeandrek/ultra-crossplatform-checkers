@@ -66,6 +66,16 @@ select_file_action(int row, int col)
 		select_file_cancel();
 		return;
 	}
+	if (row == 3) {
+		snprintf(path, 256, "%s/autosave.checkers", save_file_dir);
+		select_file_accept(path);
+		return;
+	}
+	if (row == 4) {
+		snprintf(path, 256, "%s/autosave1.checkers", save_file_dir);
+		select_file_accept(path);
+		return;
+	}
 	snprintf(path, 256, "%s/save%d.checkers", save_file_dir, row + 1);
 	select_file_accept(path);
 }
@@ -102,24 +112,34 @@ select_file(int saving,
 		{.x = 0, .y = 0.5, .data = "Empty"},
 		{.x = 0, .y = 0.3, .data = "Empty"},
 		{.x = 0, .y = 0.1, .data = "Empty"},
-		{.x = 0, .y = -0.1, .data = "Empty"},
-		{.x = 0, .y = -0.3, .data = "Empty"},
+		{.x = 0, .y = -0.1, .data = "Empty <Autosave>"},
+		{.x = 0, .y = -0.3, .data = "Empty <Autosave-1>"},
 		{.x = 0, .y = -0.5, .data = "Back"}
 	};
 	static char *save_labels[] = {
-		"Save 1", "Save 2", "Save 3", "Save 4", "Save 5"
+		"Save 1", "Save 2", "Save 3", "Save 4"
 	};
 	DIR *dir = opendir(save_file_dir);
 	struct dirent *ent;
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 3; i++)
 		select_file_elems[i].disabled = !saving;
+	select_file_elems[3].disabled = 1;
+	select_file_elems[4].disabled = 1;
 	while ((ent = readdir(dir)) != NULL) {
 		if (!strncmp(ent->d_name, "save", 4) &&
-		    ent->d_name[4] >= '1' && ent->d_name[4] <= '5' &&
+		    ent->d_name[4] >= '1' && ent->d_name[4] <= '3' &&
 		    !strcmp(ent->d_name + 5, ".checkers")) {
 			int i = ent->d_name[4] - '1';
 			select_file_elems[i].data = save_labels[i];
 			select_file_elems[i].disabled = 0;
+		}
+		if (!strcmp(ent->d_name, "autosave.checkers")) {
+			select_file_elems[3].data = "Autosave";
+			select_file_elems[3].disabled = 0;
+		}
+		if (!strcmp(ent->d_name, "autosave1.checkers")) {
+			select_file_elems[4].data = "Autosave-1";
+			select_file_elems[4].disabled = 0;
 		}
 	}
 	closedir(dir);
