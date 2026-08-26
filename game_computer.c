@@ -192,11 +192,10 @@ engine_thread(SceSize args, void *arg)
 #else
 #error Not yet supported
 #endif
-		/* If a new game is started, end_turn is false and so
-		   last_piece_idx's old value doesn't matter. */
+		if (end_turn)
+			last_piece_idx = -1;
 		my_move = search(cur_board, game_computer_player,
-				 SEARCH_DEPTH,
-				 end_turn ? -1 : last_piece_idx);
+				 SEARCH_DEPTH, last_piece_idx);
 		last_piece_idx = my_move.move.to;
 		move_made = 1;
 	}
