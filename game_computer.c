@@ -176,6 +176,8 @@ static int
 engine_thread(SceSize args, void *arg)
 #endif
 {
+	int last_piece_idx = -1;
+
 	for (;;) {
 #if defined(_WIN32)
 		WaitForSingleObject(turn_event, INFINITE);
@@ -190,8 +192,12 @@ engine_thread(SceSize args, void *arg)
 #else
 #error Not yet supported
 #endif
+		/* If a new game is started, end_turn is false and so
+		   last_piece_idx's old value doesn't matter. */
 		my_move = search(cur_board, game_computer_player,
-				 SEARCH_DEPTH, -1);
+				 SEARCH_DEPTH,
+				 end_turn ? -1 : last_piece_idx);
+		last_piece_idx = my_move.move.to;
 		move_made = 1;
 	}
 	return 0;
