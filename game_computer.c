@@ -228,13 +228,6 @@ void
 game_computer_init(void)
 {
 	pthread_t thread;
-#ifdef __ANDROID__
-	/* XXX See comment for Java_jeandre_checkers_Checkers_destroy. */
-	static int created = 0;
-
-	if (created) return;
-	created = 1;
-#endif
 
 	if (pthread_create(&thread, NULL, engine_thread, NULL) < 0) {
 		perror("checkers");

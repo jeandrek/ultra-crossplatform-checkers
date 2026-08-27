@@ -65,6 +65,16 @@ text_init(void)
 	}
 }
 
+void
+text_destroy(void)
+{
+	for (int i = 0;
+	     i < sizeof (ascii_glyphs)/sizeof (ascii_glyphs[0]);
+	     i++)
+		if (ascii_glyphs[i] != NULL)
+			free(ascii_glyphs[i]);
+}
+
 float text_scale_factor = 1.0;
 static float size = 1.0;
 static uint32_t color = 0xffffffff;

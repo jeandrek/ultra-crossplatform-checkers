@@ -40,6 +40,7 @@ import android.R;
 public class MainActivity extends Activity {
 	private Checkers checkers;
 	private GLSurfaceView view;
+	private boolean initialized;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +55,7 @@ public class MainActivity extends Activity {
 			savedInstanceState.getBoolean("checkAutosave");
 
 		checkers = new Checkers(this);
+		initialized = false;
 
 		view = new GLSurfaceView(getApplicationContext());
 		view.setOnTouchListener(new View.OnTouchListener() {
@@ -79,9 +81,14 @@ public class MainActivity extends Activity {
 		view.setRenderer(new GLSurfaceView.Renderer() {
 			@Override
 			public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-				checkers.init(view.getWidth(),
-					      view.getHeight(),
-					      filesDir, checkAutosave);
+				int w = view.getWidth();
+				int h = view.getHeight();
+				if (initialized) {
+					checkers.recreateGlObjectsAndState(w, h);
+					return;
+				}
+				checkers.init(w, h, filesDir, checkAutosave);
+				initialized = true;
 			}
 
 			@Override
@@ -114,12 +121,6 @@ public class MainActivity extends Activity {
 	protected void onPause() {
 		super.onPause();
 		checkers.autosave();
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		checkers.destroy();
 	}
 
 	@Override

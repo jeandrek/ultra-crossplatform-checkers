@@ -39,6 +39,7 @@
 #include "checkers.h"
 #include "scenegraph.h"
 #include "game.h"
+#include "game_display.h"
 #include "text.h"
 #include "select_file.h"
 
@@ -96,18 +97,16 @@ Java_jeandre_checkers_Checkers_init(JNIEnv *env, jobject obj,
 }
 
 JNIEXPORT void JNICALL
-Java_jeandre_checkers_Checkers_destroy(JNIEnv *env, jobject obj)
+Java_jeandre_checkers_Checkers_recreateGlObjectsAndState(JNIEnv *env,
+							 jobject obj,
+							 jint width,
+							 jint height)
 {
-	/* We could either put the process back into such a state where
-	   checkers_init may be called, or only recreate OpenGL objects when
-	   the above method is called again and remove the need for this
-	   one. */
-	struct state *state;
 	enter_android_call(env, obj);
-	state = checkers_get_state();
-	if (state->destroy)
-		state->destroy();
-	free(save_file_dir);
+	sg_init(width, height);
+	text_destroy();
+	text_init();
+	game.load();
 	leave_android_call();
 }
 

@@ -34,7 +34,7 @@ class Checkers {
 	public native void checkAutosave();
 	public native void init(int width, int height,
 				String filesDir, boolean checkAutosave);
-	public native void destroy();
+	public native void recreateGlObjectsAndState(int width, int height);
 	public native void resize(int width, int height);
 	public native void update();
 	public native void inputEvent(int button);
