@@ -31,7 +31,7 @@ import java.io.*;
 class Checkers {
 	private MainActivity activity;
 
-	public native void checkAutosave();
+	public native boolean initialized();
 	public native void init(int width, int height,
 				String filesDir, boolean checkAutosave);
 	public native void recreateGlObjectsAndState(int width, int height);

@@ -53,6 +53,8 @@ char *save_file_dir;
 /* Big lock */
 static pthread_mutex_t checkers_mutex = PTHREAD_MUTEX_INITIALIZER;
 
+static int initialized = 0;
+
 void
 enter_android_call(JNIEnv *env, jobject *checkers)
 {
@@ -65,6 +67,12 @@ void
 leave_android_call(void)
 {
 	pthread_mutex_unlock(&checkers_mutex);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_jeandre_checkers_Checkers_initialized(JNIEnv *env, jobject obj)
+{
+	return initialized;
 }
 
 JNIEXPORT void JNICALL
@@ -92,6 +100,8 @@ Java_jeandre_checkers_Checkers_init(JNIEnv *env, jobject obj,
 	sg_init(width, height);
 	checkers_init();
 	text_scale_factor = 2.0;
+
+	initialized = 1;
 
 	leave_android_call();
 }
