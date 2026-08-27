@@ -45,6 +45,14 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		String filesDir = getApplicationContext()
+			.getExternalFilesDir(null)
+			.getPath();
+
+		boolean checkAutosave =
+			savedInstanceState != null &&
+			savedInstanceState.getBoolean("checkAutosave");
+
 		checkers = new Checkers(this);
 
 		view = new GLSurfaceView(getApplicationContext());
@@ -68,15 +76,12 @@ public class MainActivity extends Activity {
 				return false;
 			}
 		});
-		String externalFilesDir =
-			getApplicationContext().getExternalFilesDir(null)
-				.getPath();
 		view.setRenderer(new GLSurfaceView.Renderer() {
 			@Override
 			public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 				checkers.init(view.getWidth(),
 					      view.getHeight(),
-					      externalFilesDir);
+					      filesDir, checkAutosave);
 			}
 
 			@Override
@@ -105,11 +110,23 @@ public class MainActivity extends Activity {
 		view.onPause();
 	}
 
-	/*
 	@Override
-	public void onConfigurationChanged(Configuration newConfig) {
+	protected void onPause() {
+		super.onPause();
+		checkers.autosave();
 	}
-	*/
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		checkers.destroy();
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putBoolean("checkAutosave", true);
+	}
 
 	public static class TextInputDialogFragment extends DialogFragment {
 		private String label;

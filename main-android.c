@@ -28,15 +28,18 @@
  * We could rather use NativeActivity/native_app_glue.
  */
 
-#include <jni.h>
+#include <sys/stat.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
 #include <GLES/gl.h>
+#include <jni.h>
 
 #include "checkers.h"
 #include "scenegraph.h"
+#include "game.h"
 #include "text.h"
-#include "game_computer.h"
 #include "select_file.h"
 
 /* JNIEnv for GLSurfaceView's rendering thread */
@@ -44,7 +47,7 @@ JNIEnv *checkers_jnienv;
 /* jeandre.checkers.Checkers instance */
 jobject checkers_java;
 
-const char *save_file_dir;
+char *save_file_dir;
 
 /* Big lock */
 static pthread_mutex_t checkers_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -66,17 +69,45 @@ leave_android_call(void)
 JNIEXPORT void JNICALL
 Java_jeandre_checkers_Checkers_init(JNIEnv *env, jobject obj,
 				    jint width, jint height,
-				    jstring external_files_dir)
+				    jstring files_dir,
+				    jboolean check_autosave)
 {
-	const char *path;
+	const char *files_dir_str;
 
 	enter_android_call(env, obj);
+
+	files_dir_str = (*env)->GetStringUTFChars(env, files_dir, NULL);
+	save_file_dir = strdup(files_dir_str);
+	(*env)->ReleaseStringUTFChars(env, files_dir, files_dir_str);
+
+	if (check_autosave) {
+		char path[128];
+		struct stat s;
+		snprintf(path, 128, "%s/autosave.checkers", save_file_dir);
+		if (stat(path, &s) == 0)
+			initial_filepath = path;
+	}
+
 	sg_init(width, height);
 	checkers_init();
 	text_scale_factor = 2.0;
-	path = (*env)->GetStringUTFChars(env, external_files_dir, NULL);
-	save_file_dir = strdup(path);
-	(*env)->ReleaseStringUTFChars(env, external_files_dir, path);
+
+	leave_android_call();
+}
+
+JNIEXPORT void JNICALL
+Java_jeandre_checkers_Checkers_destroy(JNIEnv *env, jobject obj)
+{
+	/* We could either put the process back into such a state where
+	   checkers_init may be called, or only recreate OpenGL objects when
+	   the above method is called again and remove the need for this
+	   one. */
+	struct state *state;
+	enter_android_call(env, obj);
+	state = checkers_get_state();
+	if (state->destroy)
+		state->destroy();
+	free(save_file_dir);
 	leave_android_call();
 }
 
@@ -123,5 +154,17 @@ Java_jeandre_checkers_Checkers_mouseUpEvent(JNIEnv *env, jobject obj,
 {
 	enter_android_call(env, obj);
 	checkers_mouse_up(x, y);
+	leave_android_call();
+}
+
+JNIEXPORT void JNICALL
+Java_jeandre_checkers_Checkers_autosave(JNIEnv *env, jobject obj)
+{
+	enter_android_call(env, obj);
+	if (game_can_save() && game_dirty) {
+		char path[256];
+		snprintf(path, 256, "%s/autosave.checkers", save_file_dir);
+		game_save(path);
+	}
 	leave_android_call();
 }

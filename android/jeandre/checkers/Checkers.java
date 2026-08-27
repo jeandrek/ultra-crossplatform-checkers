@@ -31,12 +31,16 @@ import java.io.*;
 class Checkers {
 	private MainActivity activity;
 
-	public native void init(int width, int height, String externalFilesDir);
+	public native void checkAutosave();
+	public native void init(int width, int height,
+				String filesDir, boolean checkAutosave);
+	public native void destroy();
 	public native void resize(int width, int height);
 	public native void update();
 	public native void inputEvent(int button);
 	public native void mouseMoveEvent(int x, int y);
 	public native void mouseUpEvent(int x, int y);
+	public native void autosave();
 
 	private native void textInputAccept(String value);
 	private native void textInputCancel();
