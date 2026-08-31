@@ -50,6 +50,7 @@ struct rect {
 
 #define SG_OBJ_NOLIGHTDEPTH	(1<<0)
 #define SG_OBJ_TEXTURED		(1<<1)
+#define SG_OBJ_INDEXED		(1<<2)
 
 struct sg_object {
 	uint32_t	color;
@@ -57,6 +58,8 @@ struct sg_object {
 	struct texture	*texture;
 	float		*vertices;
 	size_t		num_vertices;
+	uint8_t		*indices;
+	size_t		num_indices;
 	float		x, y, z;
 };
 

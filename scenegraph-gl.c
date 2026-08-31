@@ -149,7 +149,11 @@ sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 		glNormalPointer(GL_FLOAT, stride, obj->vertices);
 		glVertexPointer(3, GL_FLOAT, stride, &obj->vertices[3]);
 	}
-	glDrawArrays(GL_TRIANGLES, 0, obj->num_vertices);
+	if (obj->flags & SG_OBJ_INDEXED)
+		glDrawElements(GL_TRIANGLES, obj->num_indices,
+			       GL_UNSIGNED_BYTE, obj->indices);
+	else
+		glDrawArrays(GL_TRIANGLES, 0, obj->num_vertices);
 	glPopMatrix();
 	if (obj->flags & SG_OBJ_TEXTURED) {
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);

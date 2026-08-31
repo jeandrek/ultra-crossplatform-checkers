@@ -106,9 +106,11 @@ render_piece(struct scenegraph *scenegraph, int piece_type,
 {
 	struct sg_object obj;
 	obj.color = color;
-	obj.flags = 0;
+	obj.flags = SG_OBJ_INDEXED;
 	obj.vertices = oct_verts;
-	obj.num_vertices = 96;
+	obj.num_vertices = sizeof (oct_verts) / (sizeof (float) * 6);
+	obj.indices = oct_indices;
+	obj.num_indices = sizeof (oct_indices) / sizeof (uint8_t);
 	obj.x = x;
 	obj.y = y;
 	obj.z = z;
