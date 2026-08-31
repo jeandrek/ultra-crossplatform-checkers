@@ -49,7 +49,7 @@ class Checkers {
 		this.activity = activity;
 	}
 
-	public byte[] textureDataFromAsset(String fileName)
+	public byte[] dataFromAsset(String fileName)
 		throws IOException {
 		InputStream stream = activity.getAssets().open(fileName);
 		stream.mark(Integer.MAX_VALUE);

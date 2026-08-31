@@ -24,21 +24,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _TEXTURE_H_
-#define _TEXTURE_H_
+#ifndef _MODEL_H_
+#define _MODEL_H_
 
-struct texture {
-	int	width;
-	int	height;
-	union {
-		void		*buffer;
-		unsigned	gl_tex;
-	};
+struct model {
+	uint32_t	flags;
+	float		*vertices;
+	size_t		num_vertices;
+	uint8_t		*indices;
+	size_t		num_indices;
+	char		*data;
 };
 
-void	texture_init(struct texture *texture, int width, int height,
-		     void *pixels);
-void	texture_init_from_file(struct texture *texture, int width, int height,
-			       const char *path);
+struct model *model_from_file(const char *name);
 
-#endif /* !_TEXTURE_H_ */
+void free_model(struct model *model);
+
+#endif /* !_MODEL_H_ */

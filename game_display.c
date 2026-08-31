@@ -34,7 +34,7 @@
 #include "game_checkers.h"
 #include "scenegraph.h"
 #include "texture.h"
-#include "models.h"
+#include "model.h"
 #include "sprite.h"
 #include "text.h"
 
@@ -61,6 +61,8 @@ struct piece {
 };
 
 static struct texture texture_board;
+static struct model *model_board;
+static struct model *model_piece;
 static struct sprite overlay_sprite;
 static struct piece *pieces = NULL;
 static float dist_sqrt2;
@@ -74,15 +76,32 @@ render_board(struct scenegraph *scenegraph)
 {
 	struct sg_object obj;
 	obj.color = 0xffffffff;
-	obj.flags = SG_OBJ_TEXTURED;
+	obj.flags = model_board->flags;
 	obj.texture = &texture_board;
-	obj.vertices = board_verts;
-	obj.num_vertices = sizeof (board_verts)/(8*sizeof (float));
+	obj.vertices = model_board->vertices;
+	obj.num_vertices = model_board->num_vertices;
+	obj.indices = model_board->indices;
+	obj.num_indices = model_board->num_indices;
 	obj.x = 0;
 	obj.y = 0;
 	obj.z = 0;
 	sg_render_object(scenegraph, &obj);
 }
+
+static float __attribute__((aligned(16))) highlight_verts[] = {
+	0, 1, 0,
+	-0.125, 0, -0.125,
+	0, 1, 0,
+	-0.125, 0, 0.125,
+	0, 1, 0,
+	0.125, 0, -0.125,
+	0, 1, 0,
+	0.125, 0, -0.125,
+	0, 1, 0,
+	-0.125, 0, 0.125,
+	0, 1, 0,
+	0.125, 0, 0.125
+};
 
 static void
 render_highlight(struct scenegraph *scenegraph)
@@ -106,11 +125,11 @@ render_piece(struct scenegraph *scenegraph, int piece_type,
 {
 	struct sg_object obj;
 	obj.color = color;
-	obj.flags = SG_OBJ_INDEXED;
-	obj.vertices = oct_verts;
-	obj.num_vertices = sizeof (oct_verts) / (sizeof (float) * 6);
-	obj.indices = oct_indices;
-	obj.num_indices = sizeof (oct_indices) / sizeof (uint8_t);
+	obj.flags = model_piece->flags;
+	obj.vertices = model_piece->vertices;
+	obj.num_vertices = model_piece->num_vertices;
+	obj.indices = model_piece->indices;
+	obj.num_indices = model_piece->num_indices;
 	obj.x = x;
 	obj.y = y;
 	obj.z = z;
@@ -208,6 +227,8 @@ game_display_load(void)
 {
 	texture_init_from_file(&texture_board, 128, 128,
 			       TEXTURES_DIR "board");
+	model_board = model_from_file(MODELS_DIR "board");
+	model_piece = model_from_file(MODELS_DIR "piece");
 }
 
 static void
@@ -350,7 +371,7 @@ struct piece_animation {
 	float x2, y2, z2;
 } anim;
 
-float
+static inline float
 interp(float x1, float x2, float fac)
 {
 	return x1 + fac*(x2 - x1);

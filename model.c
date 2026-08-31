@@ -25,59 +25,69 @@
  */
 
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <stdint.h>
 
 #if defined(__psp__)
 #include <pspkernel.h>
-#include <pspgu.h>
-#include <pspgum.h>
-#elif defined(USE_GL_ES)
-#include <GLES/gl.h>
-#elif defined(__APPLE__)
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else
-#include <GL/gl.h>
 #endif
 
-#include "checkers.h"
 #include "scenegraph.h"
 #include "asset.h"
-#include "texture.h"
+#include "model.h"
 
-void
-texture_init(struct texture *texture, int width, int height, void *pixels)
+
+#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+static void
+swap_array_endianness(char *data, size_t len)
 {
-	texture->width = width;
-	texture->height = height;
-#ifdef __psp__
-	texture->buffer = guGetStaticVramBuffer(width, height, GU_PSM_8888);
-	texture->buffer = (void *)(0x4000000 + (uint32_t)texture->buffer);
-	memcpy(texture->buffer, pixels, 4*width*height);
-	/* sceGuCopyImage(GU_PSM_8888, 0, 0, width, height, width, */
-	/* 	       pixels, 0, 0, width, texture->buffer); */
-	sceGuTexSync();
-	sceKernelDcacheWritebackInvalidateRange(texture->buffer,
-						4*width*height);
-#else
-	glGenTextures(1, &texture->gl_tex);
-	glBindTexture(GL_TEXTURE_2D, texture->gl_tex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
-		     GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	for (size_t i = 0; i < 4*len; i += 4) {
+		char byte0 = data[i], byte1 = data[i + 1];
+		data[i] = data[i + 3];
+		data[i + 1] = data[i + 2];
+		data[i + 2] = byte1;
+		data[i + 3] = byte0;
+	}
+}
 #endif
+
+struct model *
+model_from_file(const char *name)
+{
+	struct model *model;
+	size_t vert_size;
+	uint32_t format;
+	char *data;
+
+	model = malloc(sizeof (*model));
+	model->data = data = asset_read(name, MODEL, NULL);
+	format = data[0] | data[1] << 8 | data[2] << 16 | data[3] << 24;
+	model->flags = SG_OBJ_INDEXED;
+	if (format == 1) {
+		model->flags |= SG_OBJ_TEXTURED;
+		vert_size = 8 * sizeof (float);
+	} else {
+		vert_size = 6 * sizeof (float);
+	}
+	model->num_vertices =
+		data[4] | data[5] << 8 | data[6] << 16 | data[7] << 24;
+	model->num_indices =
+		data[8] | data[9] << 8 | data[10] << 16 | data[11] << 24;
+	model->vertices = (float *)(data + 16);
+#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	swap_array_endianness(model->vertices, model->num_vertices);
+#endif
+	model->indices = (uint8_t *)(data + 16 + model->num_vertices * vert_size);
+#ifdef __psp__
+	sceKernelDcacheWritebackInvalidateRange(model->vertices,
+						model->num_vertices * vert_size
+						+ model->num_indices);
+#endif
+	return model;
 }
 
 void
-texture_init_from_file(struct texture *texture, int width, int height,
-		       const char *name)
+free_model(struct model *model)
 {
-	char *buf = asset_read(name, TEXTURE, NULL);
-	texture_init(texture, width, height, buf);
-	asset_free(buf);
+	asset_free(model->data);
+	free(model);
 }

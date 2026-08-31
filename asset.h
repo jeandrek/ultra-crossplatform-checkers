@@ -24,21 +24,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _TEXTURE_H_
-#define _TEXTURE_H_
+#ifndef _ASSET_H_
+#define _ASSET_H_
 
-struct texture {
-	int	width;
-	int	height;
-	union {
-		void		*buffer;
-		unsigned	gl_tex;
-	};
-};
+#define TEXTURE	0
+#define MODEL	1
 
-void	texture_init(struct texture *texture, int width, int height,
-		     void *pixels);
-void	texture_init_from_file(struct texture *texture, int width, int height,
-			       const char *path);
+char *asset_read(const char *name, int type, size_t *size);
+void asset_free(char *data);
 
-#endif /* !_TEXTURE_H_ */
+#endif /* !_ASSET_H_ */
