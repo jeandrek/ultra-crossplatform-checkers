@@ -231,6 +231,13 @@ game_display_load(void)
 	model_piece = model_from_file(MODELS_DIR "piece");
 }
 
+void
+game_display_unload(void)
+{
+	free_model(model_board);
+	free_model(model_piece);
+}
+
 static void
 add_piece(int location, float x, float y, float z, int player, int type)
 {

@@ -221,9 +221,10 @@ game_destroy(void)
 
 struct state game = {
 	.load = game_display_load,
+	.unload = game_display_unload,
 	.init = game_init,
-	.update = game_update,
 	.destroy = game_destroy,
+	.update = game_update,
 	.button_event = game_button_event,
 	.mouse_up_event = game_mouse_up_event,
 	.mouse_move_event = game_mouse_move_event

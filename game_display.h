@@ -30,6 +30,7 @@
 #include "game.h"
 
 void	game_display_load(void);
+void	game_display_unload(void);
 void	game_display_init(void);
 void	game_display_apply_move(struct move);
 void	game_display_set_viewpoint(int player);

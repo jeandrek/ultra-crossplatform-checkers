@@ -42,6 +42,7 @@
 
 struct state {
 	void (*load)(void);
+	void (*unload)(void);
 	void (*init)(void);
 	void (*destroy)(void);
 	void (*update)(void);

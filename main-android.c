@@ -115,6 +115,7 @@ Java_jeandre_checkers_Checkers_recreateGlObjectsAndState(JNIEnv *env,
 	enter_android_call(env, obj);
 	sg_init(width, height);
 	text_destroy();
+	game.unload();
 	text_init();
 	game.load();
 	leave_android_call();
