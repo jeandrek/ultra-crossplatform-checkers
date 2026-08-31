@@ -155,6 +155,8 @@ sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 	}
 	vert_type = GU_VERTEX_32BITF;
 	vert_type |= GU_NORMAL_32BITF | GU_TRANSFORM_3D;
+	if (obj->flags & SG_OBJ_INDEXED)
+		vert_type |= GU_INDEX_8BIT;
 	if (obj->flags & SG_OBJ_TEXTURED) {
 		struct texture *texture = obj->texture;
 		vert_type |= GU_TEXTURE_32BITF;
@@ -168,7 +170,11 @@ sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 	sceGumPushMatrix();
 	sceGumTranslate(&translate);
 	sceGumDrawArray(GU_TRIANGLES, vert_type,
-			obj->num_vertices, 0, obj->vertices);
+			obj->flags & SG_OBJ_INDEXED ?
+			obj->num_indices : obj->num_vertices,
+			obj->flags & SG_OBJ_INDEXED ?
+			obj->indices : NULL,
+			obj->vertices);
 	sceGumPopMatrix();
 	if (obj->flags & SG_OBJ_TEXTURED)	sceGuDisable(GU_TEXTURE_2D);
 	if (obj->flags & SG_OBJ_NOLIGHTDEPTH) {
