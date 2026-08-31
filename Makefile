@@ -12,8 +12,11 @@ LIBS_DNS_SD1=	-ldns_sd
 $(PROGRAM): $(OBJECTS)
 	$(CC) -o $@ $(OBJECTS) $(LDFLAGS)
 
+obj2model: obj2model.o
+	$(CC) -o $@ $< -ll
+
 clean:
-	rm -f $(PROGRAM) $(OBJECTS)
+	rm -f $(PROGRAM) $(OBJECTS) obj2model
 
 install: $(PROGRAM)
 	mkdir -p $(PREFIX)/games
