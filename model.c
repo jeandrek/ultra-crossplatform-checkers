@@ -35,17 +35,22 @@
 #include "asset.h"
 #include "model.h"
 
+#if defined(__BIG_ENDIAN__) || \
+    defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define SWAP_DATA_ENDIANNESS
+#endif
 
-#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#ifdef SWAP_DATA_ENDIANNESS
 static void
-swap_array_endianness(char *data, size_t len)
+swap_array_endianness(void *data, size_t size)
 {
-	for (size_t i = 0; i < 4*len; i += 4) {
-		char byte0 = data[i], byte1 = data[i + 1];
-		data[i] = data[i + 3];
-		data[i + 1] = data[i + 2];
-		data[i + 2] = byte1;
-		data[i + 3] = byte0;
+	uint8_t *bytes = data;
+	for (size_t i = 0; i < size; i += 4) {
+		char byte0 = bytes[i], byte1 = bytes[i + 1];
+		bytes[i] = bytes[i + 3];
+		bytes[i + 1] = bytes[i + 2];
+		bytes[i + 2] = byte1;
+		bytes[i + 3] = byte0;
 	}
 }
 #endif
@@ -53,8 +58,8 @@ swap_array_endianness(char *data, size_t len)
 struct model *
 model_from_file(const char *name)
 {
+	size_t vert_size, verts_size;
 	struct model *model;
-	size_t vert_size;
 	uint32_t format;
 	char *data;
 
@@ -73,14 +78,14 @@ model_from_file(const char *name)
 	model->num_indices =
 		data[8] | data[9] << 8 | data[10] << 16 | data[11] << 24;
 	model->vertices = (float *)(data + 16);
-#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-	swap_array_endianness(model->vertices, model->num_vertices);
+	verts_size = model->num_vertices * vert_size;
+#ifdef SWAP_DATA_ENDIANNESS
+	swap_array_endianness(model->vertices, verts_size);
 #endif
-	model->indices = (uint8_t *)(data + 16 + model->num_vertices * vert_size);
+	model->indices = (uint8_t *)(data + 16 + verts_size);
 #ifdef __psp__
 	sceKernelDcacheWritebackInvalidateRange(model->vertices,
-						model->num_vertices * vert_size
-						+ model->num_indices);
+						verts_size + model->num_indices);
 #endif
 	return model;
 }

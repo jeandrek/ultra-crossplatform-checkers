@@ -39,6 +39,7 @@
 #endif
 
 #include "checkers.h"
+#include "asset.h"
 
 #ifndef __ANDROID__
 static FILE *
