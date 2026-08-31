@@ -38,10 +38,10 @@
 #include "sprite.h"
 #include "text.h"
 
-#define COLOR_PLAYER_0		0xff0000ff
-#define COLOR_PLAYER_0_SEL	0xff8080ff
-#define COLOR_PLAYER_1		0xff4d4d4d
-#define COLOR_PLAYER_1_SEL	0xffa6a6a6
+#define COLOR_PLAYER_0		0xff4d4d4d
+#define COLOR_PLAYER_0_SEL	0xffa6a6a6
+#define COLOR_PLAYER_1		0xff0000ff
+#define COLOR_PLAYER_1_SEL	0xff8080ff
 
 #define HALF_ALPHA(col)		(((col) & 0xffffff) | (0x80 << 24))
 
@@ -185,7 +185,7 @@ render_status(struct scenegraph *scenegraph)
 	char *text = NULL;
 
 	if (cur_mode == GAME_OVER)
-		text = winner(cur_board, user_player) == 0 ? "Red wins" : "Black wins";
+		text = winner(cur_board, user_player) == 0 ? "Black wins" : "Red wins";
 	else if (cur_mode == LOST_CONNECTION)
 		text = "Lost connection";
 
@@ -197,7 +197,7 @@ render_status(struct scenegraph *scenegraph)
 	} else {
 		float margin = (FONT_HEIGHT*text_scale_factor/2 + 8)
 			* 2.0/game.sg.height;
-		text = cur_player == 0 ? "Red to move" : "Black to move";
+		text = cur_player == 0 ? "Black to move" : "Red to move";
 		text_size(1);
 		text_color(0xffaaaaaa);
 		text_draw(scenegraph, text, 0, 1 - margin, TEXT_CENTRE);

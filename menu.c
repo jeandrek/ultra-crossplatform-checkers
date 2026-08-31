@@ -81,8 +81,8 @@ new_game_menu(void)
 {
 	static struct element new_game_menu_elems[] = {
 		{.x = 0, .y = 0.3, .data = "Player vs. player"},
-		{.x = 0, .y = 0.1, .data = "Play as red vs. computer"},
-		{.x = 0, .y = -0.1, .data = "Play as black vs. computer"},
+		{.x = 0, .y = 0.1, .data = "Play as black vs. computer"},
+		{.x = 0, .y = -0.1, .data = "Play as red vs. computer"},
 		{.x = 0, .y = -0.3, .data = "Back"}
 	};
 	menu_set_elements(4, new_game_menu_elems);

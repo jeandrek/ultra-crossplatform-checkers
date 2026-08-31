@@ -174,8 +174,8 @@ static void
 host_menu(void)
 {
 	static struct element host_menu_elems[] = {
-		{.x = 0, .y = 0.2, .data = "Play as red~"},
-		{.x = 0, .y = 0, .data = "Play as black~"},
+		{.x = 0, .y = 0.2, .data = "Play as black~"},
+		{.x = 0, .y = 0, .data = "Play as red~"},
 		{.x = 0, .y = -0.2, .data = "Back"}
 	};
 	menu_set_elements(3, host_menu_elems);

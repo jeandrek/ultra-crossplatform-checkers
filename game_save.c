@@ -88,7 +88,7 @@ game_save_description(struct game_save *save, char *desc,
 		 "%s\n"
 		 "%s to move",
 		 type == LOCAL_2PLAYER ? "Player vs. player" :
-		 player == 0 ? "Player (red) vs. computer" :
-		 "Player (black) vs. computer",
-		 player == 0 ? "Red" : "Black");
+		 player == 0 ? "Player (black) vs. computer" :
+		 "Player (red) vs. computer",
+		 player == 0 ? "Black" : "Red");
 }
