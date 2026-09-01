@@ -62,7 +62,8 @@ void
 button_bounds(struct scenegraph *scenegraph, int len,
 	      float x, float y, struct rect *bounds)
 {
-	text_screen_bounds(scenegraph, len, x, y, TEXT_CENTRE, bounds);
+	text_screen_bounds(scenegraph, len, x, y, TEXT_CENTRE,
+			   NO_WRAPPING, bounds);
 	bounds->left -= 8;
 	bounds->top -= 8;
 	bounds->right += 8;

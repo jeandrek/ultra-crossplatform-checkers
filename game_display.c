@@ -285,8 +285,8 @@ position_menu_button(void)
 	menu_button_x = -game.sg.width/(float)game.sg.height + margin;
 	menu_button_y = 1 - margin;
 	text_screen_bounds(&game.sg, strlen("Menu"),
-			   menu_button_x, menu_button_y,
-			   TEXT_TOPLEFT, &menu_button_bounds);
+			   menu_button_x, menu_button_y, TEXT_TOPLEFT,
+			   NO_WRAPPING, &menu_button_bounds);
 	menu_button_bounds.left -= 8;
 	menu_button_bounds.top -= 8;
 	menu_button_bounds.right += 8;

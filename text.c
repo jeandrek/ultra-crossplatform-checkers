@@ -112,15 +112,15 @@ text_draw(struct scenegraph *scenegraph, const char *text, float x, float y,
 	  int alignment, int wrap_width)
 {
 	float pixel_size = 2.0/scenegraph->height;
-	size_t text_len, horiz_len, vert_len;
+	size_t len, horiz_len, vert_len;
 	float start_x;
 	int c;
 
 	if (wrap_width == WRAP_WIDTH_DEFAULT)
 		wrap_width = scenegraph->width/(size * FONT_WIDTH) - 2;
-	text_len = strlen(text);
-	horiz_len = text_len > wrap_width ? wrap_width : text_len;
-	vert_len = ceilf(text_len / (float)wrap_width);
+	len = strlen(text);
+	horiz_len = len > wrap_width ? wrap_width : len;
+	vert_len = ceilf(len / (float)wrap_width);
 
 	switch (alignment) {
 	case TEXT_TOPLEFT:
@@ -148,26 +148,31 @@ text_draw(struct scenegraph *scenegraph, const char *text, float x, float y,
 	}
 }
 
-/* XXX Assumes NO_WRAPPING. */
 void
 text_screen_bounds(struct scenegraph *scenegraph, size_t len, float x, float y,
-		   int alignment, struct rect *rect)
+		   int alignment, int wrap_width, struct rect *rect)
 {
 	int screen_x = scenegraph->width/2 + scenegraph->height/2 * x;
 	int screen_y = scenegraph->height/2 - scenegraph->height/2 * y;
+	size_t horiz_len, vert_len;
+
+	if (wrap_width == WRAP_WIDTH_DEFAULT)
+		wrap_width = scenegraph->width/(size * FONT_WIDTH) - 2;
+	horiz_len = len > wrap_width ? wrap_width : len;
+	vert_len = ceilf(len / (float)wrap_width);
 
 	switch (alignment) {
 	case TEXT_CENTRE:
-		rect->left = screen_x - size * FONT_WIDTH/2 * len;
-		rect->top = screen_y - size * FONT_HEIGHT/2;
-		rect->right = screen_x + size * FONT_WIDTH/2 * len;
-		rect->bottom = screen_y + size * FONT_HEIGHT/2;
+		rect->left = screen_x - size * FONT_WIDTH/2 * horiz_len;
+		rect->top = screen_y - size * FONT_HEIGHT/2 * vert_len;
+		rect->right = screen_x + size * FONT_WIDTH/2 * horiz_len;
+		rect->bottom = screen_y + size * FONT_HEIGHT/2 * vert_len;
 		break;
 	case TEXT_TOPLEFT:
 		rect->left = screen_x;
 		rect->top = screen_y;
-		rect->right = screen_x + size * FONT_WIDTH * len;
-		rect->bottom = screen_y + size * FONT_HEIGHT;
+		rect->right = screen_x + size * FONT_WIDTH * horiz_len;
+		rect->bottom = screen_y + size * FONT_HEIGHT * vert_len;
 		break;
 	}
 }

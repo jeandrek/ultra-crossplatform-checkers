@@ -41,9 +41,8 @@ void text_size(float new_size);
 void text_color(uint32_t new_color);
 void text_draw(struct scenegraph *scenegraph, const char *text,
 	       float x, float y, int alignment, int wrap_width);
-/* XXX Assumes NO_WRAPPING. */
 void text_screen_bounds(struct scenegraph *scenegraph, size_t len,
-			float x, float y, int alignment,
+			float x, float y, int alignment, int wrap_width,
 			struct rect *rect);
 
 extern float text_scale_factor;
