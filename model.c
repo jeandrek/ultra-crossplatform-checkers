@@ -61,7 +61,7 @@ model_from_file(const char *name)
 	size_t vert_size, verts_size;
 	struct model *model;
 	uint32_t format;
-	char *data;
+	uint8_t *data;
 
 	model = malloc(sizeof (*model));
 	model->data = data = asset_read(name, MODEL, NULL);

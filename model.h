@@ -33,7 +33,7 @@ struct model {
 	size_t		num_vertices;
 	uint8_t		*indices;
 	size_t		num_indices;
-	char		*data;
+	uint8_t		*data;
 };
 
 struct model *model_from_file(const char *name);

@@ -30,7 +30,7 @@
 #define TEXTURE	0
 #define MODEL	1
 
-char *asset_read(const char *name, int type, size_t *size);
-void asset_free(char *data);
+void *asset_read(const char *name, int type, size_t *size);
+void asset_free(void *data);
 
 #endif /* !_ASSET_H_ */

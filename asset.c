@@ -93,7 +93,7 @@ asset_fopen(const char *name, int type)
 }
 #endif
 
-char *
+void *
 asset_read(const char *name, int type, size_t *sizep)
 {
 	size_t size;
@@ -131,7 +131,7 @@ asset_read(const char *name, int type, size_t *sizep)
 }
 
 void
-asset_free(char *data)
+asset_free(void *data)
 {
 	free(data);
 }
