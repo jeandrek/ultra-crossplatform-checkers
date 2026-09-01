@@ -29,10 +29,11 @@
  */
 
 #include <sys/stat.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <pthread.h>
+#include <unistd.h>
 #include <GLES/gl.h>
 #include <jni.h>
 
@@ -170,11 +171,13 @@ Java_jeandre_checkers_Checkers_mouseUpEvent(JNIEnv *env, jobject obj,
 JNIEXPORT void JNICALL
 Java_jeandre_checkers_Checkers_autosave(JNIEnv *env, jobject obj)
 {
+	char path[256];
+
 	enter_android_call(env, obj);
-	if (game_can_save() && game_dirty) {
-		char path[256];
-		snprintf(path, 256, "%s/autosave.checkers", save_file_dir);
+	snprintf(path, 256, "%s/autosave.checkers", save_file_dir);
+	if (game_can_save() && game_dirty)
 		game_save(path);
-	}
+	else if (game_type != NO_GAME && game_is_over())
+		unlink(path);
 	leave_android_call();
 }

@@ -69,6 +69,7 @@ struct other_player {
 #include "game_save.h"
 
 int	game_can_save(void);
+int	game_is_over(void);
 int	game_save_to_buffer(struct game_save *buf);
 int	game_load_from_buffer(struct game_save *buf);
 int	game_load(const char *path);

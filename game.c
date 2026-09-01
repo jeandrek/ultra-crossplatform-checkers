@@ -131,6 +131,12 @@ game_can_save(void)
 }
 
 int
+game_is_over(void)
+{
+	return cur_mode == GAME_OVER;
+}
+
+int
 game_load_from_buffer(struct game_save *buf)
 {
 	board_t board;
