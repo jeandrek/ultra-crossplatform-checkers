@@ -13,7 +13,7 @@ $(PROGRAM): $(OBJECTS)
 	$(CC) -o $@ $(OBJECTS) $(LDFLAGS)
 
 obj2model: obj2model.o
-	$(CC) -o $@ $< -ll
+	$(CC) -o $@ obj2model.o -ll
 
 clean:
 	rm -f $(PROGRAM) $(OBJECTS) obj2model
