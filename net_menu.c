@@ -257,6 +257,7 @@ add_discovered_game(struct disc_ent *ent)
 	}
 	item = malloc(sizeof (*item));
 	item->disc_ent = ent;
+	memset(&item->elem, 0, sizeof (item->elem));
 	item->next = join_items;
 	join_items = item;
 	num_join_items++;
