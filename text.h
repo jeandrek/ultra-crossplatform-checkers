@@ -27,6 +27,9 @@
 #ifndef _TEXT_H_
 #define _TEXT_H_
 
+#define NO_WRAPPING		0x7fffffff
+#define WRAP_WIDTH_DEFAULT	-1
+
 enum {
 	TEXT_TOPLEFT,
 	TEXT_CENTRE
@@ -36,10 +39,12 @@ void text_init(void);
 void text_destroy(void);
 void text_size(float new_size);
 void text_color(uint32_t new_color);
-void text_draw(struct scenegraph *scenegraph, const char *s, float x, float y,
-	       int alignment);
-void text_screen_bounds(struct scenegraph *scenegraph, size_t len, float x, float y,
-			int alignment, struct rect *rect);
+void text_draw(struct scenegraph *scenegraph, const char *text,
+	       float x, float y, int alignment, int wrap_width);
+/* XXX Assumes NO_WRAPPING. */
+void text_screen_bounds(struct scenegraph *scenegraph, size_t len,
+			float x, float y, int alignment,
+			struct rect *rect);
 
 extern float text_scale_factor;
 

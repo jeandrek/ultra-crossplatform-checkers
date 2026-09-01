@@ -24,6 +24,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -104,12 +105,22 @@ draw_glyph(struct scenegraph *scenegraph, struct glyph *g, float x, float y)
 	sprite_draw(scenegraph, &s);
 }
 
+/* XXX This is linear time and adequate but preprocessing text
+   would be better than doing this every frame. */
 void
-text_draw(struct scenegraph *scenegraph, const char *str, float x, float y,
-	  int alignment)
+text_draw(struct scenegraph *scenegraph, const char *text, float x, float y,
+	  int alignment, int wrap_width)
 {
 	float pixel_size = 2.0/scenegraph->height;
+	size_t text_len, horiz_len, vert_len;
+	float start_x;
 	int c;
+
+	if (wrap_width == WRAP_WIDTH_DEFAULT)
+		wrap_width = scenegraph->width/(size * FONT_WIDTH) - 2;
+	text_len = strlen(text);
+	horiz_len = text_len > wrap_width ? wrap_width : text_len;
+	vert_len = ceilf(text_len / (float)wrap_width);
 
 	switch (alignment) {
 	case TEXT_TOPLEFT:
@@ -117,21 +128,30 @@ text_draw(struct scenegraph *scenegraph, const char *str, float x, float y,
 		y -= size * FONT_HEIGHT/2.0 * pixel_size;
 		break;
 	case TEXT_CENTRE:
-		x -= size * FONT_WIDTH/2.0 * pixel_size * (strlen(str) - 1);
+		x -= size * FONT_WIDTH/2.0 * pixel_size * (horiz_len - 1);
+		y += size * FONT_HEIGHT/2.0 * pixel_size * (vert_len - 1);
 		break;
 	}
 
-	while ((c = *str++)) {
+	start_x = x;
+	for (int i = 0; text[i] != '\0'; i++) {
+		c = text[i];
 		if (ascii_glyphs[c] != NULL) {
 			draw_glyph(scenegraph, ascii_glyphs[c], x, y);
 		}
-		x += size * FONT_WIDTH * pixel_size;
+		if (i % wrap_width == wrap_width - 1) {
+			y -= size * FONT_HEIGHT * pixel_size;
+			x = start_x;
+		} else {
+			x += size * FONT_WIDTH * pixel_size;
+		}
 	}
 }
 
+/* XXX Assumes NO_WRAPPING. */
 void
 text_screen_bounds(struct scenegraph *scenegraph, size_t len, float x, float y,
-	       int alignment, struct rect *rect)
+		   int alignment, struct rect *rect)
 {
 	int screen_x = scenegraph->width/2 + scenegraph->height/2 * x;
 	int screen_y = scenegraph->height/2 - scenegraph->height/2 * y;

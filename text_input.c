@@ -104,13 +104,14 @@ text_input_render(struct scenegraph *scenegraph)
 
 	text_size(1);
 	text_color(0xffffffff);
-	text_draw(scenegraph, text_buffer, 0, 0, TEXT_CENTRE);
+	text_draw(scenegraph, text_buffer, 0, 0, TEXT_CENTRE, NO_WRAPPING);
 	text_color(0xffaaaaaa);
-	text_draw(scenegraph, text_input_label, 0, 0.2, TEXT_CENTRE);
+	text_draw(scenegraph, text_input_label, 0, 0.2, TEXT_CENTRE,
+		  NO_WRAPPING);
 	text_color(button_color(1, 0, 0));
-	text_draw(scenegraph, "OK", -0.2, -0.2, TEXT_CENTRE);
+	text_draw(scenegraph, "OK", -0.2, -0.2, TEXT_CENTRE, NO_WRAPPING);
 	text_color(button_color(1, 1, 0));
-	text_draw(scenegraph, "Cancel", 0.2, -0.2, TEXT_CENTRE);
+	text_draw(scenegraph, "Cancel", 0.2, -0.2, TEXT_CENTRE, NO_WRAPPING);
 }
 
 static void (*text_input_render_functions[])(struct scenegraph *) = {

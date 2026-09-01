@@ -193,14 +193,15 @@ render_status(struct scenegraph *scenegraph)
 		sprite_draw(scenegraph, &overlay_sprite);
 		text_size(1);
 		text_color(0xffffffff);
-		text_draw(scenegraph, text, 0, 0, TEXT_CENTRE);
+		text_draw(scenegraph, text, 0, 0, TEXT_CENTRE, NO_WRAPPING);
 	} else {
 		float margin = (FONT_HEIGHT*text_scale_factor/2 + 8)
 			* 2.0/game.sg.height;
 		text = cur_player == 0 ? "Black to move" : "Red to move";
 		text_size(1);
 		text_color(0xffaaaaaa);
-		text_draw(scenegraph, text, 0, 1 - margin, TEXT_CENTRE);
+		text_draw(scenegraph, text, 0, 1 - margin, TEXT_CENTRE,
+			  NO_WRAPPING);
 	}
 }
 
@@ -209,7 +210,8 @@ render_menu_button(struct scenegraph *scenegraph)
 {
 	text_size(1);
 	text_color(menu_button_highlighted ? 0xffffffff : 0xffaaaaaa);
-	text_draw(scenegraph, "Menu", menu_button_x, menu_button_y, TEXT_TOPLEFT);
+	text_draw(scenegraph, "Menu", menu_button_x, menu_button_y,
+		  TEXT_TOPLEFT, NO_WRAPPING);
 }
 
 static void (*render_functions[])(struct scenegraph *) = {
