@@ -234,7 +234,7 @@ game_net_stop_hosting(void)
 }
 
 #ifdef USE_DNS_SD
-static void
+static void DNSSD_API
 discovery_callback(DNSServiceRef sd_ref, DNSServiceFlags flags,
 		   uint32_t if_idx, DNSServiceErrorType error,
 		   const char *name, const char *regtype,
