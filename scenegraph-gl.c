@@ -102,20 +102,20 @@ sg_render(struct scenegraph *scenegraph)
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 	}
-	if (scenegraph->light0_enabled) {
-		GLfloat light_pos[] = {
-			scenegraph->light0_x, scenegraph->light0_y,
-			scenegraph->light0_z, 1
-		};
-		glEnable(GL_LIGHTING);
-		glEnable(GL_LIGHT0);
-		glEnable(GL_COLOR_MATERIAL);
-		glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
-	}
 	glRotatef(-scenegraph->cam_dir_vert * 180/M_PI, 1, 0, 0);
 	glRotatef(-scenegraph->cam_dir_horiz * 180/M_PI, 0, 1, 0);
 	glTranslatef(-scenegraph->cam_x, -scenegraph->cam_y,
 		     -scenegraph->cam_z);
+	if (scenegraph->light0_enabled) {
+		GLfloat light_pos[] = {
+			scenegraph->light0_x, scenegraph->light0_y,
+			scenegraph->light0_z, 1
+			/* 0.707, 0.707, 0, 0 */
+		};
+		glEnable(GL_LIGHTING);
+		glEnable(GL_LIGHT0);
+		glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+	}
 	for (size_t i = 0; i < scenegraph->num_render; i++) {
 		scenegraph->render[i](scenegraph);
 	}
@@ -124,19 +124,31 @@ sg_render(struct scenegraph *scenegraph)
 void
 sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 {
+	float color[] = {(obj->color & 0xff)/255.0,
+			 ((obj->color >> 8) & 0xff)/255.0,
+			 ((obj->color >> 16) & 0xff)/255.0,
+			 (obj->color >> 24)/255.0};
 	if (obj->flags & SG_OBJ_NOLIGHTDEPTH) {
 		glDisable(GL_LIGHTING);
 		glDisable(GL_DEPTH_TEST);
+		glColor4f(color[0], color[1], color[2], color[3]);
+	} else {
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, color);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, color);
+	}
+	if (obj->flags & SG_OBJ_SPECULAR) {
+		float spec_color[] = {0.3, 0.3, 0.3, 1};
+		glMaterialfv(GL_FRONT, GL_SPECULAR, spec_color);
+		glMaterialf(GL_FRONT, GL_SHININESS, 100);
+	} else {
+		float spec_color[] = {0, 0, 0, 1};
+		glMaterialfv(GL_FRONT, GL_SPECULAR, spec_color);
 	}
 	if (obj->flags & SG_OBJ_TEXTURED) {
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, obj->texture->gl_tex);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	}
-	glColor4f((obj->color & 0xff)/255.0,
-		  ((obj->color >> 8) & 0xff)/255.0,
-		  ((obj->color >> 16) & 0xff)/255.0,
-		  (obj->color >> 24)/255.0);
 	glPushMatrix();
 	glTranslatef(obj->x, obj->y, obj->z);
 	if (obj->flags & SG_OBJ_TEXTURED) {

@@ -233,9 +233,17 @@ game_mouse_up_event(int x, int y)
 	}
 }
 
+#include <math.h>
+extern int move_cam;
 void
 game_mouse_move_event(int x, int y)
 {
+	if (move_cam) {
+		game.sg.cam_dir_horiz = -2*M_PI*x/game.sg.width + M_PI;
+		game.sg.cam_dir_vert = -2*M_PI*y/game.sg.height + M_PI;
+		return;
+	}
+
 	int idx = mouse_coords_to_square(x, y);
 
 	menu_button_highlighted =

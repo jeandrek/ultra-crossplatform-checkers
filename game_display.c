@@ -125,7 +125,7 @@ render_piece(struct scenegraph *scenegraph, int piece_type,
 {
 	struct sg_object obj;
 	obj.color = color;
-	obj.flags = model_piece->flags;
+	obj.flags = model_piece->flags | SG_OBJ_SPECULAR;
 	obj.vertices = model_piece->vertices;
 	obj.num_vertices = model_piece->num_vertices;
 	obj.indices = model_piece->indices;
@@ -227,7 +227,7 @@ static void (*render_functions[])(struct scenegraph *) = {
 void
 game_display_load(void)
 {
-	texture_init_from_file(&texture_board, 128, 128,
+	texture_init_from_file(&texture_board, 256, 256,
 			       TEXTURES_DIR "board");
 	model_board = model_from_file(MODELS_DIR "board");
 	model_piece = model_from_file(MODELS_DIR "piece");

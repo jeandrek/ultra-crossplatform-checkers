@@ -126,10 +126,10 @@ sg_render(struct scenegraph *scenegraph)
 		light0_pos.z = scenegraph->light0_z;
 		sceGuLight(0, GU_POINTLIGHT, GU_DIFFUSE_AND_SPECULAR,
 			   &light0_pos);
-		sceGuLightColor(0, GU_DIFFUSE, scenegraph->light0_color);
+		sceGuLightColor(0, GU_DIFFUSE_AND_SPECULAR,
+				scenegraph->light0_color);
 		sceGuLightAtt(0, 1, 0, 0);
 		sceGuAmbient(GU_COLOR(0.1, 0.1, 0.1, 1));
-		sceGuSpecular(1);
 	}
 	sceGumTranslate(&translate);
 	for (int i = 0; i < scenegraph->num_render; i++) {
@@ -167,6 +167,12 @@ sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 			      texture->width, texture->buffer);
 	}
 	sceGuColor(obj->color);
+	if (obj->flags & SG_OBJ_SPECULAR) {
+		sceGuSpecular(100);
+		sceGuMaterial(GU_SPECULAR, 0xffffffff);
+	} else {
+		sceGuMaterial(GU_SPECULAR, 0);
+	}
 	sceGumPushMatrix();
 	sceGumTranslate(&translate);
 	sceGumDrawArray(GU_TRIANGLES, vert_type,

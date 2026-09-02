@@ -61,6 +61,7 @@ handle_button(int button)
 	}
 }
 
+int move_cam = 0;
 void
 input_handle(void)
 {
@@ -72,6 +73,7 @@ input_handle(void)
 	uint8_t state[256];
 
 	GetKeyboardState(state);
+	move_cam = state['C'] >> 7;
 #endif
 	for (int i = 0; i < NUM_BUTTONS; i++) {
 #if defined(__psp__)

@@ -76,7 +76,7 @@ asset_fopen(const char *name, int type)
 		;
 	snprintf(path + i, 128 - i, "\\%s", name);
 #elif defined(__psp__)
-	char *path = name;
+	const char *path = name;
 #endif
 	FILE *f = fopen(path, "rb");
 
