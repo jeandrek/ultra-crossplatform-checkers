@@ -102,6 +102,10 @@ sg_render(struct scenegraph *scenegraph)
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 	}
+	glRotatef(-scenegraph->cam_dir_vert * 180/M_PI, 1, 0, 0);
+	glRotatef(-scenegraph->cam_dir_horiz * 180/M_PI, 0, 1, 0);
+	glTranslatef(-scenegraph->cam_x, -scenegraph->cam_y,
+		     -scenegraph->cam_z);
 	if (scenegraph->light0_enabled) {
 		GLfloat light_pos[] = {
 			scenegraph->light0_x, scenegraph->light0_y,
@@ -112,10 +116,6 @@ sg_render(struct scenegraph *scenegraph)
 		glEnable(GL_COLOR_MATERIAL);
 		glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
 	}
-	glRotatef(-scenegraph->cam_dir_vert * 180/M_PI, 1, 0, 0);
-	glRotatef(-scenegraph->cam_dir_horiz * 180/M_PI, 0, 1, 0);
-	glTranslatef(-scenegraph->cam_x, -scenegraph->cam_y,
-		     -scenegraph->cam_z);
 	for (size_t i = 0; i < scenegraph->num_render; i++) {
 		scenegraph->render[i](scenegraph);
 	}
