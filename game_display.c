@@ -148,8 +148,10 @@ board_pos_to_world_pos(float *x, float *y, float *z, int i)
 	*z = -(-0.875 + 0.25*(i / 8));
 }
 
+void render_piece_shadow_volume(struct scenegraph *scenegraph, float x, float y, float z);
+
 static void
-render_pieces(struct scenegraph *scenegraph)
+render_pieces_or_shadow_vol(struct scenegraph *scenegraph, int shadow_vol)
 {
 	for (struct piece *piece = pieces; piece != NULL; piece = piece->next) {
 		int selected =
@@ -157,9 +159,16 @@ render_pieces(struct scenegraph *scenegraph)
 			&& piece->player == user_player
 			&& piece->location == sel_square;
 		int color = colors[piece->player][selected];
-		render_piece(scenegraph, piece->type,
-			     piece->x, piece->y, piece->z, color);
+		if (shadow_vol) {
+			render_piece_shadow_volume(scenegraph,
+						   piece->x, piece->y,
+						   piece->z);
+		} else
+			render_piece(scenegraph, piece->type,
+				     piece->x, piece->y, piece->z, color);
 	}
+
+	if (shadow_vol) return;
 
 	if (cur_mode != SELECT_PIECE && cur_mode != SELECT_MOVE) return;
 
@@ -177,6 +186,18 @@ render_pieces(struct scenegraph *scenegraph)
 		board_pos_to_world_pos(&x, &y, &z, i);
 		render_piece(scenegraph, sel_piece_type, x, y, z, color);
 	}
+}
+
+static void
+render_pieces(struct scenegraph *scenegraph)
+{
+	render_pieces_or_shadow_vol(scenegraph, 0);
+}
+
+void
+render_shadow_volumes(struct scenegraph *scenegraph)
+{
+	render_pieces_or_shadow_vol(scenegraph, 1);
 }
 
 static void
@@ -331,8 +352,8 @@ game_display_init(void)
 	game.sg.near_plane = 0.1;
 	game.sg.far_plane = 24;
 	game.sg.light0_enabled = 1;
-	game.sg.light0_x = 1;
-	game.sg.light0_y = 2;
+	game.sg.light0_x = 0;
+	game.sg.light0_y = 1.5;
 	game.sg.light0_z = 0;
 	game.sg.light0_color = 0xffffffff;
 	sg_init_scenegraph(&game.sg);

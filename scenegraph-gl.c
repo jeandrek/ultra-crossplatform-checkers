@@ -52,6 +52,7 @@ sg_init(int w, int h)
 	glEnable(GL_CULL_FACE);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_STENCIL_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -85,10 +86,82 @@ sg_update(struct scenegraph *scenegraph)
 }
 
 void
+render_piece_shadow_volume(struct scenegraph *scenegraph, float x, float y, float z)
+{
+	float light_pos[3] = {scenegraph->light0_x, scenegraph->light0_y,
+			      scenegraph->light0_z};
+	float circle[36];
+	int silhouette_i = 0;
+	float silhouette[72];
+
+	for (int i = 0; i < 12; i++) {
+		float theta = 2*M_PI*i/12;
+		circle[3*i] = x + 0.1*cosf(theta);
+		circle[3*i + 1] = y;
+		circle[3*i + 2] = z + 0.1*sinf(theta);
+	}
+
+	float last_dp = NAN;
+	for (int i = 0; i < 12; i++) {
+		float normal[3];
+		float light[3];
+		normal[0] = 10*circle[3*i];
+		normal[1] = 0;
+		normal[2] = 10*circle[3*i + 2];
+		light[0] = light_pos[0] - circle[3*i];
+		light[1] = light_pos[1] - circle[3*i + 1];
+		light[2] = light_pos[2] - circle[3*i + 2];
+		float magnitude = sqrtf(light[0]*light[0] + light[1]*light[1] + light[2]*light[2]);
+		light[0] /= magnitude;
+		light[1] /= magnitude;
+		light[2] /= magnitude;
+		float dp = normal[0]*light[0] + normal[1]*light[1] + normal[2]*light[2];
+
+#define add(off) do {							\
+			silhouette[3*silhouette_i] = circle[3*i];	\
+			silhouette[3*silhouette_i + 1] = circle[3*i + 1] + (off); \
+			silhouette[3*silhouette_i + 2] = circle[3*i + 2]; \
+			silhouette_i++;					\
+		} while (0)
+
+		if (last_dp < 0 && dp >= 0)
+			add(0.02);
+		else if (last_dp >= 0 && dp < 0)
+			add(-0.03);
+
+		if (dp < 0)
+			add(0.02);
+		else
+			add(-0.03);
+		last_dp = dp;
+	}
+
+	glBegin(GL_QUAD_STRIP);
+	for (int j = 0; j <= silhouette_i; j++) {
+		int i = j % silhouette_i;
+		float light[3];
+		light[0] = light_pos[0] - silhouette[3*i];
+		light[1] = light_pos[1] - silhouette[3*i + 1];
+		light[2] = light_pos[2] - silhouette[3*i + 2];
+		float magnitude = sqrtf(light[0]*light[0] + light[1]*light[1] + light[2]*light[2]);
+		light[0] /= magnitude;
+		light[1] /= magnitude;
+		light[2] /= magnitude;
+		glVertex3f(silhouette[3*i] - 10*light[0],
+			   silhouette[3*i + 1] - 10*light[1],
+			   silhouette[3*i + 2] - 10*light[2]);
+		glVertex3f(silhouette[3*i],
+			   silhouette[3*i + 1],
+			   silhouette[3*i + 2]);
+	}
+	glEnd();
+}
+
+void
 sg_render(struct scenegraph *scenegraph)
 {
 	glClearColor(0, 0, 0, 1);
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 	if (scenegraph->cam3d_enabled) {
 		float tan_fov_2 = tanf(scenegraph->fov/2.0 * M_PI/180.0);
 		float aspect = (float)width/(float)height;
@@ -119,6 +192,30 @@ sg_render(struct scenegraph *scenegraph)
 	for (size_t i = 0; i < scenegraph->num_render; i++) {
 		scenegraph->render[i](scenegraph);
 	}
+
+	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+	glDepthMask(GL_FALSE);
+	glStencilFunc(GL_ALWAYS, 0, 0xff);
+	glStencilOp(GL_KEEP,  GL_KEEP, GL_INVERT);
+
+	render_shadow_volumes(scenegraph);
+
+	glFrontFace(GL_CW);
+	render_shadow_volumes(scenegraph);
+	glFrontFace(GL_CCW);
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	glDepthMask(GL_TRUE);
+
+	glDepthFunc(GL_EQUAL);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+	glStencilFunc(GL_NOTEQUAL, 0, 0xff);
+	glDisable(GL_LIGHT0);
+	for (size_t i = 0; i < scenegraph->num_render; i++) {
+		scenegraph->render[i](scenegraph);
+	}
+	glEnable(GL_LIGHT0);
+	glDepthFunc(GL_LESS);
+	glStencilFunc(GL_EQUAL, 0, 0xff);
 }
 
 void
