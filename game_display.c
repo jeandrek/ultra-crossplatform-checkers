@@ -163,6 +163,12 @@ render_pieces_or_shadow_vol(struct scenegraph *scenegraph, int shadow_vol)
 			render_piece_shadow_volume(scenegraph,
 						   piece->x, piece->y,
 						   piece->z);
+			if (piece->type == KING) {
+				render_piece_shadow_volume(scenegraph,
+							   piece->x,
+							   piece->y + 0.065,
+							   piece->z);
+			}
 		} else
 			render_piece(scenegraph, piece->type,
 				     piece->x, piece->y, piece->z, color);

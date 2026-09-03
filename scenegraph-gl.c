@@ -157,6 +157,8 @@ render_piece_shadow_volume(struct scenegraph *scenegraph, float x, float y, floa
 	glEnd();
 }
 
+void render_shadow_volumes(struct scenegraph *);
+
 void
 sg_render(struct scenegraph *scenegraph)
 {
@@ -196,9 +198,12 @@ sg_render(struct scenegraph *scenegraph)
 	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 	glDepthMask(GL_FALSE);
 	glStencilFunc(GL_ALWAYS, 0, 0xff);
-	glStencilOp(GL_KEEP,  GL_KEEP, GL_INVERT);
+
+	glStencilOp(GL_KEEP,  GL_KEEP, GL_INCR);
 
 	render_shadow_volumes(scenegraph);
+
+	glStencilOp(GL_KEEP,  GL_KEEP, GL_DECR);
 
 	glFrontFace(GL_CW);
 	render_shadow_volumes(scenegraph);

@@ -74,6 +74,7 @@ main(int argc, char *argv[])
 		GLX_DEPTH_SIZE, 16,
 		GLX_STENCIL_SIZE, 8,
 		GLX_DOUBLEBUFFER, 1,
+		GLX_SAMPLE_BUFFERS, 1,
 		None
 	};
 	XSetWindowAttributes win_attribs;
