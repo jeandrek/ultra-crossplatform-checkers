@@ -241,6 +241,8 @@ game_mouse_move_event(int x, int y)
 	if (move_cam) {
 		game.sg.cam_dir_horiz = -2*M_PI*x/game.sg.width + M_PI;
 		game.sg.cam_dir_vert = -2*M_PI*y/game.sg.height + M_PI;
+		game.sg.cam_y = 1.5 * sinf(-game.sg.cam_dir_vert);
+		game.sg.cam_z = 1.5 * cosf(-game.sg.cam_dir_vert);
 		return;
 	}
 
