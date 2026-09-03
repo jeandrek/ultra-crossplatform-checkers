@@ -49,7 +49,7 @@ static const int can_repeat[NUM_BUTTONS] = {
 };
 
 static int repeat_delay[NUM_BUTTONS] = {0};
-
+int move_cam = 0;
 static void
 handle_button(int button)
 {
@@ -61,7 +61,6 @@ handle_button(int button)
 	}
 }
 
-int move_cam = 0;
 void
 input_handle(void)
 {
@@ -89,4 +88,7 @@ input_handle(void)
 #endif
 		else repeat_delay[i] = 0;
 	}
+#ifdef USE_X11
+	move_cam = button_state[INPUT_FREELOOK];
+#endif
 }

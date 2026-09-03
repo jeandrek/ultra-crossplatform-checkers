@@ -35,7 +35,8 @@ static int input_mapping[] = {
 	[INPUT_RIGHT] = XK_Right,
 	[INPUT_PAUSE] = XK_Escape,
 	[INPUT_ACCEPT] = XK_space,
-	[INPUT_BACK] = XK_BackSpace
+	[INPUT_BACK] = XK_BackSpace,
+	[INPUT_FREELOOK] = XK_Shift_L
 };
 
 #endif /* !_INPUT_MAPPING_H_ */
