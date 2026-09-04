@@ -51,6 +51,8 @@ struct rect {
 #define SG_OBJ_NOLIGHTDEPTH	(1<<0)
 #define SG_OBJ_TEXTURED		(1<<1)
 #define SG_OBJ_INDEXED		(1<<2)
+#define SG_OBJ_PROJ_SHADOW	(1<<3)
+#define SG_OBJ_RECEIVES_PROJ_SHADOW	(1<<4)
 
 struct sg_object {
 	uint32_t	color;

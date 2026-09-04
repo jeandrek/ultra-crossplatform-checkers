@@ -72,6 +72,7 @@ main(int argc, char *argv[])
 	int glx_attribs[] = {
 		GLX_RED_SIZE, 8, GLX_GREEN_SIZE, 8, GLX_BLUE_SIZE, 8,
 		GLX_DEPTH_SIZE, 16,
+		GLX_STENCIL_SIZE, 8,
 		GLX_DOUBLEBUFFER, 1,
 		None
 	};

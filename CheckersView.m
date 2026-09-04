@@ -46,6 +46,7 @@ static int8_t keycode_buttons[128];
 		NSOpenGLPFAColorSize, 24,
 		NSOpenGLPFAAlphaSize, 8,
 		NSOpenGLPFADepthSize, 24,
+		NSOpenGLPFAStencilSize, 8,
 		NSOpenGLPFAAccumSize, 0,
 		0
 	};

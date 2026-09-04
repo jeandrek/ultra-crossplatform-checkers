@@ -52,6 +52,7 @@ sg_init(int w, int h)
 	glEnable(GL_CULL_FACE);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_STENCIL_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -88,7 +89,7 @@ void
 sg_render(struct scenegraph *scenegraph)
 {
 	glClearColor(0, 0, 0, 1);
-	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 	if (scenegraph->cam3d_enabled) {
 		float tan_fov_2 = tanf(scenegraph->fov/2.0 * M_PI/180.0);
 		float aspect = (float)width/(float)height;
@@ -121,6 +122,16 @@ sg_render(struct scenegraph *scenegraph)
 	}
 }
 
+static void
+sg_draw_object(struct scenegraph *scenegraph, struct sg_object *obj)
+{
+	if (obj->flags & SG_OBJ_INDEXED)
+		glDrawElements(GL_TRIANGLES, obj->num_indices,
+			       GL_UNSIGNED_BYTE, obj->indices);
+	else
+		glDrawArrays(GL_TRIANGLES, 0, obj->num_vertices);
+}
+
 void
 sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 {
@@ -137,8 +148,11 @@ sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 		  ((obj->color >> 8) & 0xff)/255.0,
 		  ((obj->color >> 16) & 0xff)/255.0,
 		  (obj->color >> 24)/255.0);
+
+	if (obj->flags & SG_OBJ_RECEIVES_PROJ_SHADOW)
+		glStencilFunc(GL_EQUAL, 0, ~0);
+
 	glPushMatrix();
-	glTranslatef(obj->x, obj->y, obj->z);
 	if (obj->flags & SG_OBJ_TEXTURED) {
 		int stride = 8*sizeof (float);
 		glTexCoordPointer(2, GL_FLOAT, stride, obj->vertices);
@@ -149,12 +163,57 @@ sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 		glNormalPointer(GL_FLOAT, stride, obj->vertices);
 		glVertexPointer(3, GL_FLOAT, stride, &obj->vertices[3]);
 	}
-	if (obj->flags & SG_OBJ_INDEXED)
-		glDrawElements(GL_TRIANGLES, obj->num_indices,
-			       GL_UNSIGNED_BYTE, obj->indices);
-	else
-		glDrawArrays(GL_TRIANGLES, 0, obj->num_vertices);
+	if (obj->flags & SG_OBJ_PROJ_SHADOW) {
+		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+		glDepthMask(GL_FALSE);
+		glStencilOp(GL_KEEP, GL_INCR, GL_INCR);
+		glStencilFunc(GL_ALWAYS, 0, ~0);
+
+		glTranslatef(scenegraph->light0_x,
+			     scenegraph->light0_y,
+			     scenegraph->light0_z);
+		glRotatef(-90, 1, 0, 0);
+		{
+			float floor_dist =
+				scenegraph->light0_y - 0.1;
+
+			glTranslatef(0, 0, -floor_dist);
+			glScalef(1, 1, 0);
+			float persp[] = {
+				floor_dist, 0, 0, 0,
+				0, floor_dist, 0, 0,
+				0, 0, 1, -1,
+				0, 0, 0, 0
+			};
+			glMultMatrixf(persp);
+		}
+		glRotatef(90, 1, 0, 0);
+		glTranslatef(-scenegraph->light0_x,
+			     -scenegraph->light0_y,
+			     -scenegraph->light0_z);
+		glTranslatef(obj->x, obj->y, obj->z);
+		sg_draw_object(scenegraph, obj);
+
+		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+		glDepthMask(GL_TRUE);
+	} else {
+		glTranslatef(obj->x, obj->y, obj->z);
+		sg_draw_object(scenegraph, obj);
+	}
 	glPopMatrix();
+
+	if (obj->flags & SG_OBJ_RECEIVES_PROJ_SHADOW) {
+		glDisable(GL_LIGHT0);
+		glStencilFunc(GL_NOTEQUAL, 0, ~0);
+		glPushMatrix();
+		glTranslatef(obj->x, obj->y, obj->z);
+		sg_draw_object(scenegraph, obj);
+		glPopMatrix();
+		glStencilFunc(GL_ALWAYS, 0, ~0);
+		glEnable(GL_LIGHT0);
+	}
+
 	if (obj->flags & SG_OBJ_TEXTURED) {
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisable(GL_TEXTURE_2D);

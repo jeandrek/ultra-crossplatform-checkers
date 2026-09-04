@@ -76,7 +76,7 @@ render_board(struct scenegraph *scenegraph)
 {
 	struct sg_object obj;
 	obj.color = 0xffffffff;
-	obj.flags = model_board->flags;
+	obj.flags = model_board->flags | SG_OBJ_RECEIVES_PROJ_SHADOW;
 	obj.texture = &texture_board;
 	obj.vertices = model_board->vertices;
 	obj.num_vertices = model_board->num_vertices;
@@ -121,11 +121,13 @@ render_highlight(struct scenegraph *scenegraph)
 
 static void
 render_piece(struct scenegraph *scenegraph, int piece_type,
-	     float x, float y, float z, uint32_t color)
+	     float x, float y, float z, uint32_t color, int shadow)
 {
 	struct sg_object obj;
 	obj.color = color;
 	obj.flags = model_piece->flags;
+	if (shadow)
+		obj.flags |= SG_OBJ_PROJ_SHADOW;
 	obj.vertices = model_piece->vertices;
 	obj.num_vertices = model_piece->num_vertices;
 	obj.indices = model_piece->indices;
@@ -149,7 +151,7 @@ board_pos_to_world_pos(float *x, float *y, float *z, int i)
 }
 
 static void
-render_pieces(struct scenegraph *scenegraph)
+render_pieces_or_shadows(struct scenegraph *scenegraph, int shadow)
 {
 	for (struct piece *piece = pieces; piece != NULL; piece = piece->next) {
 		int selected =
@@ -157,11 +159,14 @@ render_pieces(struct scenegraph *scenegraph)
 			&& piece->player == user_player
 			&& piece->location == sel_square;
 		int color = colors[piece->player][selected];
+		if (selected && shadow)
+			continue;
 		render_piece(scenegraph, piece->type,
-			     piece->x, piece->y, piece->z, color);
+			     piece->x, piece->y, piece->z, color, shadow);
 	}
 
-	if (cur_mode != SELECT_PIECE && cur_mode != SELECT_MOVE) return;
+	if (shadow || (cur_mode != SELECT_PIECE && cur_mode != SELECT_MOVE))
+		return;
 
 	for (int i = 0; i < 64; i++) {
 		float x, y, z;
@@ -175,8 +180,21 @@ render_pieces(struct scenegraph *scenegraph)
 				 COLOR_PLAYER_1_SEL : COLOR_PLAYER_1);
 		color = HALF_ALPHA(color);
 		board_pos_to_world_pos(&x, &y, &z, i);
-		render_piece(scenegraph, sel_piece_type, x, y, z, color);
+		render_piece(scenegraph, sel_piece_type, x, y, z,
+			     color, shadow);
 	}
+}
+
+static void
+render_pieces(struct scenegraph *scenegraph)
+{
+	render_pieces_or_shadows(scenegraph, 0);
+}
+
+static void
+render_piece_shadows(struct scenegraph *scenegraph)
+{
+	render_pieces_or_shadows(scenegraph, 1);
 }
 
 static void
@@ -215,6 +233,7 @@ render_menu_button(struct scenegraph *scenegraph)
 }
 
 static void (*render_functions[])(struct scenegraph *) = {
+	render_piece_shadows,
 	render_board,
 	render_highlight,
 	render_pieces,
