@@ -56,6 +56,7 @@ public class MainActivity extends Activity {
 		checkers = new Checkers(this);
 
 		view = new GLSurfaceView(getApplicationContext());
+		view.setEGLConfigChooser(8, 8, 8, 0, 16, 8);
 		view.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View view, MotionEvent event) {
