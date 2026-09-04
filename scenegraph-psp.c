@@ -40,6 +40,7 @@
 #include <pspgu.h>
 #include <pspgum.h>
 
+#include "shadow.h"
 #include "scenegraph.h"
 #include "texture.h"
 
@@ -172,39 +173,11 @@ sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 	sceGuColor(obj->color);
 	sceGumPushMatrix();
 	if (obj->flags & SG_OBJ_PROJ_SHADOW) {
-		ScePspFVector3 light_pos = {
-			scenegraph->light0_x,
-			scenegraph->light0_y,
-			scenegraph->light0_z
-		};
 		sceGuPixelMask(0x00ffffff);
 		sceGuDepthMask(GU_TRUE);
 		sceGuStencilOp(GU_KEEP, GU_INCR, GU_INCR);
 		sceGuStencilFunc(GU_ALWAYS, 0, ~0);
-		sceGumTranslate(&light_pos);
-		sceGumRotateX(-M_PI/2);
-		{
-			ScePspFVector3 scale = {1, 1, 0};
-			float floor_dist =
-				scenegraph->light0_y - 0.1;
-			ScePspFVector3 floor_pos_light_space = {
-				0, 0, -floor_dist
-			};
-			sceGumTranslate(&floor_pos_light_space);
-			sceGumScale(&scale);
-			ScePspFMatrix4 persp = {
-				{floor_dist, 0, 0, 0},
-				{0, floor_dist, 0, 0},
-				{0, 0, 1, -1},
-				{0, 0, 0, 0}
-			};
-			sceGumMultMatrix(&persp);
-		}
-		sceGumRotateX(M_PI/2);
-		light_pos.x *= -1;
-		light_pos.y *= -1;
-		light_pos.z *= -1;
-		sceGumTranslate(&light_pos);
+		shadow_projection_matrix(scenegraph);
 	} else if (obj->flags & SG_OBJ_RECEIVES_PROJ_SHADOW) {
 		sceGuStencilFunc(GU_EQUAL, 0, ~0);
 	}

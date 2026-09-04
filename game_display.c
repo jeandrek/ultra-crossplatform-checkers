@@ -154,13 +154,15 @@ static void
 render_pieces_or_shadows(struct scenegraph *scenegraph, int shadow)
 {
 	for (struct piece *piece = pieces; piece != NULL; piece = piece->next) {
-		int selected =
+		uint32_t color;
+		int selected;
+		if (shadow && piece->location == sel_square)
+			continue;
+		selected =
 			(cur_mode == SELECT_PIECE || cur_mode == SELECT_MOVE)
 			&& piece->player == user_player
 			&& piece->location == sel_square;
-		int color = colors[piece->player][selected];
-		if (selected && shadow)
-			continue;
+		color = colors[piece->player][selected];
 		render_piece(scenegraph, piece->type,
 			     piece->x, piece->y, piece->z, color, shadow);
 	}
@@ -169,8 +171,8 @@ render_pieces_or_shadows(struct scenegraph *scenegraph, int shadow)
 		return;
 
 	for (int i = 0; i < 64; i++) {
+		uint32_t color;
 		float x, y, z;
-		int color;
 		if (!((sel_piece_moves >> i) & 1)) continue;
 		if (user_player == 0)
 			color = (cur_mode == SELECT_MOVE && i == sel_move ?

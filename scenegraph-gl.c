@@ -39,6 +39,7 @@
 #include <GL/gl.h>
 #endif
 
+#include "shadow.h"
 #include "scenegraph.h"
 #include "texture.h"
 
@@ -123,7 +124,7 @@ sg_render(struct scenegraph *scenegraph)
 }
 
 static void
-sg_draw_object(struct scenegraph *scenegraph, struct sg_object *obj)
+sg_render_object_geom(struct scenegraph *scenegraph, struct sg_object *obj)
 {
 	if (obj->flags & SG_OBJ_INDEXED)
 		glDrawElements(GL_TRIANGLES, obj->num_indices,
@@ -169,37 +170,14 @@ sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 		glStencilOp(GL_KEEP, GL_INCR, GL_INCR);
 		glStencilFunc(GL_ALWAYS, 0, ~0);
 
-		glTranslatef(scenegraph->light0_x,
-			     scenegraph->light0_y,
-			     scenegraph->light0_z);
-		glRotatef(-90, 1, 0, 0);
-		{
-			float floor_dist =
-				scenegraph->light0_y - 0.1;
-
-			glTranslatef(0, 0, -floor_dist);
-			glScalef(1, 1, 0);
-			float persp[] = {
-				floor_dist, 0, 0, 0,
-				0, floor_dist, 0, 0,
-				0, 0, 1, -1,
-				0, 0, 0, 0
-			};
-			glMultMatrixf(persp);
-		}
-		glRotatef(90, 1, 0, 0);
-		glTranslatef(-scenegraph->light0_x,
-			     -scenegraph->light0_y,
-			     -scenegraph->light0_z);
-		glTranslatef(obj->x, obj->y, obj->z);
-		sg_draw_object(scenegraph, obj);
-
+		shadow_projection_matrix(scenegraph);
+	}
+	glTranslatef(obj->x, obj->y, obj->z);
+	sg_render_object_geom(scenegraph, obj);
+	if (obj->flags & SG_OBJ_PROJ_SHADOW) {
 		glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 		glDepthMask(GL_TRUE);
-	} else {
-		glTranslatef(obj->x, obj->y, obj->z);
-		sg_draw_object(scenegraph, obj);
 	}
 	glPopMatrix();
 
@@ -208,7 +186,7 @@ sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 		glStencilFunc(GL_NOTEQUAL, 0, ~0);
 		glPushMatrix();
 		glTranslatef(obj->x, obj->y, obj->z);
-		sg_draw_object(scenegraph, obj);
+		sg_render_object_geom(scenegraph, obj);
 		glPopMatrix();
 		glStencilFunc(GL_ALWAYS, 0, ~0);
 		glEnable(GL_LIGHT0);
