@@ -81,6 +81,7 @@ sg_init_scenegraph(struct scenegraph *scenegraph)
 	sceGuDepthRange(65535, 0);
 	sceGuDepthFunc(GU_GEQUAL);
 	sceGuEnable(GU_DEPTH_TEST);
+	sceGuEnable(GU_STENCIL_TEST);
 	sceGuBlendFunc(GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
 	sceGuEnable(GU_BLEND);
 
@@ -103,7 +104,9 @@ sg_render(struct scenegraph *scenegraph)
 	sceGuStart(GU_DIRECT, display_list);
 	sceGuClearColor(GU_COLOR(0.0, 0.0, 0.0, 1.0));
 	sceGuClearDepth(0);
-	sceGuClear(GU_COLOR_BUFFER_BIT|GU_DEPTH_BUFFER_BIT);
+	sceGuClearStencil(0);
+	sceGuClear(GU_COLOR_BUFFER_BIT|GU_DEPTH_BUFFER_BIT
+		   |GU_STENCIL_BUFFER_BIT);
 	if (scenegraph->cam3d_enabled) {
 		sceGumMatrixMode(GU_PROJECTION);
 		sceGumLoadIdentity();
@@ -128,7 +131,7 @@ sg_render(struct scenegraph *scenegraph)
 			   &light0_pos);
 		sceGuLightColor(0, GU_DIFFUSE, scenegraph->light0_color);
 		sceGuLightAtt(0, 1, 0, 0);
-		sceGuAmbient(GU_COLOR(0.1, 0.1, 0.1, 1));
+		sceGuAmbient(GU_COLOR(0.2, 0.2, 0.2, 1));
 		sceGuSpecular(1);
 	}
 	sceGumTranslate(&translate);
@@ -168,6 +171,43 @@ sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 	}
 	sceGuColor(obj->color);
 	sceGumPushMatrix();
+	if (obj->flags & SG_OBJ_PROJ_SHADOW) {
+		ScePspFVector3 light_pos = {
+			scenegraph->light0_x,
+			scenegraph->light0_y,
+			scenegraph->light0_z
+		};
+		sceGuPixelMask(0x00ffffff);
+		sceGuDepthMask(GU_TRUE);
+		sceGuStencilOp(GU_KEEP, GU_INCR, GU_INCR);
+		sceGuStencilFunc(GU_ALWAYS, 0, ~0);
+		sceGumTranslate(&light_pos);
+		sceGumRotateX(-M_PI/2);
+		{
+			ScePspFVector3 scale = {1, 1, 0};
+			float floor_dist =
+				scenegraph->light0_y - 0.1;
+			ScePspFVector3 floor_pos_light_space = {
+				0, 0, -floor_dist
+			};
+			sceGumTranslate(&floor_pos_light_space);
+			sceGumScale(&scale);
+			ScePspFMatrix4 persp = {
+				{floor_dist, 0, 0, 0},
+				{0, floor_dist, 0, 0},
+				{0, 0, 1, -1},
+				{0, 0, 0, 0}
+			};
+			sceGumMultMatrix(&persp);
+		}
+		sceGumRotateX(M_PI/2);
+		light_pos.x *= -1;
+		light_pos.y *= -1;
+		light_pos.z *= -1;
+		sceGumTranslate(&light_pos);
+	} else if (obj->flags & SG_OBJ_RECEIVES_PROJ_SHADOW) {
+		sceGuStencilFunc(GU_EQUAL, 0, ~0);
+	}
 	sceGumTranslate(&translate);
 	sceGumDrawArray(GU_TRIANGLES, vert_type,
 			obj->flags & SG_OBJ_INDEXED ?
@@ -175,6 +215,22 @@ sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 			obj->flags & SG_OBJ_INDEXED ?
 			obj->indices : NULL,
 			obj->vertices);
+	if (obj->flags & SG_OBJ_PROJ_SHADOW) {
+		sceGuPixelMask(0);
+		sceGuDepthMask(GU_FALSE);
+		sceGuStencilOp(GU_KEEP, GU_KEEP, GU_KEEP);
+	} else if (obj->flags & SG_OBJ_RECEIVES_PROJ_SHADOW) {
+		sceGuStencilFunc(GU_NOTEQUAL, 0, ~0);
+		sceGuDisable(GU_LIGHT0);
+		sceGumDrawArray(GU_TRIANGLES, vert_type,
+				obj->flags & SG_OBJ_INDEXED ?
+				obj->num_indices : obj->num_vertices,
+				obj->flags & SG_OBJ_INDEXED ?
+				obj->indices : NULL,
+				obj->vertices);
+		sceGuEnable(GU_LIGHT0);
+		sceGuStencilFunc(GU_ALWAYS, 0, ~0);
+	}
 	sceGumPopMatrix();
 	if (obj->flags & SG_OBJ_TEXTURED)	sceGuDisable(GU_TEXTURE_2D);
 	if (obj->flags & SG_OBJ_NOLIGHTDEPTH) {
