@@ -56,6 +56,9 @@ sg_init(int w, int h)
 	glEnable(GL_BLEND);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
+#ifdef USE_SHADERS
+	sg_shaders_init();
+#endif
 }
 
 void
@@ -111,6 +114,9 @@ sg_render(struct scenegraph *scenegraph)
 			scenegraph->light0_x, scenegraph->light0_y,
 			scenegraph->light0_z, 1
 		};
+#ifdef USE_SHADERS
+		sg_shaders_set_lighting_enabled(1);
+#endif
 		glEnable(GL_LIGHTING);
 		glEnable(GL_LIGHT0);
 		glEnable(GL_COLOR_MATERIAL);
@@ -125,10 +131,16 @@ void
 sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 {
 	if (obj->flags & SG_OBJ_NOLIGHTDEPTH) {
+#ifdef USE_SHADERS
+		sg_shaders_set_lighting_enabled(0);
+#endif
 		glDisable(GL_LIGHTING);
 		glDisable(GL_DEPTH_TEST);
 	}
 	if (obj->flags & SG_OBJ_TEXTURED) {
+#ifdef USE_SHADERS
+		sg_shaders_set_texturing_enabled(1);
+#endif
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, obj->texture->gl_tex);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -158,9 +170,15 @@ sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)
 	if (obj->flags & SG_OBJ_TEXTURED) {
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glDisable(GL_TEXTURE_2D);
+#ifdef USE_SHADERS
+		sg_shaders_set_texturing_enabled(0);
+#endif
 	}
 	if (obj->flags & SG_OBJ_NOLIGHTDEPTH) {
 		glEnable(GL_LIGHTING);
+#ifdef USE_SHADERS
+		sg_shaders_set_lighting_enabled(1);
+#endif
 		glEnable(GL_DEPTH_TEST);
 	}
 }

@@ -115,6 +115,9 @@ sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 #else
 	float aspect = (float)scenegraph->width / (float)scenegraph->height;
 
+#ifdef USE_SHADERS
+	sg_shaders_set_lighting_enabled(0);
+#endif
 	glDisable(GL_LIGHTING);
 	glDisable(GL_DEPTH_TEST);
 	glDisableClientState(GL_NORMAL_ARRAY);
@@ -133,6 +136,9 @@ sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 		 sprite->scale * sprite->height/scenegraph->height, 1);
 
 	if (sprite->texture != NULL) {
+#ifdef USE_SHADERS
+		sg_shaders_set_texturing_enabled(1);
+#endif
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, sprite->texture->gl_tex);
 	}
@@ -150,9 +156,16 @@ sprite_draw(struct scenegraph *scenegraph, struct sprite *sprite)
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 
-	if (sprite->texture != NULL)
+	if (sprite->texture != NULL) {
 		glDisable(GL_TEXTURE_2D);
+#ifdef USE_SHADERS
+		sg_shaders_set_texturing_enabled(0);
+#endif
+	}
 	glEnable(GL_LIGHTING);
+#ifdef USE_SHADERS
+	sg_shaders_set_lighting_enabled(1);
+#endif
 	glEnable(GL_DEPTH_TEST);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);

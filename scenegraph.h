@@ -71,6 +71,11 @@ void	sg_init_scenegraph(struct scenegraph *scenegraph);
 void	sg_update(struct scenegraph *scenegraph);
 void	sg_render(struct scenegraph *scenegraph);
 void	sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj);
+#ifdef USE_SHADERS
+void	sg_shaders_init(void);
+void	sg_shaders_set_lighting_enabled(int enabled);
+void	sg_shaders_set_texturing_enabled(int enabled);
+#endif
 
 #ifdef __psp__
 extern uint32_t display_list[262144];
