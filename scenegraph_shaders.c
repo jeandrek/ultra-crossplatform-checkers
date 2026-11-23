@@ -59,7 +59,7 @@ static const char *vert_src =
 	"  diffuse_fac = clamp(dot(normal, light_dir), 0, 1);\n"
 	"  if (lighting_enabled == 1) {\n"
 	"    color = gl_FrontLightProduct[0].diffuse * vec4(vec3(diffuse_fac), 1);\n"
-	"    color += gl_FrontLightModelProduct.sceneColor;\n"
+	"    color += vec4(vec3(gl_FrontLightModelProduct.sceneColor), 0);\n"
 	"    color = clamp(color, 0, 1);\n"
 	"  }\n"
 	"  gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
