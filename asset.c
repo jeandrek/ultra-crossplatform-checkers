@@ -55,7 +55,8 @@ asset_fopen(const char *name, int type)
 				      CFStringCreateWithCString(NULL, name, 0),
 				      NULL,
 				      type == TEXTURE ? CFSTR("textures")
-				      : CFSTR("models"));
+				      : type == MODEL ? CFSTR("models")
+				      : CFSTR("shaders"));
 	if (url == NULL)
 		exit(1);
 	CFURLGetFileSystemRepresentation(url, 1, (uint8_t *)path, 128);

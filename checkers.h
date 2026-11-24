@@ -30,12 +30,15 @@
 #if defined(__ANDROID__)
 #define TEXTURES_DIR	"textures/"
 #define MODELS_DIR	"models/"
+#define SHADERS_DIR	"shaders/"
 #elif defined(__APPLE__)
 #define TEXTURES_DIR	""
 #define MODELS_DIR	""
+#define SHADERS_DIR	""
 #else
 #define TEXTURES_DIR	"assets/textures/"
 #define MODELS_DIR	"assets/models/"
+#define SHADERS_DIR	"assets/shaders/"
 #endif
 
 #include "scenegraph.h"

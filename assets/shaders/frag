@@ -1,0 +1,28 @@
+#version 140
+uniform bool lighting_enabled;
+uniform bool texturing_enabled;
+uniform bool shadows_enabled;
+uniform sampler2D texture;
+uniform sampler2DShadow shadow_map;
+//varying vec4 pos_eye;
+//varying vec3 normal;
+varying vec2 texcoord;
+varying vec3 shadow_texcoord;
+varying vec4 color;
+varying float diffuse_fac;
+void main()
+{
+  gl_FragColor = color;
+  float d = diffuse_fac;
+  if (lighting_enabled) {
+    if (shadows_enabled) {
+      d *= shadow2D(shadow_map, shadow_texcoord).r;
+    }
+    gl_FragColor = gl_FrontLightProduct[0].diffuse * vec4(vec3(d), 1);
+    gl_FragColor += vec4(vec3(gl_FrontLightModelProduct.sceneColor), 0);
+    gl_FragColor = clamp(gl_FragColor, 0, 1);
+  }
+  if (texturing_enabled) {
+    gl_FragColor *= texture2D(texture, texcoord);
+  }
+}

@@ -55,11 +55,11 @@ static GLuint view_location;
 static GLuint shadow_view_location;
 static GLuint shadow_proj_location;
 
+static const char dummy_pixels[SHADOW_MAP_SIZE*SHADOW_MAP_SIZE*4] = {0};
+
 void
 sg_shadow_mapping_init(void)
 {
-	char pixels[SHADOW_MAP_SIZE*SHADOW_MAP_SIZE*4];
-
 	glGenFramebuffers(1, &shadow_fbo);
 	glGenTextures(1, &shadow_map_tex);
 
@@ -74,7 +74,7 @@ sg_shadow_mapping_init(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
 		     SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 0,
-		     GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, pixels);
+		     GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, dummy_pixels);
 	glActiveTexture(GL_TEXTURE0);
 
 	shadows_enabled_location = glGetUniformLocation(sg_program, "shadows_enabled");

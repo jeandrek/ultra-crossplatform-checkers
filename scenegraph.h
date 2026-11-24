@@ -73,6 +73,8 @@ void	sg_render(struct scenegraph *scenegraph);
 void	sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj);
 #ifdef USE_SHADERS
 void	sg_render_for_shadow(struct scenegraph *scenegraph);
+unsigned int	sg_shaders_compile_program(const char *vert_name,
+					   const char *frag_name);
 void	sg_shaders_init(void);
 void	sg_shaders_set_lighting_enabled(int enabled);
 void	sg_shaders_set_texturing_enabled(int enabled);

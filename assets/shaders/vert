@@ -1,0 +1,25 @@
+#version 140
+uniform mat4 view;
+uniform mat4 shadow_view;
+uniform mat4 shadow_proj;
+//varying vec4 pos_eye;
+//varying vec3 normal;
+varying vec2 texcoord;
+varying vec3 shadow_texcoord;
+varying vec4 color;
+varying float diffuse_fac;
+void main()
+{
+  vec4 pos_eye;
+  vec3 normal;
+  pos_eye = gl_ModelViewMatrix * gl_Vertex;
+  normal = gl_NormalMatrix * gl_Normal;
+  texcoord = vec2(gl_MultiTexCoord0);
+  vec4 pos_shadow = shadow_proj * shadow_view * inverse(view) * pos_eye;
+  pos_shadow = vec4(vec3(pos_shadow.x/pos_shadow.w, pos_shadow.y/pos_shadow.w, pos_shadow.z/pos_shadow.w), 1);
+  shadow_texcoord = vec3(pos_shadow.x*0.5, pos_shadow.y*0.5, pos_shadow.z*0.5) + vec3(0.5, 0.5, 0.5);
+  color = gl_Color;
+  vec3 light_dir = normalize(vec3(gl_LightSource[0].position - pos_eye));
+  diffuse_fac = clamp(dot(normal, light_dir), 0, 1);
+  gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+}

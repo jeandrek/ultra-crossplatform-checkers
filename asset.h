@@ -29,6 +29,7 @@
 
 #define TEXTURE	0
 #define MODEL	1
+#define SHADER	2
 
 void *asset_read(const char *name, int type, size_t *size);
 void asset_free(void *data);

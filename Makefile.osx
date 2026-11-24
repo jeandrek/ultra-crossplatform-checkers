@@ -8,7 +8,8 @@ Checkers.app: $(PROGRAM)
 	mkdir -p $@/Contents/MacOS
 	mkdir -p $@/Contents/Resources
 	cp cocoa/Info.plist $@/Contents
-	cp -r cocoa/English.lproj assets/textures assets/models $@/Contents/Resources
+	cp -r cocoa/English.lproj assets/textures assets/models \
+		assets/shaders $@/Contents/Resources
 	cp $< $@/Contents/MacOS
 
 $(PROGRAM): $(OBJECTS)
