@@ -162,6 +162,9 @@ render_pieces(struct scenegraph *scenegraph)
 	}
 
 	if (cur_mode != SELECT_PIECE && cur_mode != SELECT_MOVE) return;
+#ifdef USE_SHADERS
+	if (sg_rendering_for_shadow) return;
+#endif
 
 	for (int i = 0; i < 64; i++) {
 		float x, y, z;

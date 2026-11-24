@@ -44,6 +44,8 @@
 
 static int width, height;
 
+int sg_rendering_for_shadow = 0;
+
 void
 sg_init(int w, int h)
 {
@@ -58,6 +60,7 @@ sg_init(int w, int h)
 	glEnableClientState(GL_NORMAL_ARRAY);
 #ifdef USE_SHADERS
 	sg_shaders_init();
+	sg_shadow_mapping_init();
 #endif
 }
 
@@ -93,13 +96,17 @@ sg_render(struct scenegraph *scenegraph)
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	if (scenegraph->cam3d_enabled) {
+#ifdef USE_SHADERS
+		sg_shadow_mapping_render_map(scenegraph);
+#endif
 		float tan_fov_2 = tanf(scenegraph->fov/2.0 * M_PI/180.0);
 		float aspect = (float)width/(float)height;
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glFrustum(-0.1 * tan_fov_2 * aspect,
-			  0.1 * tan_fov_2 * aspect,
-			  -0.1 * tan_fov_2, 0.1 * tan_fov_2,
+		glFrustum(-scenegraph->near_plane * tan_fov_2 * aspect,
+			  scenegraph->near_plane * tan_fov_2 * aspect,
+			  -scenegraph->near_plane * tan_fov_2,
+			  scenegraph->near_plane * tan_fov_2,
 			  scenegraph->near_plane,
 			  scenegraph->far_plane);
 		glMatrixMode(GL_MODELVIEW);
@@ -122,10 +129,25 @@ sg_render(struct scenegraph *scenegraph)
 		glEnable(GL_COLOR_MATERIAL);
 		glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
 	}
+#ifdef USE_SHADERS
+	sg_shadow_mapping_begin_render();
+#endif
 	for (size_t i = 0; i < scenegraph->num_render; i++) {
 		scenegraph->render[i](scenegraph);
 	}
 }
+
+#ifdef USE_SHADERS
+void
+sg_render_for_shadow(struct scenegraph *scenegraph)
+{
+	sg_rendering_for_shadow = 1;
+	for (size_t i = 0; i < scenegraph->num_render; i++) {
+		scenegraph->render[i](scenegraph);
+	}
+	sg_rendering_for_shadow = 0;
+}
+#endif
 
 void
 sg_render_object(struct scenegraph *scenegraph, struct sg_object *obj)

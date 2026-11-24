@@ -39,12 +39,17 @@
 #include <GL/glext.h>
 #endif
 
+#include "scenegraph.h"
+
 static const char *vert_src =
 	"#version 140\n"
-	"uniform int lighting_enabled;\n"
+	"uniform mat4 view;\n"
+	"uniform mat4 shadow_view;\n"
+	"uniform mat4 shadow_proj;\n"
 	//"varying vec4 pos_eye;\n"
 	//"varying vec3 normal;\n"
 	"varying vec2 texcoord;\n"
+	"varying vec3 shadow_texcoord;\n"
 	"varying vec4 color;\n"
 	"varying float diffuse_fac;\n"
 	"void main()\n"
@@ -54,30 +59,41 @@ static const char *vert_src =
 	"  pos_eye = gl_ModelViewMatrix * gl_Vertex;\n"
 	"  normal = gl_NormalMatrix * gl_Normal;\n"
 	"  texcoord = vec2(gl_MultiTexCoord0);\n"
+	"  vec4 pos_shadow = shadow_proj * shadow_view * inverse(view) * pos_eye;\n"
+	"  pos_shadow = vec4(vec3(pos_shadow.x/pos_shadow.w, pos_shadow.y/pos_shadow.w, pos_shadow.z/pos_shadow.w), 1);\n"
+	"  shadow_texcoord = vec3(pos_shadow.x*0.5, pos_shadow.y*0.5, pos_shadow.z*0.5) + vec3(0.5, 0.5, 0.5);\n"
 	"  color = gl_Color;\n"
 	"  vec3 light_dir = normalize(vec3(gl_LightSource[0].position - pos_eye));\n"
 	"  diffuse_fac = clamp(dot(normal, light_dir), 0, 1);\n"
-	"  if (lighting_enabled == 1) {\n"
-	"    color = gl_FrontLightProduct[0].diffuse * vec4(vec3(diffuse_fac), 1);\n"
-	"    color += vec4(vec3(gl_FrontLightModelProduct.sceneColor), 0);\n"
-	"    color = clamp(color, 0, 1);\n"
-	"  }\n"
 	"  gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n"
 	"}\n";
 
 static const char *frag_src =
 	"#version 140\n"
-	"uniform int texturing_enabled;\n"
+	"uniform bool lighting_enabled;\n"
+	"uniform bool texturing_enabled;\n"
+	"uniform bool shadows_enabled;\n"
 	"uniform sampler2D texture;\n"
+	"uniform sampler2DShadow shadow_map;\n"
 	//"varying vec4 pos_eye;\n"
 	//"varying vec3 normal;\n"
 	"varying vec2 texcoord;\n"
+	"varying vec3 shadow_texcoord;\n"
 	"varying vec4 color;\n"
 	"varying float diffuse_fac;\n"
 	"void main()\n"
 	"{\n"
 	"  gl_FragColor = color;\n"
-	"  if (texturing_enabled == 1) {\n"
+	"  float d = diffuse_fac;\n"
+	"  if (lighting_enabled) {\n"
+	"    if (shadows_enabled) {\n"
+	"      d *= shadow2D(shadow_map, shadow_texcoord).r;\n"
+	"    }\n"
+	"    gl_FragColor = gl_FrontLightProduct[0].diffuse * vec4(vec3(d), 1);\n"
+	"    gl_FragColor += vec4(vec3(gl_FrontLightModelProduct.sceneColor), 0);\n"
+	"    gl_FragColor = clamp(gl_FragColor, 0, 1);\n"
+	"  }\n"
+	"  if (texturing_enabled) {\n"
 	"    gl_FragColor *= texture2D(texture, texcoord);\n"
 	"  }\n"
 	"}\n";
@@ -85,6 +101,8 @@ static const char *frag_src =
 static GLuint lighting_enabled_location;
 static GLuint texturing_enabled_location;
 static GLuint texture_location;
+
+GLuint sg_program;
 
 static GLuint
 compile_shader(GLenum type, const char *src)
@@ -141,9 +159,11 @@ sg_shaders_init(void)
 		glGetUniformLocation(program, "texturing_enabled");
 	texture_location = glGetUniformLocation(program, "texture");
 
+	glUseProgram(program);
+
 	glUniform1i(texture_location, 0);
 
-	glUseProgram(program);
+	sg_program = program;
 }
 
 void
