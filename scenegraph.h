@@ -76,6 +76,7 @@ void	sg_render_for_shadow(struct scenegraph *scenegraph);
 unsigned int	sg_shaders_compile_program(const char *vert_name,
 					   const char *frag_name);
 void	sg_shaders_init(void);
+int	sg_using_scenegraph_program(void);
 void	sg_shaders_set_lighting_enabled(int enabled);
 void	sg_shaders_set_texturing_enabled(int enabled);
 void	sg_shadow_mapping_init(void);
@@ -86,6 +87,7 @@ void	sg_shadow_mapping_set_shadows_enabled(int enabled);
 extern int	sg_rendering_for_shadow;
 
 extern unsigned	sg_program;
+
 #endif
 
 #ifdef __psp__

@@ -125,14 +125,24 @@ sg_shaders_init(void)
 
 }
 
+int
+sg_using_scenegraph_program(void)
+{
+	int p;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &p);
+	return p == sg_program;
+}
+
 void
 sg_shaders_set_lighting_enabled(int enabled)
 {
+	if (!sg_using_scenegraph_program()) return;
 	glUniform1i(lighting_enabled_location, enabled);
 }
 
 void
 sg_shaders_set_texturing_enabled(int enabled)
 {
+	if (!sg_using_scenegraph_program()) return;
 	glUniform1i(texturing_enabled_location, enabled);
 }

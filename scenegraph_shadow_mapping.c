@@ -42,9 +42,12 @@
 #include <GL/glext.h>
 #endif
 
+#include "checkers.h"
 #include "scenegraph.h"
 
 #define SHADOW_MAP_SIZE		1024
+
+static GLuint shadow_map_program;
 
 static GLuint shadow_fbo;
 static GLuint shadow_map_tex;
@@ -85,6 +88,10 @@ sg_shadow_mapping_init(void)
 
 	glUniform1i(shadows_enabled_location, 1);
 	glUniform1i(shadow_map_location, 1);
+
+	shadow_map_program =
+		sg_shaders_compile_program(SHADERS_DIR "vert-shadow-map",
+					   SHADERS_DIR "frag-shadow-map");
 }
 
 void
@@ -96,6 +103,8 @@ sg_shadow_mapping_render_map(struct scenegraph *scenegraph)
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, shadow_fbo);
 	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
 			       shadow_map_tex, 0);
+
+	glUseProgram(shadow_map_program);
 
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
@@ -112,8 +121,6 @@ sg_shadow_mapping_render_map(struct scenegraph *scenegraph)
 
 	glGetFloatv(GL_MODELVIEW_MATRIX, view);
 	glGetFloatv(GL_PROJECTION_MATRIX, proj);
-	glUniformMatrix4fv(shadow_view_location, 1, GL_FALSE, view);
-	glUniformMatrix4fv(shadow_proj_location, 1, GL_FALSE, proj);
 
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(1, 8);
@@ -131,7 +138,12 @@ sg_shadow_mapping_render_map(struct scenegraph *scenegraph)
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 
+	glUseProgram(sg_program);
+
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+	glUniformMatrix4fv(shadow_view_location, 1, GL_FALSE, view);
+	glUniformMatrix4fv(shadow_proj_location, 1, GL_FALSE, proj);
 }
 
 void
@@ -146,5 +158,6 @@ sg_shadow_mapping_begin_render(void)
 void
 sg_shadow_mapping_set_shadows_enabled(int enabled)
 {
+	if (!sg_using_scenegraph_program()) return;
 	glUniform1i(shadows_enabled_location, enabled);
 }
